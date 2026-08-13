@@ -1,0 +1,14 @@
+# Repository policy: only the final documentation package is versioned.
+*
+
+# Git policy itself and project entry point.
+!.gitignore
+!README.md
+
+# Approved Markdown documentation.
+!docs/
+!docs/*.md
+
+# Approved standalone presentation.
+!presentation/
+!presentation/candidate-cms-presentation.html
