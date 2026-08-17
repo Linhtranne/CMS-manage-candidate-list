@@ -15,6 +15,14 @@ MVP kết nối đúng **một hộp thư chung chính danh**, ví dụ `ungvien
 
 Provider có thể là Microsoft 365, Google Workspace hoặc SMTP/IMAP doanh nghiệp. Adapter phải giữ cùng một hợp đồng nghiệp vụ để không khóa hệ thống vào nhà cung cấp.
 
+### Điều kiện email chính danh trước go-live
+
+- Miền gửi và hộp thư phải được chủ sở hữu DNS/tenant xác minh; SPF khai báo đúng nhà cung cấp gửi thực tế, DKIM được bật ký và DMARC đạt alignment cho luồng gửi production.
+- `From` phải là hộp thư chung hoặc alias đã được phê duyệt. `Reply-To` phải quay về hộp thư chung/alias đã xác minh để phản hồi đi vào CMS; không giả mạo địa chỉ hiển thị của miền chưa xác minh.
+- Envelope sender/bounce address và webhook hoặc poller phải cho phép ghi nhận delayed bounce. Provider acceptance không được trình bày như bằng chứng delivered.
+- IT/Security lưu owner của DNS/tenant, bằng chứng cấu hình, kết quả gửi thử có SPF/DKIM/DMARC pass và lịch kiểm tra lại. Thay provider, miền hoặc alias phải chạy lại gate này.
+- Chính sách DMARC cuối cùng và lộ trình nâng mức bảo vệ phải do chủ sở hữu miền phê duyệt dựa trên toàn bộ nguồn gửi hợp lệ; CMS không tự sửa DNS.
+
 ## 3. Luồng gửi đi
 
 ```mermaid

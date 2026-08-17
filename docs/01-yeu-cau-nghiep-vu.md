@@ -49,7 +49,7 @@ Module này chỉ giữ dữ liệu khách hàng/đơn hàng cần cho cung ứn
 
 - Khởi tạo lộ trình từ `SupplyJourneyTemplate` phù hợp với nơi cư trú, tuyến visa, trường hợp tuyển mới/chuyển việc và, khi cần, ngành/nghề.
 - Theo dõi xác nhận nhận việc, hợp đồng/giấy tờ, COE, visa, đào tạo trước xuất cảnh, kế hoạch xuất cảnh, đã sang Nhật, doanh nghiệp tiếp nhận và hoàn tất cung ứng.
-- Cho phép mốc không áp dụng được đánh dấu `WAIVED/NOT_APPLICABLE`; không ép ứng viên đang ở Nhật đi qua toàn bộ luồng xuất cảnh từ Việt Nam.
+- Mốc nằm ngoài bối cảnh được bỏ khỏi template hoặc đánh dấu `NOT_APPLICABLE` kèm lý do; `WAIVED` chỉ dùng cho miễn trừ có thẩm quyền đối với mốc vốn phải áp dụng, bắt buộc ghi lý do, người duyệt và audit. Không ép ứng viên đang ở Nhật đi qua toàn bộ luồng xuất cảnh từ Việt Nam.
 - Sinh việc cần làm, hạn xử lý, cảnh báo trễ và người phụ trách.
 - Cho phép xử lý nộp lại, tạm dừng, rút lui, đổi kế hoạch hoặc blocker mà không làm mất lịch sử.
 - Ngày/chặng bay và mã đặt chỗ, nếu cần lưu, chỉ là trường tùy chọn của mốc **Kế hoạch xuất cảnh**, không phải module nghiệp vụ riêng.

@@ -38,7 +38,7 @@ Test logic thuần dùng unit test/factory nhỏ; constraint, transaction và pe
 
 **Given** application được xác nhận `PASSED`.  
 **When** điều phối khởi tạo Supply Journey.  
-**Then** chỉ có tối đa một lộ trình hiệu lực và có các milestone chuẩn từ xác nhận nhận việc đến doanh nghiệp Nhật tiếp nhận/hoàn tất cung ứng; không bắt buộc thực thể chuyến bay riêng.
+**Then** Candidate chỉ có tối đa một lộ trình hiệu lực kể cả khi đã đỗ nhiều Application, và journey có các milestone từ xác nhận nhận việc đến doanh nghiệp Nhật tiếp nhận/hoàn tất cung ứng; không bắt buộc thực thể chuyến bay riêng.
 
 ### AC-05 — Gửi email không trùng
 
@@ -164,7 +164,49 @@ Test logic thuần dùng unit test/factory nhỏ; constraint, transaction và pe
 
 **Given** một ứng viên tuyển mới từ Việt Nam và một ứng viên đang ở Nhật chuyển việc.  
 **When** hai SupplyJourney được khởi tạo.  
-**Then** journey đầu có các mốc COE/visa/xuất cảnh phù hợp; journey thứ hai không bị ép qua mốc xuất cảnh và mọi mốc waived có lý do/audit.
+**Then** journey đầu có các mốc COE/visa/xuất cảnh phù hợp; journey thứ hai không bị ép qua mốc xuất cảnh, mốc ngoài bối cảnh là `NOT_APPLICABLE` có lý do, còn mọi `WAIVED` đều có lý do, người duyệt và audit.
+
+### AC-26 — Xác thực email chính danh
+
+**Given** miền, provider và hộp thư chung dự kiến dùng ở production.  
+**When** IT gửi email thử nghiệm đến hộp kiểm soát và nhận reply/bounce.  
+**Then** `From`/`Reply-To` đúng địa chỉ đã duyệt, SPF/DKIM pass, DMARC đạt alignment, phản hồi được ingest một lần và bằng chứng cấu hình có owner/ngày kiểm tra.
+
+### AC-27 — Quyền riêng tư và chia sẻ hồ sơ sang Nhật
+
+**Given** một ứng viên được thu thập/import và chuẩn bị giới thiệu cho khách hàng hoặc đối tác tại Nhật.  
+**When** nhân viên thực hiện chia sẻ hồ sơ.  
+**Then** hệ thống truy được phiên bản thông báo/chính sách áp dụng, mục đích, phạm vi dữ liệu tối thiểu, người nhận, actor và thời điểm; trường hợp chưa đủ phê duyệt/căn cứ theo policy bị chặn hoặc đưa vào review có owner.
+
+### AC-28 — Saved view, URL và lớp hồ sơ
+
+**Given** người dùng đã chọn filter, sort, trang và mở một record trong lớp chi tiết.  
+**When** tải lại URL hoặc quay lại từ trang chi tiết.  
+**Then** hệ thống khôi phục đúng ngữ cảnh được phép chia sẻ, không làm lộ PII hoặc record ngoài scope.
+
+### AC-29 — Hạn chế icon và tín hiệu trạng thái
+
+**Given** một màn hình list, form hoặc detail hoàn chỉnh.  
+**When** kiểm tra primary action, navigation, row action và status.  
+**Then** nghiệp vụ quan trọng dùng nhãn chữ; không có emoji/cờ/máy bay trang trí; icon-only hợp lệ có accessible name/tooltip; trạng thái không phụ thuộc màu/icon duy nhất.
+
+### AC-30 — Bàn phím và tablet
+
+**Given** người dùng thao tác bằng bàn phím hoặc viewport tablet.  
+**When** điều hướng navigation, filter, table, lớp chi tiết, dialog và form.  
+**Then** đủ thao tác cốt lõi, focus nhìn thấy/không bị che, lớp chi tiết trả focus đúng nơi mở và layout không làm mất primary action.
+
+### AC-31 — Xung đột cập nhật
+
+**Given** hai nhân viên mở cùng một record.  
+**When** người thứ hai lưu trên version cũ.  
+**Then** API từ chối ghi đè im lặng và UI hiển thị dữ liệu đã thay đổi cùng hành động tải lại an toàn.
+
+### AC-32 — Trạng thái tác vụ nền
+
+**Given** import, export, report hoặc gửi email chạy bất đồng bộ.  
+**When** job đang chạy, thành công một phần hoặc thất bại.  
+**Then** UI dùng nhãn trạng thái chính xác, không báo hoàn tất khi mới xếp hàng, giữ được chi tiết lỗi và cho retry an toàn theo quyền.
 
 ## 3. Gate phát hành
 
@@ -175,6 +217,7 @@ Test logic thuần dùng unit test/factory nhỏ; constraint, transaction và pe
 - Không có lỗ hổng critical/high chưa có quyết định chấp nhận rủi ro.
 - Backup mới và lần restore test còn hiệu lực.
 - Monitoring/alert/runbook cho thay đổi mới đã sẵn sàng.
+- Email production đạt gate SPF/DKIM/DMARC và reply/bounce; privacy notice, mục đích xử lý và quy tắc chia sẻ sang Nhật đã được owner có thẩm quyền duyệt.
 - Product owner và đại diện từng bộ phận ký nghiệm thu UAT.
 
 ## 4. Kiểm thử tải trước go-live

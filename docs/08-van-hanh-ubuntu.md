@@ -91,7 +91,7 @@ Restore test tối thiểu theo lịch phải khôi phục cả DB và tệp, sa
 - API error rate, latency P50/P95/P99 và saturation.
 - PostgreSQL connections, slow query, locks, disk và replication/PITR lag.
 - Queue depth, tuổi job lâu nhất, retry, DLQ.
-- Email sync delay, bounce/failure rate, webhook/poller health.
+- Email sync delay, bounce/failure rate, webhook/poller health; tỷ lệ SPF/DKIM/DMARC pass/alignment và thay đổi bất thường về deliverability theo dữ liệu provider/report sẵn có.
 - Object storage capacity, scan backlog và lỗi signed URL.
 - CPU, RAM, disk inode, TLS expiry và backup freshness.
 
@@ -104,7 +104,7 @@ Mỗi cảnh báo cần có severity, owner và runbook; tránh cảnh báo khô
 3. Tạo/kiểm tra backup trước migration production.
 4. Chạy migration backward-compatible.
 5. Deploy API/Web/Worker theo thứ tự tương thích.
-6. Smoke test: đăng nhập, tìm candidate, mở application, queue email thử nghiệm, kiểm tra worker.
+6. Smoke test: đăng nhập, tìm candidate, mở application, queue email đến hộp thử nghiệm kiểm soát, kiểm tra worker, SPF/DKIM/DMARC, reply ingest và bounce path.
 7. Theo dõi metrics/log và rollback image khi gate không đạt.
 
 Migration phá vỡ tương thích dùng chiến lược expand → migrate/backfill → contract qua nhiều lần phát hành.
@@ -116,6 +116,7 @@ Migration phá vỡ tương thích dùng chiến lược expand → migrate/back
 - Queue tăng không giảm hoặc worker crash loop.
 - Mailbox sync dừng, token hết hạn, provider rate limit.
 - Email gửi trùng/bounce tăng đột biến.
+- Email authentication/alignment thất bại do thay đổi DNS, DKIM key, provider, miền hoặc alias gửi.
 - Object storage đầy hoặc attachment scan backlog.
 - Khôi phục point-in-time và đối soát tệp.
 - Thu hồi tài khoản/secret khẩn cấp.

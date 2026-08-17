@@ -58,7 +58,7 @@ Không ghi plaintext passport, token, body email hoặc nội dung tài liệu v
 | `VisaRoute` | code, name, residence_context, status, version | Phân biệt ứng viên ngoài Nhật và đang ở Nhật |
 | `IndustryFieldDefinition` | sector/occupation, field_key, label, data_type, validation, required_rule, version | JSON schema được kiểm tra; không thực thi script tùy ý |
 
-Không sao chép cứng danh mục ngành của portal tham khảo vào mã nguồn. Business owner duyệt danh mục khởi tạo; IT chỉ là một `IndustrySector` và có thể có các nghề như backend, frontend, QA hoặc hạ tầng.
+Không hardcode danh mục ngành/nghề bên ngoài vào mã nguồn. Business owner duyệt danh mục khởi tạo và mapping khi import; IT chỉ là một `IndustrySector` và có thể có các nghề như backend, frontend, QA hoặc hạ tầng.
 
 ### 3.2 CandidateOccupationProfile và Qualification
 
@@ -150,12 +150,15 @@ View dẫn xuất:
 
 | Trường | Giá trị | Quy tắc |
 |---|---|---|
-| `application_id` | FK | Unique cho lộ trình hiệu lực |
+| `candidate_id` | FK | Lấy từ Application khi tạo; bất biến; dùng cưỡng chế một journey hiệu lực trên Candidate |
+| `application_id` | FK | Application `PASSED` tạo journey; có thể có nhiều journey lịch sử |
 | `template_id/template_version` | FK/integer | Snapshot template được chọn lúc khởi tạo |
 | `owner_user_id` | FK | Điều phối chịu trách nhiệm |
 | `status` | enum | `ACTIVE`, `ON_HOLD`, `COMPLETED`, `CANCELLED` |
 | `started_at/completed_at` | timestamp | `completed_at` chỉ khi đã xác nhận tiếp nhận |
 | `cancel_reason` | string | Bắt buộc khi `CANCELLED` |
+
+Giữ mọi journey lịch sử. Tạo partial unique index `UNIQUE (candidate_id) WHERE status IN ('ACTIVE', 'ON_HOLD')` để ngăn Candidate có hai journey hiệu lực từ hai Application khác nhau mà vẫn cho phép khởi tạo lại sau khi journey trước đã `CANCELLED` hoặc `COMPLETED`. `candidate_id` phải khớp Candidate của `application_id` và được service/trigger kiểm soát trong transaction.
 
 ### 6.3 JourneyMilestone
 
@@ -171,7 +174,7 @@ Danh mục mốc chuẩn để Journey Template lựa chọn, sắp xếp và c�
 8. `CLIENT_RECEIVED`
 9. `SUPPLY_COMPLETED`
 
-Mỗi mốc có `status` (`NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`, `BLOCKED`, `WAIVED`, `NOT_APPLICABLE`), `owner_user_id`, `planned_at`, `due_at`, `completed_at`, `blocker_reason`, `waive_reason`, `attempt_no`, checklist và liên kết tài liệu.
+Mỗi mốc có `status` (`NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`, `BLOCKED`, `WAIVED`, `NOT_APPLICABLE`), `owner_user_id`, `planned_at`, `due_at`, `completed_at`, `blocker_party` (`CANDIDATE`, `CLIENT_PARTNER`, `INTERNAL`, `OTHER`), `blocker_reason`, `waive_reason`, `waived_by`, `waived_at`, `not_applicable_reason`, `attempt_no`, checklist và liên kết tài liệu. UI suy ra view “Chờ ứng viên/đối tác” từ `BLOCKED + blocker_party`; `NOT_APPLICABLE` biểu diễn mốc không thuộc bối cảnh; `WAIVED` là miễn trừ có thẩm quyền đối với mốc vốn áp dụng.
 
 Ứng viên đang ở Nhật không bị ép qua các mốc xuất cảnh; template phù hợp có thể bỏ các mốc đó hoặc đánh dấu `NOT_APPLICABLE` có lý do. Các trường tùy chọn của `DEPARTURE_PLAN` gồm ngày xuất cảnh, điểm đi/đến, tham chiếu lịch trình và tệp xác nhận. Không tạo bảng `Flight`/`FlightSegment` trong baseline.
 

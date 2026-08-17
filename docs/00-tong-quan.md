@@ -54,7 +54,9 @@ Hệ thống là **Candidate Operations CMS/ATS nội bộ đa ngành** của b�
 | [Mô hình dữ liệu](./04-mo-hinh-du-lieu.md) | Các thực thể liên hệ với nhau thế nào? |
 | [Email Hub](./05-email-hub.md) | Gửi, nhận, ghép luồng và lưu tệp ra sao? |
 | [Phân quyền](./06-phan-quyen-bao-mat.md) | Ai được thấy và làm gì? |
-| [Thiết kế CMS](./07-thiet-ke-cms.md) | Nhân viên thao tác trên các màn hình nào? |
+| [Thiết kế CMS](./07-thiet-ke-cms.md) | Nhân viên thao tác trên các màn hình nào và tiêu chí UI là gì? |
+| [Bộ chương UI/UX](./ui-ux/00-index.md) | App shell, từng khu vực nghiệp vụ và hệ thống giao diện được thiết kế ra sao? |
+| [Roadmap code UI/UX](./backlogs/00-ui-ux-roadmap.md) | Tám khu vực được triển khai theo thứ tự, interface và gate kiểm thử nào? |
 | [Vận hành Ubuntu](./08-van-hanh-ubuntu.md) | Chạy, sao lưu và khôi phục thế nào? |
 | [Kiểm thử](./09-kiem-thu-nghiem-thu.md) | Bằng chứng nào xác nhận hệ thống đạt yêu cầu? |
 | [Lộ trình MVP](./10-lo-trinh-mvp.md) | Nên xây theo thứ tự nào? |

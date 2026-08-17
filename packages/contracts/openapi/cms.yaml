@@ -1,0 +1,1844 @@
+openapi: 3.1.0
+info:
+  title: Candidate Supply CMS API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  /me:
+    get:
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Current internal user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /search:
+    get:
+      operationId: searchWorkspace
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 2 }
+      responses:
+        '200':
+          description: Permission-scoped workspace search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated internal session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /auth/logout:
+    post:
+      operationId: logout
+      responses:
+        '204':
+          description: Session revoked
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /saved-views:
+    get:
+      operationId: listSavedViews
+      parameters:
+        - in: query
+          name: resource
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Saved views
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/SavedView' }
+        default:
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createSavedView
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveViewRequest' }
+      responses:
+        '201':
+          description: Saved view created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SavedView' }
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /saved-views/{id}:
+    patch:
+      operationId: updateSavedView
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveViewRequest' }
+      responses:
+        '200':
+          description: Saved view updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SavedView' }
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /work-items:
+    get:
+      operationId: listWorkItems
+      parameters:
+        - { in: query, name: view, required: false, schema: { type: string, default: actionable } }
+        - { in: query, name: sort, required: false, schema: { type: string, default: priority } }
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: cursor, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Work queue
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkItemsResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /work-items/summary:
+    get:
+      operationId: getWorkSummary
+      parameters:
+        - { in: query, name: view, required: false, schema: { type: string, default: actionable } }
+      responses:
+        '200':
+          description: Work queue KPI summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkSummaryResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /work-items/{id}:
+    get:
+      operationId: getWorkItem
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Work item detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkItem' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      operationId: updateWorkItem
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WorkItemUpdate' }
+      responses:
+        '200':
+          description: Updated work item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkItem' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /clients:
+    get:
+      operationId: listClients
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: status, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Client list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClientsResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /clients/{id}:
+    get:
+      operationId: getClient
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Client detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Client' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /orders:
+    get:
+      operationId: listOrders
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: status, required: false, schema: { type: string } }
+        - { in: query, name: industry, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Recruitment order list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrdersResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Recruitment order detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JobOrder' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /orders/{id}/status:
+    patch:
+      operationId: updateOrderStatus
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderStatusUpdate' }
+      responses:
+        '200':
+          description: Updated recruitment order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JobOrder' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /orders/{id}/applications:
+    post:
+      operationId: addCandidatesToOrder
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AddCandidatesRequest' }
+      responses:
+        '201':
+          description: Applications created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AddCandidatesResponse' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /candidates/search-for-order:
+    get:
+      operationId: searchCandidatesForOrder
+      parameters:
+        - { in: query, name: orderId, required: true, schema: { type: string } }
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: industry, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Candidate matches
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidateSearchResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /candidates:
+    get:
+      operationId: listCandidates
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, potential, applying, passed, supplying, supplied, missing-contact, duplicates] } }
+        - { in: query, name: industry, required: false, schema: { type: string } }
+        - { in: query, name: readiness, required: false, schema: { type: string } }
+        - { in: query, name: contactability, required: false, schema: { type: string } }
+        - { in: query, name: cursor, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Candidate master list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidatesResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createCandidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCandidateRequest' }
+      responses:
+        '201':
+          description: Candidate created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /candidates/{id}:
+    get:
+      operationId: getCandidate
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Candidate 360 detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidateDetail' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      operationId: updateCandidate
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CandidateUpdateRequest' }
+      responses:
+        '200':
+          description: Candidate updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CandidateDetail' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /candidates/imports:
+    post:
+      operationId: importCandidates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportCandidatesRequest' }
+      responses:
+        '201':
+          description: Candidate import accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportCandidatesResponse' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /candidates/{id}/duplicate-review:
+    post:
+      operationId: reviewCandidateDuplicate
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DuplicateReviewRequest' }
+      responses:
+        '200':
+          description: Duplicate review recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications:
+    get:
+      operationId: listApplications
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [screening, waiting-interview, interviewed, waiting-result, passed, closed, overdue] } }
+        - { in: query, name: orderId, required: false, schema: { type: string } }
+        - { in: query, name: ownerId, required: false, schema: { type: string } }
+        - { in: query, name: cursor, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Application pipeline
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationsResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}:
+    get:
+      operationId: getApplication
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Application detail with interview timeline and audit history
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApplicationDetail' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/interviews:
+    post:
+      operationId: createApplicationInterview
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateInterviewRequest' }
+      responses:
+        '201':
+          description: Interview scheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/interviews/{interviewId}/reschedules:
+    post:
+      operationId: rescheduleApplicationInterview
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: interviewId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RescheduleInterviewRequest' }
+      responses:
+        '200':
+          description: Rescheduled interview with previous schedule preserved in history
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/interviews/{interviewId}/cancellation:
+    post:
+      operationId: cancelApplicationInterview
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: interviewId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CancelInterviewRequest' }
+      responses:
+        '200':
+          description: Interview cancelled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/interviews/{interviewId}/no-show:
+    post:
+      operationId: markApplicationInterviewNoShow
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: interviewId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CancelInterviewRequest' }
+      responses:
+        '200':
+          description: Interview marked as no-show
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/interviews/{interviewId}/results:
+    post:
+      operationId: saveApplicationInterviewResult
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: interviewId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveInterviewResultRequest' }
+      responses:
+        '200':
+          description: Interview result saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/decisions:
+    post:
+      operationId: decideApplication
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApplicationDecisionRequest' }
+      responses:
+        '200':
+          description: Application decision saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Application' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/journey-eligibility:
+    get:
+      operationId: getApplicationJourneyEligibility
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Eligibility and active journey conflict check
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JourneyEligibility' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /applications/{id}/supply-journey:
+    post:
+      operationId: startApplicationSupplyJourney
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StartSupplyJourneyRequest' }
+      responses:
+        '201':
+          description: Supply journey started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SupplyJourney' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /supply-journeys:
+    get:
+      operationId: listSupplyJourneys
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, active, on-hold, at-risk, waiting-candidate, waiting-external, completed] } }
+        - { in: query, name: ownerId, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Supply journey list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SupplyJourneysResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /supply-journeys/{id}:
+    get:
+      operationId: getSupplyJourney
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Supply journey detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SupplyJourneyDetail' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /supply-journeys/{id}/milestones/{milestoneId}:
+    patch:
+      operationId: updateSupplyJourneyMilestone
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: milestoneId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateMilestoneRequest' }
+      responses:
+        '200':
+          description: Updated milestone
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JourneyMilestone' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /supply-journeys/{id}/milestones/{milestoneId}/waiver:
+    post:
+      operationId: waiveSupplyJourneyMilestone
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: milestoneId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WaiveMilestoneRequest' }
+      responses:
+        '200':
+          description: Waived milestone
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JourneyMilestone' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /mailbox/conversations:
+    get:
+      operationId: listMailboxConversations
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, needs-action, unmatched, sent, received] } }
+      responses:
+        '200':
+          description: Shared mailbox conversations
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationsResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /mailbox/conversations/{id}:
+    get:
+      operationId: getMailboxConversation
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Conversation thread
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationDetail' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /mailbox/conversations/{id}/send:
+    post:
+      operationId: sendMailboxEmail
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SendEmailRequest' }
+      responses:
+        '202':
+          description: Email queued for sending
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmailSendResult' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /mailbox/conversations/{id}/link:
+    post:
+      operationId: linkMailboxConversation
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LinkConversationRequest' }
+      responses:
+        '200':
+          description: Conversation linked to a candidate context
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /reports/summary:
+    get:
+      operationId: getReportSummary
+      parameters:
+        - { in: query, name: from, required: false, schema: { type: string, format: date } }
+        - { in: query, name: to, required: false, schema: { type: string, format: date } }
+        - { in: query, name: teamId, required: false, schema: { type: string } }
+        - { in: query, name: ownerId, required: false, schema: { type: string } }
+        - { in: query, name: clientId, required: false, schema: { type: string } }
+        - { in: query, name: orderId, required: false, schema: { type: string } }
+        - { in: query, name: industryId, required: false, schema: { type: string } }
+        - { in: query, name: sourceId, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Operational report summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportSummary' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /reports/funnel:
+    get:
+      operationId: getReportFunnel
+      parameters:
+        - { in: query, name: from, required: false, schema: { type: string, format: date } }
+        - { in: query, name: to, required: false, schema: { type: string, format: date } }
+        - { in: query, name: teamId, required: false, schema: { type: string } }
+        - { in: query, name: ownerId, required: false, schema: { type: string } }
+        - { in: query, name: clientId, required: false, schema: { type: string } }
+        - { in: query, name: orderId, required: false, schema: { type: string } }
+        - { in: query, name: industryId, required: false, schema: { type: string } }
+        - { in: query, name: sourceId, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Recruitment funnel report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportFunnelResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /reports/exports:
+    post:
+      operationId: createReportExport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReportExportRequest' }
+      responses:
+        '202':
+          description: Export job queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExportJob' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /reports/exports/{id}:
+    get:
+      operationId: getReportExport
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Export job status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExportJob' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      parameters:
+        - { in: query, name: query, required: false, schema: { type: string } }
+        - { in: query, name: status, required: false, schema: { type: string, enum: [ACTIVE, LOCKED, INVITED] } }
+      responses:
+        '200':
+          description: Internal users
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUsersResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/users/{id}:
+    patch:
+      operationId: updateAdminUser
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminUserUpdate' }
+      responses:
+        '200':
+          description: Updated internal user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUser' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/roles:
+    get:
+      operationId: listAdminRoles
+      responses:
+        '200':
+          description: Role permission matrix
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminRolesResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/roles/{id}:
+    patch:
+      operationId: updateAdminRole
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminRoleUpdate' }
+      responses:
+        '200':
+          description: Updated role
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminRole' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/catalogs:
+    get:
+      operationId: listAdminCatalogs
+      parameters:
+        - { in: query, name: type, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Versioned catalog values
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCatalogsResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/catalogs/{id}/retire:
+    post:
+      operationId: retireAdminCatalog
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VersionedActionRequest' }
+      responses:
+        '200':
+          description: Retired catalog value
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCatalogItem' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/templates:
+    get:
+      operationId: listAdminTemplates
+      parameters:
+        - { in: query, name: type, required: false, schema: { type: string, enum: [JOURNEY, EMAIL] } }
+      responses:
+        '200':
+          description: Versioned journey and email templates
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminTemplatesResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/templates/{id}/retire:
+    post:
+      operationId: retireAdminTemplate
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VersionedActionRequest' }
+      responses:
+        '200':
+          description: Retired template
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminTemplate' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/mailbox:
+    get:
+      operationId: getAdminMailboxSettings
+      responses:
+        '200':
+          description: Shared mailbox health without credential material
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MailboxSettingsView' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+  /admin/audit:
+    get:
+      operationId: listAdminAuditEvents
+      parameters:
+        - { in: query, name: actorId, required: false, schema: { type: string } }
+        - { in: query, name: resourceId, required: false, schema: { type: string } }
+        - { in: query, name: action, required: false, schema: { type: string } }
+        - { in: query, name: from, required: false, schema: { type: string, format: date } }
+        - { in: query, name: to, required: false, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Read-only audit log
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminAuditResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+components:
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiProblem'
+    Conflict:
+      description: Optimistic concurrency or duplicate relation conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiProblem'
+    ValidationError:
+      description: Business validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiProblem'
+    Forbidden:
+      description: Permission required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiProblem'
+  schemas:
+    CurrentUser:
+      type: object
+      required: [id, displayName, roles, permissions]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string }
+        roles: { type: array, items: { type: string } }
+        permissions: { type: array, items: { type: string } }
+    ApiProblem:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        traceId: { type: string }
+    SearchResult:
+      type: object
+      required: [id, type, typeLabel, primaryText, href]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [candidate, client, order] }
+        typeLabel: { type: string }
+        primaryText: { type: string }
+        secondaryText: { type: string }
+        href: { type: string }
+    SearchResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/SearchResult' }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, writeOnly: true }
+    Session:
+      type: object
+      required: [user, expiresAt]
+      properties:
+        user: { $ref: '#/components/schemas/CurrentUser' }
+        expiresAt: { type: string, format: date-time }
+    SaveViewRequest:
+      type: object
+      required: [resource, name, query, visibility]
+      properties:
+        resource: { type: string }
+        name: { type: string }
+        query: { type: object, additionalProperties: { oneOf: [{ type: string }, { type: array, items: { type: string } }] } }
+        visibility: { type: string, enum: [PRIVATE, TEAM] }
+    SavedView:
+      allOf:
+        - $ref: '#/components/schemas/SaveViewRequest'
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+    PersonRef:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+    CandidateRef:
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        name: { type: string }
+    ClientRef:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+    OrderRef:
+      type: object
+      required: [id, code, position]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        position: { type: string }
+    WorkItem:
+      type: object
+      required: [id, title, priority, status, dueAt, assignee, sourceType, sourceLabel, candidate, order, client, updatedAt, version]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        priority: { type: string, enum: [URGENT, HIGH, NORMAL] }
+        status: { type: string, enum: [TODO, IN_PROGRESS, WAITING_REPLY, DONE] }
+        dueAt: { type: string, format: date-time }
+        assignee: { $ref: '#/components/schemas/PersonRef' }
+        sourceType: { type: string }
+        sourceLabel: { type: string }
+        candidate: { $ref: '#/components/schemas/CandidateRef' }
+        order: { $ref: '#/components/schemas/OrderRef' }
+        client: { $ref: '#/components/schemas/ClientRef' }
+        updatedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+        lastActivity: { type: string }
+        notes: { type: string }
+    WorkItemsResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/WorkItem' } }
+        nextCursor: { type: string, nullable: true }
+    WorkSummary:
+      type: object
+      required: [overdue, today, waitingReply, unresolvedEmail, journeyRisk]
+      properties:
+        overdue: { type: integer }
+        today: { type: integer }
+        waitingReply: { type: integer }
+        unresolvedEmail: { type: integer }
+        journeyRisk: { type: integer }
+    WorkSummaryResponse:
+      type: object
+      required: [summary]
+      properties:
+        summary: { $ref: '#/components/schemas/WorkSummary' }
+    WorkItemUpdate:
+      type: object
+      required: [version]
+      properties:
+        status: { type: string, enum: [TODO, IN_PROGRESS, WAITING_REPLY, DONE] }
+        dueAt: { type: string, format: date-time }
+        assigneeId: { type: string }
+        reason: { type: string }
+        version: { type: integer, minimum: 0 }
+    Client:
+      type: object
+      required: [id, code, name, organizationType, industryLabels, owner, activeOrders, target, passed, lastActivity, status, region]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        name: { type: string }
+        organizationType: { type: string }
+        industryLabels: { type: array, items: { type: string } }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        activeOrders: { type: integer }
+        target: { type: integer }
+        passed: { type: integer }
+        lastActivity: { type: string, format: date-time }
+        status: { type: string, enum: [PROSPECT, ACTIVE, PAUSED, INACTIVE] }
+        region: { type: string }
+        contactName: { type: string }
+        notes: { type: string }
+    ClientsResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Client' } }
+    OrderMetrics:
+      type: object
+      required: [target, activeApplications, passed, supplied]
+      properties:
+        target: { type: integer }
+        activeApplications: { type: integer }
+        passed: { type: integer }
+        supplied: { type: integer }
+    JobOrder:
+      type: object
+      required: [id, code, position, client, industryLabel, occupation, location, target, deadline, owner, status, metrics, health, version]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        position: { type: string }
+        client: { $ref: '#/components/schemas/ClientRef' }
+        industryLabel: { type: string }
+        occupation: { type: string }
+        location: { type: string }
+        target: { type: integer }
+        deadline: { type: string, format: date-time }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        status: { type: string, enum: [DRAFT, RECRUITING, PAUSED, FILLED, CLOSED] }
+        metrics: { $ref: '#/components/schemas/OrderMetrics' }
+        health: { type: string, enum: [EXPIRING, UNDER_TARGET, INTERVIEW_DELAY, RESULT_DELAY, FILLED, CLIENT_PAUSED] }
+        version: { type: integer, minimum: 0 }
+        salary: { type: string }
+        contractType: { type: string }
+        japaneseLevel: { type: string }
+        criteria: { type: array, items: { type: string } }
+    OrdersResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/JobOrder' } }
+    CandidateMatch:
+      type: object
+      required: [id, code, name, industryLabel, occupation, japaneseLevel, readiness, hasActiveApplicationInOrder, hasActiveJourney]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        name: { type: string }
+        industryLabel: { type: string }
+        occupation: { type: string }
+        japaneseLevel: { type: string }
+        readiness: { type: string }
+        hasActiveApplicationInOrder: { type: boolean }
+        hasActiveJourney: { type: boolean }
+    CandidateSearchResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/CandidateMatch' } }
+    CandidateOccupationProfile:
+      type: object
+      required: [industryLabel, occupation, yearsExperience, skills, status]
+      properties:
+        industryLabel: { type: string }
+        occupation: { type: string }
+        yearsExperience: { type: number, minimum: 0 }
+        skills: { type: array, items: { type: string } }
+        status: { type: string, enum: [PRIMARY, SECONDARY, ARCHIVED] }
+    CandidateFile:
+      type: object
+      required: [id, fileName, category, scanStatus, uploadedAt]
+      properties:
+        id: { type: string }
+        fileName: { type: string }
+        category: { type: string, enum: [CV, IDENTITY, CERTIFICATE, LANGUAGE, OTHER] }
+        scanStatus: { type: string, enum: [PENDING, SAFE, QUARANTINED, REJECTED] }
+        uploadedAt: { type: string, format: date-time }
+        downloadUrl: { type: string, format: uri, nullable: true }
+    CandidateHistoryEvent:
+      type: object
+      required: [id, type, occurredAt, actor, summary]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [CREATED, PROFILE_UPDATED, APPLICATION_CREATED, JOURNEY_STARTED, EMAIL_RECEIVED, NOTE_ADDED, FILE_ATTACHED] }
+        occurredAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/PersonRef' }
+        summary: { type: string }
+    Candidate:
+      type: object
+      required: [id, code, name, industryLabels, occupation, japaneseLevel, recordStatus, readinessStatus, contactabilityStatus, operationalPhase, owner, lastActivityAt, nextAction, applicationCount, hasActiveJourney, version]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        name: { type: string }
+        industryLabels: { type: array, minItems: 1, items: { type: string } }
+        occupation: { type: string }
+        japaneseLevel: { type: string }
+        recordStatus: { type: string, enum: [ACTIVE, ARCHIVED] }
+        readinessStatus: { type: string, enum: [NOT_READY, READY_FOR_REVIEW, READY_FOR_INTERVIEW] }
+        contactabilityStatus: { type: string, enum: [CONTACTABLE, DO_NOT_CONTACT, UNKNOWN] }
+        operationalPhase: { type: string, enum: [POTENTIAL, APPLYING, PASSED, SUPPLYING, SUPPLIED] }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        lastActivityAt: { type: string, format: date-time }
+        nextAction: { type: string }
+        applicationCount: { type: integer, minimum: 0 }
+        hasActiveJourney: { type: boolean }
+        isPossibleDuplicate: { type: boolean }
+        version: { type: integer, minimum: 0 }
+        emailMasked: { type: string, nullable: true }
+        phoneMasked: { type: string, nullable: true }
+        source: { type: string }
+    CandidateDetail:
+      allOf:
+        - $ref: '#/components/schemas/Candidate'
+        - type: object
+          required: [email, phone, address, occupationProfiles, applications, journeys, emailCount, files, notes, history]
+          properties:
+            email: { type: string, format: email, nullable: true }
+            phone: { type: string, nullable: true }
+            address: { type: string, nullable: true }
+            occupationProfiles: { type: array, items: { $ref: '#/components/schemas/CandidateOccupationProfile' } }
+            applications: { type: array, items: { $ref: '#/components/schemas/Application' } }
+            journeys: { type: array, items: { $ref: '#/components/schemas/SupplyJourneySummary' } }
+            emailCount: { type: integer, minimum: 0 }
+            files: { type: array, items: { $ref: '#/components/schemas/CandidateFile' } }
+            notes: { type: array, items: { type: string } }
+            history: { type: array, items: { $ref: '#/components/schemas/CandidateHistoryEvent' } }
+    CandidatesResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Candidate' } }
+        nextCursor: { type: string, nullable: true }
+    CreateCandidateRequest:
+      type: object
+      required: [name, industryLabels, occupation, japaneseLevel, source, version]
+      properties:
+        name: { type: string, minLength: 1 }
+        industryLabels: { type: array, minItems: 1, items: { type: string, minLength: 1 } }
+        occupation: { type: string, minLength: 1 }
+        japaneseLevel: { type: string, minLength: 1 }
+        email: { type: string, format: email, nullable: true }
+        phone: { type: string, nullable: true }
+        address: { type: string, nullable: true }
+        source: { type: string, minLength: 1 }
+        readinessStatus: { type: string, enum: [NOT_READY, READY_FOR_REVIEW, READY_FOR_INTERVIEW] }
+        contactabilityStatus: { type: string, enum: [CONTACTABLE, DO_NOT_CONTACT, UNKNOWN] }
+        version: { type: integer, minimum: 0 }
+    CandidateUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateCandidateRequest'
+    ImportCandidatesRequest:
+      type: object
+      required: [fileName, rows, version]
+      properties:
+        fileName: { type: string, minLength: 1 }
+        rows: { type: array, minItems: 1, items: { type: object, additionalProperties: true } }
+        version: { type: integer, minimum: 0 }
+    ImportCandidatesResponse:
+      type: object
+      required: [importId, fileName, totalRows, validRows, invalidRows, duplicateRows, createdCandidateIds]
+      properties:
+        importId: { type: string }
+        fileName: { type: string }
+        totalRows: { type: integer, minimum: 0 }
+        validRows: { type: integer, minimum: 0 }
+        invalidRows: { type: integer, minimum: 0 }
+        duplicateRows: { type: integer, minimum: 0 }
+        createdCandidateIds: { type: array, items: { type: string } }
+    DuplicateReviewRequest:
+      type: object
+      required: [action, version]
+      properties:
+        action: { type: string, enum: [MARK_REVIEWED, KEEP_SEPARATE, MERGE] }
+        targetCandidateId: { type: string, nullable: true }
+        reason: { type: string, nullable: true }
+        version: { type: integer, minimum: 0 }
+    AddCandidatesRequest:
+      type: object
+      required: [candidateIds, source]
+      properties:
+        candidateIds: { type: array, minItems: 1, items: { type: string } }
+        source: { type: string, enum: [MANUAL_MATCH] }
+    AddCandidatesResponse:
+      type: object
+      required: [createdApplicationIds]
+      properties:
+        createdApplicationIds: { type: array, items: { type: string } }
+    OrderStatusUpdate:
+      type: object
+      required: [status, reasonCode, version]
+      properties:
+        status: { type: string, enum: [DRAFT, RECRUITING, PAUSED, FILLED, CLOSED] }
+        reasonCode: { type: string }
+        note: { type: string, maxLength: 1000 }
+        version: { type: integer, minimum: 0 }
+    InterviewHistoryEvent:
+      type: object
+      required: [id, type, occurredAt, actor, summary]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [SCHEDULED, RESCHEDULED, CANCELLED, COMPLETED, RESULT_RECORDED] }
+        occurredAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/PersonRef' }
+        summary: { type: string }
+        previousScheduledAt: { type: string, format: date-time, nullable: true }
+        reason: { type: string, nullable: true }
+    Interview:
+      type: object
+      required: [id, round, scheduledAt, timeZone, mode, scheduleStatus, result, participants, version, history, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        round: { type: integer, minimum: 1 }
+        scheduledAt: { type: string, format: date-time }
+        timeZone: { type: string, minLength: 1 }
+        mode: { type: string, enum: [ONLINE, IN_PERSON] }
+        meetingUrl: { type: string, format: uri, nullable: true }
+        location: { type: string, nullable: true }
+        participants: { type: array, minItems: 1, items: { $ref: '#/components/schemas/PersonRef' } }
+        scheduleStatus: { type: string, enum: [SCHEDULED, COMPLETED, CANCELLED, NO_SHOW] }
+        result: { type: string, enum: [PENDING, PASS, FAIL] }
+        feedback: { type: string, nullable: true }
+        strengths: { type: array, items: { type: string } }
+        concerns: { type: array, items: { type: string } }
+        nextStep: { type: string, nullable: true }
+        version: { type: integer, minimum: 0 }
+        history: { type: array, items: { $ref: '#/components/schemas/InterviewHistoryEvent' } }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Application:
+      type: object
+      required: [id, candidate, order, client, owner, status, source, appliedAt, lastActivityAt, version, interviews]
+      properties:
+        id: { type: string }
+        candidate: { $ref: '#/components/schemas/CandidateRef' }
+        order: { $ref: '#/components/schemas/OrderRef' }
+        client: { $ref: '#/components/schemas/ClientRef' }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        status: { type: string, enum: [MATCHED, IN_INTERVIEW_PROCESS, PASSED, FAILED, WITHDRAWN, ON_HOLD] }
+        source: { type: string, enum: [MANUAL_MATCH, REFERRAL, IMPORT, PORTAL] }
+        appliedAt: { type: string, format: date-time }
+        lastActivityAt: { type: string, format: date-time }
+        dueAt: { type: string, format: date-time, nullable: true }
+        version: { type: integer, minimum: 0 }
+        interviews: { type: array, items: { $ref: '#/components/schemas/Interview' } }
+        decisionReason: { type: string, nullable: true }
+    ApplicationHistoryEvent:
+      type: object
+      required: [id, type, occurredAt, actor, summary]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [APPLICATION_CREATED, STATUS_CHANGED, INTERVIEW_UPDATED, NOTE_ADDED, FILE_ATTACHED, JOURNEY_STARTED] }
+        occurredAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/PersonRef' }
+        summary: { type: string }
+        metadata: { type: object, additionalProperties: true }
+    ApplicationDetail:
+      allOf:
+        - $ref: '#/components/schemas/Application'
+        - type: object
+          required: [history, notes, files]
+          properties:
+            history: { type: array, items: { $ref: '#/components/schemas/ApplicationHistoryEvent' } }
+            notes: { type: array, items: { type: string } }
+            files: { type: array, items: { type: string } }
+    ApplicationsResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Application' } }
+        nextCursor: { type: string, nullable: true }
+    CreateInterviewRequest:
+      type: object
+      required: [scheduledAt, timeZone, mode, participants, version]
+      properties:
+        scheduledAt: { type: string, format: date-time }
+        timeZone: { type: string, minLength: 1 }
+        mode: { type: string, enum: [ONLINE, IN_PERSON] }
+        meetingUrl: { type: string, format: uri, nullable: true }
+        location: { type: string, nullable: true }
+        participants: { type: array, minItems: 1, items: { type: string } }
+        version: { type: integer, minimum: 0 }
+    RescheduleInterviewRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateInterviewRequest'
+        - type: object
+          required: [reason]
+          properties:
+            reason: { type: string, minLength: 1, maxLength: 1000 }
+    CancelInterviewRequest:
+      type: object
+      required: [reason, version]
+      properties:
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+        version: { type: integer, minimum: 0 }
+    SaveInterviewResultRequest:
+      type: object
+      required: [result, feedback, strengths, concerns, recordedAt, version]
+      properties:
+        result: { type: string, enum: [PASS, FAIL] }
+        feedback: { type: string, minLength: 1, maxLength: 5000 }
+        strengths: { type: array, items: { type: string } }
+        concerns: { type: array, items: { type: string } }
+        nextStep: { type: string, nullable: true }
+        recordedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+    ApplicationDecisionRequest:
+      type: object
+      required: [status, decidedAt, version]
+      properties:
+        status: { type: string, enum: [PASSED, FAILED, WITHDRAWN] }
+        reasonCode: { type: string, nullable: true }
+        note: { type: string, nullable: true, maxLength: 2000 }
+        decidedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+    JourneyEligibility:
+      type: object
+      required: [allowed, reasons, activeJourney, templates]
+      properties:
+        allowed: { type: boolean }
+        reasons: { type: array, items: { type: string } }
+        activeJourney: { $ref: '#/components/schemas/SupplyJourney', nullable: true }
+        templates:
+          type: array
+          items:
+            type: object
+            required: [id, name, version]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              version: { type: string }
+    StartSupplyJourneyRequest:
+      type: object
+      required: [templateId, templateVersion, ownerUserId, startedAt]
+      properties:
+        templateId: { type: string }
+        templateVersion: { type: string }
+        ownerUserId: { type: string }
+        startedAt: { type: string, format: date-time }
+    SupplyJourney:
+      type: object
+      required: [id, candidateId, applicationId, templateId, templateVersion, owner, status, startedAt, version]
+      properties:
+        id: { type: string }
+        candidateId: { type: string }
+        applicationId: { type: string }
+        templateId: { type: string }
+        templateVersion: { type: string }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        status: { type: string, enum: [ACTIVE, ON_HOLD, COMPLETED, CANCELLED] }
+        startedAt: { type: string, format: date-time }
+        version: { type: integer, minimum: 0 }
+    JourneyProgress:
+      type: object
+      required: [completed, applicable]
+      properties:
+        completed: { type: integer, minimum: 0 }
+        applicable: { type: integer, minimum: 0 }
+    JourneyMilestone:
+      type: object
+      required: [id, journeyId, code, name, sequence, status, dueAt, owner, evidenceIds, requiredEvidenceCount, completedEvidenceCount, version]
+      properties:
+        id: { type: string }
+        journeyId: { type: string }
+        code: { type: string }
+        name: { type: string }
+        sequence: { type: integer, minimum: 1 }
+        status: { type: string, enum: [NOT_STARTED, IN_PROGRESS, COMPLETED, BLOCKED, WAIVED, NOT_APPLICABLE] }
+        dueAt: { type: string, format: date-time, nullable: true }
+        completedAt: { type: string, format: date-time, nullable: true }
+        owner: { $ref: '#/components/schemas/PersonRef' }
+        blockerParty: { type: string, enum: [CANDIDATE, CLIENT_PARTNER, INTERNAL, OTHER], nullable: true }
+        blockerReason: { type: string, nullable: true }
+        naReason: { type: string, nullable: true }
+        waiverReason: { type: string, nullable: true }
+        approver: { $ref: '#/components/schemas/PersonRef', nullable: true }
+        evidenceIds: { type: array, items: { type: string } }
+        requiredEvidenceCount: { type: integer, minimum: 0 }
+        completedEvidenceCount: { type: integer, minimum: 0 }
+        version: { type: integer, minimum: 0 }
+    JourneyEvidence:
+      type: object
+      required: [id, milestoneId, fileName, scanStatus, uploadedAt, uploadedBy]
+      properties:
+        id: { type: string }
+        milestoneId: { type: string }
+        fileName: { type: string }
+        scanStatus: { type: string, enum: [PENDING, SAFE, QUARANTINED, REJECTED] }
+        uploadedAt: { type: string, format: date-time }
+        uploadedBy: { $ref: '#/components/schemas/PersonRef' }
+        downloadUrl: { type: string, format: uri, nullable: true }
+    JourneyHistoryEvent:
+      type: object
+      required: [id, type, occurredAt, actor, summary]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [JOURNEY_STARTED, MILESTONE_UPDATED, MILESTONE_WAIVED, JOURNEY_COMPLETED, JOURNEY_CANCELLED] }
+        occurredAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/PersonRef' }
+        summary: { type: string }
+    SupplyJourneySummary:
+      allOf:
+        - $ref: '#/components/schemas/SupplyJourney'
+        - type: object
+          required: [candidate, order, client, templateName, currentMilestone, nearestDueAt, progress, health]
+          properties:
+            candidate: { $ref: '#/components/schemas/CandidateRef' }
+            order: { $ref: '#/components/schemas/OrderRef' }
+            client: { $ref: '#/components/schemas/ClientRef' }
+            templateName: { type: string }
+            currentMilestone: { type: string }
+            nearestDueAt: { type: string, format: date-time, nullable: true }
+            progress: { $ref: '#/components/schemas/JourneyProgress' }
+            health: { type: string, enum: [ON_TRACK, OVERDUE, AT_RISK, COMPLETED] }
+    SupplyJourneyDetail:
+      allOf:
+        - $ref: '#/components/schemas/SupplyJourneySummary'
+        - type: object
+          required: [milestones, evidence, history, hasDeparturePlan]
+          properties:
+            milestones: { type: array, items: { $ref: '#/components/schemas/JourneyMilestone' } }
+            evidence: { type: array, items: { $ref: '#/components/schemas/JourneyEvidence' } }
+            history: { type: array, items: { $ref: '#/components/schemas/JourneyHistoryEvent' } }
+            hasDeparturePlan: { type: boolean }
+            departurePlan:
+              type: object
+              nullable: true
+              properties:
+                departureDate: { type: string, format: date-time, nullable: true }
+                airport: { type: string, nullable: true }
+                note: { type: string, nullable: true }
+    SupplyJourneysResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/SupplyJourneySummary' } }
+        nextCursor: { type: string, nullable: true }
+    UpdateMilestoneRequest:
+      type: object
+      required: [status, evidenceIds, version]
+      properties:
+        status: { type: string, enum: [NOT_STARTED, IN_PROGRESS, COMPLETED, BLOCKED, WAIVED, NOT_APPLICABLE] }
+        blockerParty: { type: string, enum: [CANDIDATE, CLIENT_PARTNER, INTERNAL, OTHER], nullable: true }
+        blockerReason: { type: string, nullable: true }
+        naReason: { type: string, nullable: true }
+        evidenceIds: { type: array, items: { type: string } }
+        version: { type: integer, minimum: 0 }
+    WaiveMilestoneRequest:
+      type: object
+      required: [reason, approverId, evidenceIds, version]
+      properties:
+        reason: { type: string, minLength: 1, maxLength: 1000 }
+        approverId: { type: string, minLength: 1 }
+        evidenceIds: { type: array, items: { type: string } }
+        version: { type: integer, minimum: 0 }
+    EmailAttachment:
+      type: object
+      required: [id, fileName, sizeBytes, scanStatus]
+      properties:
+        id: { type: string }
+        fileName: { type: string }
+        sizeBytes: { type: integer, minimum: 0 }
+        scanStatus: { type: string, enum: [PENDING, SAFE, QUARANTINED, REJECTED] }
+        downloadUrl: { type: string, format: uri, nullable: true }
+    EmailMessage:
+      type: object
+      required: [id, direction, status, from, to, subject, bodyText, sentOrReceivedAt, attachmentIds, immutable]
+      properties:
+        id: { type: string }
+        direction: { type: string, enum: [INBOUND, OUTBOUND] }
+        status: { type: string, enum: [RECEIVED, QUEUED, SENDING, SENT, FAILED, BOUNCED] }
+        from: { type: string, format: email }
+        to: { type: array, items: { type: string, format: email } }
+        cc: { type: array, items: { type: string, format: email } }
+        subject: { type: string }
+        bodyText: { type: string }
+        sanitizedHtml: { type: string, nullable: true }
+        sentOrReceivedAt: { type: string, format: date-time }
+        attachmentIds: { type: array, items: { type: string } }
+        immutable: { type: boolean, const: true }
+    Conversation:
+      type: object
+      required: [id, subject, snippet, lastActivityAt, status, candidate, applicationId, journeyId, messageCount, hasUnreadInbound, version]
+      properties:
+        id: { type: string }
+        subject: { type: string }
+        snippet: { type: string }
+        lastActivityAt: { type: string, format: date-time }
+        status: { type: string, enum: [NEEDS_ACTION, MATCHED, UNMATCHED, SENT, RECEIVED, CLOSED] }
+        candidate: { $ref: '#/components/schemas/CandidateRef', nullable: true }
+        applicationId: { type: string, nullable: true }
+        journeyId: { type: string, nullable: true }
+        messageCount: { type: integer, minimum: 0 }
+        hasUnreadInbound: { type: boolean }
+        version: { type: integer, minimum: 0 }
+    ConversationDetail:
+      allOf:
+        - $ref: '#/components/schemas/Conversation'
+        - type: object
+          required: [messages, attachments, internalNotes]
+          properties:
+            messages: { type: array, items: { $ref: '#/components/schemas/EmailMessage' } }
+            attachments: { type: array, items: { $ref: '#/components/schemas/EmailAttachment' } }
+            internalNotes: { type: array, items: { type: string } }
+    ConversationsResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Conversation' } }
+    SendEmailRequest:
+      type: object
+      required: [to, subject, body, idempotencyKey, version]
+      properties:
+        to: { type: array, minItems: 1, items: { type: string, format: email } }
+        cc: { type: array, items: { type: string, format: email } }
+        subject: { type: string, minLength: 1 }
+        body: { type: string, minLength: 1 }
+        templateId: { type: string, nullable: true }
+        attachmentIds: { type: array, items: { type: string } }
+        idempotencyKey: { type: string, minLength: 8 }
+        version: { type: integer, minimum: 0 }
+    EmailSendResult:
+      type: object
+      required: [messageId, status, queuedAt]
+      properties:
+        messageId: { type: string }
+        status: { type: string, enum: [QUEUED, SENDING, SENT, FAILED, BOUNCED] }
+        queuedAt: { type: string, format: date-time }
+    LinkConversationRequest:
+      type: object
+      required: [candidateId, version]
+      properties:
+        candidateId: { type: string }
+        applicationId: { type: string, nullable: true }
+        journeyId: { type: string, nullable: true }
+        version: { type: integer, minimum: 0 }
+    ReportMetric:
+      type: object
+      required: [key, label, value, unit, asOf, drilldownHref]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        value: { type: number }
+        numerator: { type: integer, minimum: 0 }
+        denominator: { type: integer, minimum: 0 }
+        unit: { type: string, enum: [COUNT, PERCENT, DAYS, MINUTES] }
+        asOf: { type: string, format: date-time }
+        drilldownHref: { type: string }
+    ReportFilters:
+      type: object
+      required: [timeZone]
+      properties:
+        from: { type: string, format: date, nullable: true }
+        to: { type: string, format: date, nullable: true }
+        teamId: { type: string, nullable: true }
+        ownerId: { type: string, nullable: true }
+        clientId: { type: string, nullable: true }
+        orderId: { type: string, nullable: true }
+        industryId: { type: string, nullable: true }
+        sourceId: { type: string, nullable: true }
+        timeZone: { type: string }
+    ReportSummary:
+      type: object
+      required: [filters, asOf, metrics, sourceQuality, clients, journeys, mailbox, workload, dataQuality]
+      properties:
+        filters: { $ref: '#/components/schemas/ReportFilters' }
+        asOf: { type: string, format: date-time }
+        metrics: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        sourceQuality: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        clients: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        journeys: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        mailbox: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        workload: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+        dataQuality: { type: array, items: { $ref: '#/components/schemas/ReportMetric' } }
+    ReportFunnelStage:
+      type: object
+      required: [key, label, numerator, denominator, rate, drilldownHref]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        numerator: { type: integer, minimum: 0 }
+        denominator: { type: integer, minimum: 0 }
+        rate: { type: number, minimum: 0, maximum: 1 }
+        drilldownHref: { type: string }
+    ReportFunnelResponse:
+      type: object
+      required: [asOf, timeZone, stages]
+      properties:
+        asOf: { type: string, format: date-time }
+        timeZone: { type: string }
+        stages: { type: array, items: { $ref: '#/components/schemas/ReportFunnelStage' } }
+    CreateReportExportRequest:
+      type: object
+      required: [reportKey, format, filters, includedFields]
+      properties:
+        reportKey: { type: string }
+        format: { type: string, enum: [CSV, XLSX] }
+        filters: { $ref: '#/components/schemas/ReportFilters' }
+        includedFields: { type: array, items: { type: string } }
+    ReportExportJob:
+      type: object
+      required: [id, reportKey, format, status, createdAt, requestedBy]
+      properties:
+        id: { type: string }
+        reportKey: { type: string }
+        format: { type: string, enum: [CSV, XLSX] }
+        status: { type: string, enum: [QUEUED, RUNNING, COMPLETED, FAILED, EXPIRED] }
+        progress: { type: integer, minimum: 0, maximum: 100, nullable: true }
+        downloadUrl: { type: string, format: uri, nullable: true }
+        expiresAt: { type: string, format: date-time, nullable: true }
+        error: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        requestedBy: { $ref: '#/components/schemas/PersonRef' }
+    AdminUser:
+      type: object
+      required: [id, displayName, email, team, roleIds, status, lastActiveAt, version]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        email: { type: string, format: email }
+        team: { $ref: '#/components/schemas/PersonRef' }
+        roleIds: { type: array, items: { type: string } }
+        status: { type: string, enum: [ACTIVE, LOCKED, INVITED] }
+        lastActiveAt: { type: string, format: date-time, nullable: true }
+        version: { type: integer, minimum: 0 }
+    AdminUsersResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminUser' } }
+    AdminUserUpdate:
+      type: object
+      required: [teamId, roleIds, status, version]
+      properties:
+        teamId: { type: string }
+        roleIds: { type: array, items: { type: string } }
+        status: { type: string, enum: [ACTIVE, LOCKED, INVITED] }
+        version: { type: integer, minimum: 0 }
+    AdminRole:
+      type: object
+      required: [id, name, description, actions, scopes, sensitivities, permissionRules, version]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        actions: { type: array, items: { type: string } }
+        scopes: { type: array, items: { type: string, enum: [SELF, TEAM, DEPARTMENT, ALL] } }
+        sensitivities: { type: array, items: { type: string } }
+        permissionRules: { type: array, items: { $ref: '#/components/schemas/AdminPermissionRule' } }
+        version: { type: integer, minimum: 0 }
+    AdminRolesResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminRole' } }
+    AdminRoleUpdate:
+      type: object
+      required: [actions, scopes, sensitivities, permissionRules, version]
+      properties:
+        actions: { type: array, items: { type: string } }
+        scopes: { type: array, items: { type: string, enum: [SELF, TEAM, DEPARTMENT, ALL] } }
+        sensitivities: { type: array, items: { type: string } }
+        permissionRules: { type: array, items: { $ref: '#/components/schemas/AdminPermissionRule' } }
+        version: { type: integer, minimum: 0 }
+    AdminPermissionRule:
+      type: object
+      required: [action, scope, sensitivities, approvalRequired, reasonRequired]
+      properties:
+        action: { type: string }
+        scope: { type: string, enum: [SELF, TEAM, DEPARTMENT, ALL] }
+        sensitivities: { type: array, items: { type: string, enum: [NORMAL, PERSONAL, HIGHLY_SENSITIVE] } }
+        approvalRequired: { type: boolean }
+        reasonRequired: { type: boolean }
+    AdminCatalogItem:
+      type: object
+      required: [id, type, code, label, version, status, usageCount]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [INDUSTRY, OCCUPATION, VISA_ROUTE, SOURCE] }
+        code: { type: string }
+        label: { type: string }
+        version: { type: integer, minimum: 0 }
+        status: { type: string, enum: [ACTIVE, RETIRED] }
+        usageCount: { type: integer, minimum: 0 }
+    AdminCatalogsResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminCatalogItem' } }
+    VersionedActionRequest:
+      type: object
+      required: [version]
+      properties:
+        version: { type: integer, minimum: 0 }
+    AdminTemplate:
+      type: object
+      required: [id, type, name, version, status, usedByCount, updatedAt]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [JOURNEY, EMAIL] }
+        name: { type: string }
+        version: { type: string }
+        status: { type: string, enum: [ACTIVE, RETIRED, DRAFT] }
+        usedByCount: { type: integer, minimum: 0 }
+        updatedAt: { type: string, format: date-time }
+        previewText: { type: string }
+    AdminTemplatesResponse:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminTemplate' } }
+    MailboxSettingsView:
+      type: object
+      required: [address, senderName, adapter, maxAttachmentBytes, health, lastCheckedAt, credentialConfigured]
+      properties:
+        address: { type: string, format: email }
+        senderName: { type: string }
+        adapter: { type: string, enum: [MICROSOFT_365, GOOGLE_WORKSPACE, SMTP_IMAP] }
+        maxAttachmentBytes: { type: integer, minimum: 0 }
+        health: { type: string, enum: [HEALTHY, DEGRADED, DISCONNECTED] }
+        lastCheckedAt: { type: string, format: date-time }
+        credentialConfigured: { type: boolean }
+    AdminAuditEvent:
+      type: object
+      required: [id, occurredAt, actor, action, resourceType, resourceId, source, summary]
+      properties:
+        id: { type: string }
+        occurredAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/PersonRef' }
+        action: { type: string }
+        resourceType: { type: string }
+        resourceId: { type: string }
+        source: { type: string, enum: [UI, API, SYSTEM, EMAIL] }
+        summary: { type: string }
+        metadata: { type: object, additionalProperties: true }
+    AdminAuditResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminAuditEvent' } }
+        nextCursor: { type: string, nullable: true }

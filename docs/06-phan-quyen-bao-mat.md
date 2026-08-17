@@ -60,6 +60,10 @@ Ma trận này là baseline đủ cụ thể để viết policy/test; business 
 - Không ghi body email, token, hộ chiếu hoặc secret vào application log.
 - Có retention policy cho ứng viên không còn hoạt động, email, tài liệu và backup.
 - Hỗ trợ legal hold/xử lý yêu cầu dữ liệu nếu chính sách doanh nghiệp yêu cầu.
+- Trước production, Business Owner/Pháp chế phải duyệt thông báo quyền riêng tư: mục đích và căn cứ xử lý, nhóm dữ liệu, nguồn thu thập, người nhận, thời hạn lưu, kênh liên hệ và phiên bản áp dụng. CMS lưu bằng chứng/phiên bản thông báo gắn với nguồn thu thập hoặc import khi chính sách yêu cầu.
+- Việc giới thiệu/chia sẻ hồ sơ cho khách hàng hoặc đối tác tại Nhật phải theo phạm vi tối thiểu cần thiết, có mục đích, người nhận, actor và thời điểm truy vết được; cơ sở, thỏa thuận và đánh giá chuyển dữ liệu qua biên giới phải được Pháp chế/Security chốt theo chính sách và quy định áp dụng trước khi bật production.
+- Preference hoặc yêu cầu ngừng nhận email được lưu theo ứng viên và loại thông báo. Việc rút lựa chọn không tự xóa lịch sử hợp pháp hoặc chặn thông báo bắt buộc, nhưng phải ngăn các gửi tiếp theo không còn căn cứ.
+- Có quy trình tiếp nhận, xác minh, giao owner và theo dõi SLA cho yêu cầu truy cập, chỉnh sửa, hạn chế hoặc xóa dữ liệu theo chính sách đã duyệt; mọi override có lý do và audit.
 
 ## 5. Audit
 
@@ -85,6 +89,7 @@ Audit là append-only. Chỉ nhóm kiểm soát được truy vấn đầy đủ
 | Ghi đè dữ liệu đồng thời | Optimistic concurrency |
 | Rò rỉ qua log/backup | Redaction, encryption, quyền truy cập, retention |
 | Admin đọc dữ liệu trái nhiệm vụ | Tách admin cấu hình và quyền nội dung |
+| Chia sẻ hồ sơ vượt mục đích/phạm vi | Privacy notice có version, data minimization, recipient/audit và gate Pháp chế/Security |
 
 ## 7. Kiểm tra quyền bắt buộc
 

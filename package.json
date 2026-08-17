@@ -1,0 +1,28 @@
+{
+  "name": "cms-candidate-supply",
+  "private": true,
+  "packageManager": "pnpm@11.6.0",
+  "engines": {
+    "node": ">=22.15.0",
+    "pnpm": ">=11.6.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @cms/web dev",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "e2e": "playwright test",
+    "generate:contracts": "pnpm --filter @cms/contracts generate"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@next/eslint-plugin-next": "16.3.1",
+    "@playwright/test": "1.62.1",
+    "openapi-typescript": "7.13.0",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.67.0"
+  }
+}

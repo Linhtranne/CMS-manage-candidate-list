@@ -71,13 +71,14 @@ erDiagram
 
 ### 2.5 SupplyJourney — lộ trình cung ứng sang Nhật
 
-- Một `Application` đã đỗ tạo tối đa một lộ trình hiệu lực.
+- Một Candidate có thể giữ nhiều lộ trình lịch sử từ các Application đã đỗ khi hủy và khởi tạo lại, nhưng tại một thời điểm chỉ có tối đa một lộ trình hiệu lực (`ACTIVE` hoặc `ON_HOLD`) trên toàn Candidate.
 - `SupplyJourneyTemplate` được version theo nơi cư trú, tuyến visa, trường hợp tuyển mới/chuyển việc và tùy chọn ngành/nghề; journey lưu template/version đã dùng.
 - `JourneyMilestoneTemplate` định nghĩa thứ tự, khả năng chạy song song, checklist/tài liệu mặc định và điều kiện áp dụng.
 - `JourneyMilestone` không chỉ giữ trạng thái tổng mà còn giữ dự kiến/thực tế, blocker và owner.
 - Bộ mốc chuẩn có thể gồm xác nhận nhận việc, hợp đồng/hồ sơ, COE, visa/đổi tư cách, chuẩn bị trước xuất cảnh, kế hoạch xuất cảnh, đã sang Nhật, doanh nghiệp tiếp nhận và hoàn tất cung ứng; template chỉ sinh mốc áp dụng.
 - Ngày/chặng bay, mã đặt chỗ hoặc tệp hành trình là trường/tài liệu tùy chọn của mốc kế hoạch xuất cảnh; không tạo thực thể hàng không riêng trong baseline.
 - Tài liệu liên kết qua `DocumentLink` để một tệp có thể phục vụ một mốc mà không sao chép binary.
+- `SupplyJourney` giữ `candidate_id` lấy bất biến từ Application cùng `application_id` nguồn. PostgreSQL áp dụng partial unique index trên `candidate_id` với điều kiện `status IN ('ACTIVE', 'ON_HOLD')`; journey `COMPLETED`/`CANCELLED` được giữ để truy vết và không bị ghi đè.
 
 ### 2.6 Email
 

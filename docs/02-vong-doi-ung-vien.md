@@ -95,7 +95,9 @@ flowchart LR
 
 `SupplyJourneyTemplate` được chọn theo nơi cư trú hiện tại, tuyến visa, trường hợp tuyển mới/chuyển việc và tùy chọn ngành/nghề. Template sinh các milestone thực tế cho journey; thay đổi template về sau không viết lại journey đã khởi tạo.
 
-Mỗi mốc có trạng thái riêng `not_started/in_progress/completed/blocked/waived`, ngày dự kiến, ngày hoàn tất, người phụ trách, checklist và tài liệu bắt buộc. `waived` biểu diễn mốc không áp dụng và bắt buộc có lý do. Không ép tất cả mốc vào một enum duy nhất vì một số công việc có thể xử lý song song. Chi tiết chuyến bay chỉ là dữ liệu tùy chọn trong mốc **Kế hoạch xuất cảnh** của template có xuất cảnh.
+Một Candidate chỉ có tối đa một SupplyJourney hiệu lực (`ACTIVE` hoặc `ON_HOLD`) dù đã đỗ nhiều Application. Journey lịch sử đã `COMPLETED`/`CANCELLED` vẫn được giữ và không cản khởi tạo journey mới hợp lệ.
+
+Mỗi mốc dùng enum `NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`, `BLOCKED`, `WAIVED`, `NOT_APPLICABLE` và có ngày dự kiến, ngày hoàn tất, người phụ trách, checklist, tài liệu bắt buộc. `BLOCKED` kết hợp `blocker_party` để tạo view “Chờ ứng viên/đối tác”. `NOT_APPLICABLE` nghĩa là mốc không thuộc bối cảnh của journey; `WAIVED` nghĩa là mốc vốn áp dụng nhưng được người có thẩm quyền miễn trừ. Cả hai phải có lý do, còn `WAIVED` phải lưu thêm người duyệt và audit. Các mốc có thể xử lý song song nên không mô hình hóa lộ trình như một bước tuyến tính duy nhất. Chi tiết chuyến bay chỉ là dữ liệu tùy chọn trong mốc **Kế hoạch xuất cảnh** của template có xuất cảnh.
 
 ## 5. Quy tắc chuyển giao giữa bộ phận
 

@@ -1,14 +1,49 @@
-# Repository policy: only the final documentation package is versioned.
-*
+# Dependencies and build output
+node_modules/
+.next/
+dist/
+coverage/
+playwright-report/
+test-results/
+.turbo/
 
-# Git policy itself and project entry point.
-!.gitignore
-!README.md
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+*.key
 
-# Approved Markdown documentation.
-!docs/
-!docs/*.md
+# Runtime data and sensitive files
+data/
+uploads/
+exports/
+backups/
+storage/
+*.sqlite
+*.sqlite3
 
-# Approved standalone presentation.
-!presentation/
-!presentation/candidate-cms-presentation.html
+# Local agent/design tooling
+.agents/
+.agent/
+.impeccable/
+.codex/
+.superpowers/
+scripts/
+
+# Agent-generated instruction files
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
+SKILL.md
+**/SKILL.md
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Keep the existing documentation and presentation package versionable.

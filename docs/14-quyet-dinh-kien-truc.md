@@ -44,7 +44,7 @@ Tài liệu này ghi các quyết định đã chốt ở mức thiết kế. `A
 
 **Context:** Sản phẩm quản lý cung ứng nhân sự đa ngành đến doanh nghiệp Nhật, không vận hành logistics hàng không. IT chỉ là một ngành trong phạm vi cấu hình.
 
-**Decision:** SupplyJourney đi từ xác nhận nhận việc đến doanh nghiệp Nhật tiếp nhận/hoàn tất cung ứng. Chi tiết bay chỉ là dữ liệu tùy chọn trong milestone `DEPARTURE_PLAN`; không có module/aggregate hàng không riêng.
+**Decision:** SupplyJourney đi từ xác nhận nhận việc đến doanh nghiệp Nhật tiếp nhận/hoàn tất cung ứng. Một Candidate chỉ có tối đa một journey `ACTIVE`/`ON_HOLD` dù đã đỗ nhiều Application; DB cưỡng chế bằng khóa ứng viên bất biến trên journey. Chi tiết bay chỉ là dữ liệu tùy chọn trong milestone `DEPARTURE_PLAN`; không có module/aggregate hàng không riêng.
 
 **Trade-offs:** Đúng trọng tâm nghiệp vụ và đơn giản hơn; nếu sau này cần logistics nhiều chặng chuyên sâu sẽ phải mở rộng có chủ đích.
 
@@ -140,7 +140,7 @@ Tài liệu này ghi các quyết định đã chốt ở mức thiết kế. `A
 
 **Context:** Ứng viên có thể đang ngoài Nhật, đã ở Nhật, chuyển việc hoặc đổi tư cách lưu trú. Ép mọi người qua COE, visa và xuất cảnh tạo trạng thái giả và làm sai báo cáo.
 
-**Decision:** Mỗi SupplyJourney khóa một `SupplyJourneyTemplate` và version phù hợp `residence_context`, visa route, case type và khi cần ngành/nghề. Template định nghĩa mốc, thứ tự, điều kiện, SLA và evidence; mốc không áp dụng được bỏ khỏi template hoặc đánh dấu `NOT_APPLICABLE/WAIVED` có lý do.
+**Decision:** Mỗi SupplyJourney khóa một `SupplyJourneyTemplate` và version phù hợp `residence_context`, visa route, case type và khi cần ngành/nghề. Template định nghĩa mốc, thứ tự, điều kiện, SLA và evidence. Mốc ngoài bối cảnh được bỏ khỏi template hoặc đánh dấu `NOT_APPLICABLE` có lý do; `WAIVED` chỉ dành cho miễn trừ có thẩm quyền đối với mốc vốn áp dụng và phải lưu người duyệt/audit.
 
 **Trade-offs:** Phản ánh đúng nhiều tuyến cung ứng và mở rộng được; đổi lại cần UI chọn template rõ, rule kiểm tra tính phù hợp và quản trị version để không làm đổi hành trình đang chạy.
 

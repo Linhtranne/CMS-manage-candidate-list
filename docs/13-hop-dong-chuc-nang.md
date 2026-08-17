@@ -109,7 +109,7 @@ UI không dùng một dropdown application để biểu diễn vòng phỏng v�
 | Hành động UI | API contract | Guard |
 |---|---|---|
 | Gợi ý template phù hợp | `GET /applications/{id}/eligible-supply-journey-templates` | Tính từ nơi cư trú, visa route, JobOrder và hồ sơ nghề; không tự quyết định thay người dùng |
-| Khởi tạo lộ trình | `POST /applications/{id}/supply-journey` với `template_id`, `template_version` | Chỉ application `PASSED`; template applicable; tối đa một journey hiệu lực |
+| Khởi tạo lộ trình | `POST /applications/{id}/supply-journey` với `template_id`, `template_version` | Chỉ application `PASSED`; template applicable; Candidate không có journey `ACTIVE`/`ON_HOLD`; giữ journey lịch sử |
 | Xem timeline | `GET /supply-journeys/{id}` | Trả milestone, task, document, blocker theo quyền |
 | Cập nhật mốc | `PATCH /journey-milestones/{id}` + `version` | Transition hợp lệ; completed cần evidence theo loại mốc |
 | Mở lần nộp lại | `POST /journey-milestones/{id}/attempts` | Giữ attempt cũ; reason bắt buộc |
@@ -152,6 +152,7 @@ Trạng thái UI sau khi nhấn gửi phải chuyển ngay thành “Đã xếp 
 | 409 | `VERSION_CONFLICT` | Optimistic concurrency conflict |
 | 409 | `REQUIREMENT_VERSION_CONFLICT` | JobOrder đổi version trong lúc tạo/giới thiệu application |
 | 409 | `DUPLICATE_ACTIVE_APPLICATION` | Đã có active attempt cùng candidate/job order |
+| 409 | `ACTIVE_SUPPLY_JOURNEY_EXISTS` | Candidate đã có journey `ACTIVE` hoặc `ON_HOLD` từ một Application bất kỳ |
 | 409 | `DUPLICATE_CANDIDATE_REVIEW_REQUIRED` | Cần review trùng trước khi tạo/merge |
 | 422 | `CATALOG_VALUE_INACTIVE` | Ngành/nghề/visa route không còn hiệu lực cho bản ghi mới |
 | 422 | `JOURNEY_TEMPLATE_NOT_APPLICABLE` | Template không phù hợp nơi cư trú, visa route hoặc đơn hàng |

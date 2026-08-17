@@ -114,3 +114,141 @@ Ranh giới module được cưỡng chế ở code: module khác gọi qua serv
 ## 9. Quyết định kiến trúc và điều kiện xem lại
 
 Các quyết định có trạng thái, hệ quả và ngưỡng xem lại được ghi tại [14-quyet-dinh-kien-truc.md](./14-quyet-dinh-kien-truc.md). Không tự tách microservice, thêm nhiều mailbox hoặc Kubernetes chỉ vì stack hỗ trợ; chỉ xem lại khi có số liệu tải, nhu cầu đội sở hữu độc lập hoặc yêu cầu HA cụ thể.
+
+## 10. Cấu trúc monorepo mục tiêu
+
+Baseline dùng **pnpm workspace**. Chưa thêm Nx/Turborepo nếu chưa có nhu cầu cache/pipeline đủ rõ. Tên thư mục dùng kebab-case, không dùng khoảng trắng.
+
+```text
+cms-candidate-supply/
+├── PRODUCT.md
+├── README.md
+├── docs/
+│   ├── srs/
+│   ├── conventions/
+│   ├── backlogs/
+│   ├── architecture/
+│   ├── database/
+│   ├── ui-ux/
+│   └── operations/
+├── apps/
+│   ├── web/
+│   └── api/
+├── packages/
+│   ├── contracts/
+│   ├── eslint-config/
+│   └── tsconfig/
+├── tests/
+│   ├── e2e/
+│   ├── contract/
+│   ├── performance/
+│   └── security/
+├── infra/
+│   ├── compose/
+│   ├── proxy/
+│   ├── monitoring/
+│   └── backup/
+├── .agents/
+├── .husky/
+├── eslint.config.mjs
+├── prettier.config.mjs
+├── pnpm-workspace.yaml
+├── docker-compose.yml
+├── .env.example
+└── .gitignore
+```
+
+`.agents/` là công cụ làm việc cục bộ và bị bỏ qua trên Git theo policy hiện tại. Khi bắt đầu code, `.gitignore` allowlist tài liệu phải được thay bằng policy source phù hợp; không được tạo code rồi để toàn bộ source bị bỏ qua.
+
+## 11. Frontend mục tiêu
+
+```text
+apps/web/
+├── public/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   └── (cms)/
+│   ├── components/
+│   │   ├── ui/
+│   │   └── layout/
+│   ├── features/
+│   │   └── <feature>/
+│   │       ├── components/
+│   │       ├── hooks/
+│   │       ├── schemas/
+│   │       ├── services/
+│   │       ├── types/
+│   │       └── utils/
+│   ├── lib/
+│   │   ├── api/
+│   │   ├── auth/
+│   │   ├── permissions/
+│   │   └── observability/
+│   ├── providers/
+│   └── styles/app.css
+├── instrumentation.ts
+├── next.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+Quy tắc:
+
+- route/layout theo Next.js App Router;
+- component UI dùng chung ở `components/ui`, component nghiệp vụ colocate theo feature;
+- schema/service/type ưu tiên nằm trong feature, tránh thư mục global thành “junk drawer”;
+- server state đi qua generated OpenAPI client/query layer; chỉ thêm Zustand/Redux khi có state UI xuyên màn hình thực sự;
+- token Tailwind v4/CSS-first nằm trong `styles/app.css`, không bắt buộc `tailwind.config.ts` nếu không có nhu cầu tương thích đặc biệt;
+- chưa tạo `packages/ui` khi chỉ có một frontend consumer; chỉ tách khi có consumer thứ hai thật sự.
+
+## 12. Backend mục tiêu
+
+```text
+apps/api/
+├── src/
+│   ├── bootstrap/
+│   │   ├── api.ts
+│   │   ├── worker.ts
+│   │   └── scheduler.ts
+│   ├── app.module.ts
+│   ├── common/
+│   │   ├── constants/
+│   │   ├── decorators/
+│   │   ├── exceptions/
+│   │   ├── filters/
+│   │   ├── guards/
+│   │   ├── interceptors/
+│   │   ├── i18n/
+│   │   └── utils/
+│   ├── config/
+│   ├── database/
+│   └── modules/
+│       ├── identity-access/
+│       ├── catalog/
+│       ├── clients-orders/
+│       ├── candidates/
+│       ├── applications-interviews/
+│       ├── supply-journeys/
+│       ├── email-hub/
+│       ├── tasks-reporting/
+│       └── audit/
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+├── Dockerfile
+├── nest-cli.json
+├── tsconfig.json
+└── package.json
+```
+
+Không dùng generic `BaseController/BaseService` để áp CRUD mù cho domain có transition, permission, audit và invariant. Tái sử dụng DTO pagination/response hoặc helper hạ tầng khi thực sự ổn định; logic nghiệp vụ vẫn nằm trong module và service contract rõ ràng.
+
+## 13. Test và hợp đồng dùng chung
+
+- Unit/integration test gần source của module/feature.
+- `tests/e2e`, `contract`, `performance`, `security` dành cho kiểm thử xuyên ứng dụng.
+- `packages/contracts` chứa client/type sinh từ OpenAPI và artifact hợp đồng, không chứa business logic backend chia sẻ ngược sang frontend.
+- Husky, ESLint, Prettier và TypeScript strict cấu hình ở root để tránh lệch chuẩn giữa Web/API.
+- Chỉ commit `.env.example`; mọi `.env*` có secret bị bỏ qua.
+- Sentry/observability là integration trong app/infra, không phải thư mục root mang tên nhà cung cấp.

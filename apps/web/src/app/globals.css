@@ -1,0 +1,196 @@
+@import 'tailwindcss';
+
+:root {
+  --cms-color-surface: #fbfaf7;
+  --cms-color-panel: #ffffff;
+  --cms-color-text: #182233;
+  --cms-color-text-muted: #667085;
+  --cms-color-accent: #245ea8;
+  --cms-color-danger: #b42318;
+  --cms-color-border: #d9dee7;
+  --cms-color-success: #18794e;
+  --cms-color-warning: #a15c00;
+  --cms-motion-fast: 150ms;
+  --cms-motion-normal: 240ms;
+  --cms-motion-slow: 360ms;
+  --cms-motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme {
+  --color-surface: #fbfaf7;
+  --color-panel: #ffffff;
+  --color-text: #182233;
+  --color-text-muted: #667085;
+  --color-accent: #245ea8;
+  --color-danger: #b42318;
+  --color-border: #d9dee7;
+  --color-success: #18794e;
+  --color-warning: #a15c00;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --radius-control: 0.5rem;
+  --shadow-panel: 0 10px 30px rgb(24 34 51 / 8%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--cms-color-surface);
+  color: var(--cms-color-text);
+  font-family: var(--font-sans, 'Be Vietnam Pro'), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--cms-color-accent) 40%, transparent);
+  outline-offset: 2px;
+}
+
+@keyframes cms-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cms-slide-in {
+  from { opacity: 0; transform: translate3d(1.25rem, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes cms-modal-in {
+  from { opacity: 0; transform: translate3d(0, 0.75rem, 0) scale(0.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes cms-loading-pulse {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 1; }
+}
+
+@keyframes cms-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes cms-slide-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(1.25rem, 0, 0); }
+}
+
+@keyframes cms-modal-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(0, 0.5rem, 0) scale(0.985); }
+}
+
+@keyframes cms-mobile-navigation-in {
+  from { opacity: 0; transform: translate3d(-100%, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes cms-mobile-navigation-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(-100%, 0, 0); }
+}
+
+.cms-drawer-layer {
+  animation: cms-fade-in var(--cms-motion-normal) var(--cms-motion-ease) both;
+}
+
+.cms-drawer-layer[data-state='closing'] {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+  pointer-events: none;
+}
+
+.cms-drawer-backdrop {
+  animation: cms-fade-in var(--cms-motion-slow) var(--cms-motion-ease) both;
+}
+
+.cms-drawer-panel {
+  animation: cms-slide-in var(--cms-motion-slow) var(--cms-motion-ease) both;
+  will-change: transform, opacity;
+}
+
+.cms-drawer-layer[data-state='closing'] .cms-drawer-backdrop {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-drawer-layer[data-state='closing'] .cms-drawer-panel {
+  animation: cms-slide-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-drawer-layer[data-state='closing'] .cms-modal-panel {
+  animation: cms-modal-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-modal-panel {
+  animation: cms-modal-in var(--cms-motion-normal) var(--cms-motion-ease) both;
+  will-change: transform, opacity;
+}
+
+.cms-modal-layer {
+  animation: cms-fade-in var(--cms-motion-normal) var(--cms-motion-ease) both;
+}
+
+.cms-modal-layer[data-state='closing'] {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+  pointer-events: none;
+}
+
+.cms-modal-layer[data-state='closing'] .cms-modal-backdrop {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-modal-layer[data-state='closing'] .cms-modal-panel {
+  animation: cms-modal-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-content-enter {
+  animation: cms-fade-in var(--cms-motion-normal) var(--cms-motion-ease) both;
+}
+
+.cms-loading-pulse {
+  animation: cms-loading-pulse 1.4s ease-in-out infinite;
+}
+
+.cms-mobile-navigation-backdrop {
+  animation: cms-fade-in var(--cms-motion-normal) var(--cms-motion-ease) both;
+}
+
+.cms-mobile-navigation-panel {
+  animation: cms-mobile-navigation-in var(--cms-motion-slow) var(--cms-motion-ease) both;
+  will-change: transform, opacity;
+}
+
+.cms-mobile-navigation[data-state='closing'] {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+  pointer-events: none;
+}
+
+.cms-mobile-navigation[data-state='closing'] .cms-mobile-navigation-backdrop {
+  animation: cms-fade-out var(--cms-motion-fast) ease-in both;
+}
+
+.cms-mobile-navigation[data-state='closing'] .cms-mobile-navigation-panel {
+  animation: cms-mobile-navigation-out var(--cms-motion-fast) ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
