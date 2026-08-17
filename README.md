@@ -1,82 +1,72 @@
 # Japan Candidate Supply CMS
 
-CMS nội bộ cho bộ phận Kinh doanh/Tuyển dụng quản lý ứng viên đa ngành và cung ứng nhân sự sang Nhật. Ứng viên không đăng nhập CMS; mọi trao đổi chính danh đi qua hộp thư chung và được lưu vết.
+Hồ sơ thiết kế cho CMS nội bộ quản lý tuyển dụng và cung ứng ứng viên đa ngành sang Nhật Bản. Hệ thống theo dõi từ nguồn ứng viên, ứng tuyển, phỏng vấn, trúng tuyển đến quá trình doanh nghiệp Nhật tiếp nhận; ứng viên không đăng nhập CMS và chỉ giao tiếp qua email.
 
-## Trạng thái Sprint 3
+## Trạng thái hiện tại
 
-Sprint 0–3 đã có frontend/mock runtime chạy được:
+- Phiên bản tài liệu: **Design Baseline 1.2**.
+- Repository hiện chỉ bàn giao **tài liệu thiết kế** và **bản trình bày HTML độc lập**.
+- Chưa có mã nguồn Next.js/NestJS, database migration, API chạy thật hoặc môi trường production.
+- Danh mục ngành/nghề/visa và các Journey Template ban đầu vẫn cần business owner phê duyệt trước khi khóa schema.
 
-- Next.js App Router + TypeScript strict, Tailwind CSS v4, font Be Vietnam Pro local.
-- OpenAPI contract sinh type tự động, `openapi-fetch`, TanStack Query, MSW fixtures.
-- App shell permission-aware với bảy khu vực: Việc của tôi, Khách hàng & Đơn hàng, Ứng viên, Ứng tuyển & Phỏng vấn, Lộ trình cung ứng, Hộp thư chung, Báo cáo.
-- Design primitives: Button, StatusLabel, EmptyState, LoadingState, ErrorState; không dùng icon/emoji để thay cho nhãn nghiệp vụ.
-- URL state cho list, saved view theo quyền, bảng generic và detail drawer.
-- Sprint 1: hàng đợi công việc, khách hàng, đơn tuyển và thêm ứng viên vào đơn.
-- Sprint 2: pipeline ứng tuyển, nhiều vòng phỏng vấn, kết quả/quyết định và cổng khởi tạo journey.
-- Sprint 3: danh sách/chi tiết lộ trình cung ứng, milestone guard, evidence, blocker/waiver, departure tùy chọn; shared inbox, immutable thread, queued send, unmatched review, quarantine và conflict.
-- Health route, Playwright + axe smoke test, Docker Compose và Docker image chạy non-root.
+## Các quyết định cốt lõi
 
-## Chạy local
+- CMS chỉ dành cho nhân viên nội bộ; ứng viên không có tài khoản hoặc portal.
+- Hỗ trợ đa ngành bằng catalog `IndustrySector`, `Occupation` và `VisaRoute`; IT chỉ là một ngành cấu hình.
+- Một người có một `Candidate`, nhiều hồ sơ nghề và nhiều `Application` theo đơn hàng.
+- `Candidate`, `Application`, `Interview` và `SupplyJourney` là các lớp dữ liệu tách biệt.
+- MVP dùng một hộp thư doanh nghiệp chung; CMS lưu nội dung, thời gian, tệp đính kèm và lịch sử phản hồi.
+- Supply Journey quản lý quá trình cung ứng nhân sự, không phải hệ thống quản lý chuyến bay.
+- Kiến trúc mục tiêu là modular monolith chạy trên Ubuntu Server bằng Docker Compose.
 
-Yêu cầu Node 22 và pnpm 11.6+.
+## Xem nhanh
 
-```powershell
-pnpm install --frozen-lockfile
-pnpm dev
-```
+1. Đọc [Tổng quan hồ sơ](./docs/00-tong-quan.md).
+2. Mở [bản trình bày HTML](./presentation/candidate-cms-presentation.html) bằng trình duyệt.
+3. Dùng `←` / `→`, `Page Up` / `Page Down`, `Home` / `End` để điều khiển slide.
+4. Dùng nút **Trình chiếu** để bật toàn màn hình hoặc `Ctrl+P` để in/xuất PDF ngang.
 
-Mở `http://localhost:3000/work`, `http://localhost:3000/supply-journeys` hoặc `http://localhost:3000/mailbox`.
+Bản trình bày là một file HTML tự chứa, không tải thư viện hoặc tài nguyên từ Internet. Font **Be Vietnam Pro** đã được nhúng trực tiếp để hiển thị tiếng Việt ổn định trên máy trình chiếu.
 
-Ở development, MSW tự khởi động để mô phỏng `GET /api/v1/me`, search, login và saved views. Production không dùng fixture: App shell yêu cầu phiên thật từ `GET /api/v1/me`. Nếu đổi `NEXT_PUBLIC_API_BASE_URL`, cần truyền giá trị đó ở bước Docker build vì đây là biến public được Next.js đóng gói vào client.
+## Bộ tài liệu
 
-Quality gate:
+| Mã | Tài liệu | Nội dung chính |
+|---:|---|---|
+| 00 | [Tổng quan](./docs/00-tong-quan.md) | Mục tiêu, phạm vi và bản đồ tài liệu |
+| 01 | [Yêu cầu nghiệp vụ](./docs/01-yeu-cau-nghiep-vu.md) | Chức năng, quy tắc và ranh giới sản phẩm |
+| 02 | [Vòng đời ứng viên](./docs/02-vong-doi-ung-vien.md) | Candidate, Application, Interview và Supply Journey |
+| 03 | [Kiến trúc và stack](./docs/03-kien-truc-va-stack.md) | Kiến trúc logic và công nghệ mục tiêu |
+| 04 | [Mô hình dữ liệu](./docs/04-mo-hinh-du-lieu.md) | Thực thể, quan hệ và nguồn sự thật |
+| 05 | [Email Hub](./docs/05-email-hub.md) | Gửi, nhận, ghép phản hồi và lưu tệp |
+| 06 | [Phân quyền và bảo mật](./docs/06-phan-quyen-bao-mat.md) | Action, scope, dữ liệu nhạy cảm và audit |
+| 07 | [Thiết kế CMS](./docs/07-thiet-ke-cms.md) | Màn hình, thao tác và báo cáo |
+| 08 | [Vận hành Ubuntu](./docs/08-van-hanh-ubuntu.md) | Topology, backup, restore và monitoring |
+| 09 | [Kiểm thử và nghiệm thu](./docs/09-kiem-thu-nghiem-thu.md) | Acceptance criteria và chất lượng |
+| 10 | [Lộ trình MVP](./docs/10-lo-trinh-mvp.md) | Thứ tự triển khai và gate từng phase |
+| 11 | [Từ điển dữ liệu](./docs/11-tu-dien-du-lieu.md) | Trường, enum, snapshot và ràng buộc |
+| 12 | [Ma trận email](./docs/12-ma-tran-email-thong-bao.md) | Sự kiện, template, phê duyệt và reply |
+| 13 | [Hợp đồng API/UI](./docs/13-hop-dong-chuc-nang.md) | Hành động, endpoint, guard và lỗi |
+| 14 | [Quyết định kiến trúc](./docs/14-quyet-dinh-kien-truc.md) | ADR và điều kiện xem xét lại |
+| 15 | [Ma trận truy vết](./docs/15-truy-vet-yeu-cau.md) | Yêu cầu gốc, thiết kế và bằng chứng nghiệm thu |
 
-```powershell
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
-```
+## Chính sách nội dung Git
 
-Contract được sinh lại bằng:
+`.gitignore` được cấu hình theo allowlist. Git chỉ nhận:
 
-```powershell
-pnpm generate:contracts
-```
+- `.gitignore`;
+- `README.md`;
+- các file Markdown trực tiếp trong `docs/`;
+- `presentation/candidate-cms-presentation.html`.
 
-## Docker trên Ubuntu
+Toàn bộ nội dung khác bị bỏ qua, bao gồm agent/skill cục bộ, script hỗ trợ, file kế hoạch tạm, secrets, dữ liệu ứng viên, import/export, email attachment, backup, database volume, log và build artifact.
 
-```bash
-docker compose config --quiet
-docker compose build web
-docker compose up -d web
-```
+Không đưa dữ liệu ứng viên thật, nội dung email, hộ chiếu, credential hoặc backup production vào repository. `.gitignore` chỉ là lớp phòng ngừa nhầm lẫn, không phải cơ chế bảo vệ dữ liệu đã từng commit.
 
-Health check: `GET /api/health`. Image chạy bằng user non-root, filesystem read-only và có `/tmp` riêng. Biến môi trường production lấy từ `.env.example`; không commit `.env`.
+## Các quyết định cần chốt trước khi triển khai
 
-## Cấu trúc chính
-
-```text
-apps/web/                 Next.js CMS frontend
-packages/contracts/       OpenAPI YAML và generated TypeScript types
-tests/e2e/                Playwright + axe release smoke tests
-docs/                     SRS, ERD, UI/UX guideline và backlog Sprint 0–4
-presentation/             HTML deck dùng để trình bày dự án
-```
-
-## Tài liệu nguồn
-
-- [PRODUCT.md](./PRODUCT.md): mục tiêu, người dùng, phạm vi và nguyên tắc sản phẩm.
-- [docs/00-tong-quan.md](./docs/00-tong-quan.md) đến [docs/15-truy-vet-yeu-cau.md](./docs/15-truy-vet-yeu-cau.md): yêu cầu, domain, email hub, quyền, vận hành và nghiệm thu.
-- [docs/ui-ux/00-index.md](./docs/ui-ux/00-index.md): chỉ mục tám khu vực UI/UX.
-- [docs/backlogs/00-ui-ux-roadmap.md](./docs/backlogs/00-ui-ux-roadmap.md): roadmap và các implementation plan.
-- [presentation/candidate-cms-presentation.html](./presentation/candidate-cms-presentation.html): bản trình bày độc lập.
-
-## Git và dữ liệu nhạy cảm
-
-`.gitignore` loại dependency, build output, secrets, dữ liệu ứng viên/email, backup, script hỗ trợ và các file agent/skill sinh tự động. Chỉ đưa tài liệu thiết kế, presentation và source đã được review vào Git; không commit PII, credential, attachment email hoặc dữ liệu production.
-
-## Phạm vi chưa nhận là hoàn tất
-
-Sprint 3 vẫn là frontend/mock runtime, chưa phải toàn bộ sản phẩm production: backend NestJS, Prisma migration, PostgreSQL, Redis/worker, email provider thật, object storage, audit persistence và permission enforcement phía API sẽ được triển khai ở các sprint tiếp theo theo backlog.
+1. Danh mục ngành, nghề, visa route, chứng chỉ và trường chuyên môn ban đầu.
+2. Journey Template cho ứng viên ngoài Nhật, đang ở Nhật, chuyển việc và đổi tư cách lưu trú.
+3. Provider và địa chỉ hộp thư chung.
+4. Cơ cấu đội/phòng ban và ma trận quyền cuối cùng.
+5. Topology máy chủ, ngân sách, RPO và RTO chính thức.
+6. Nguồn dữ liệu hiện tại và kế hoạch làm sạch/import.
