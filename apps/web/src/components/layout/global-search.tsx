@@ -7,12 +7,14 @@ import type { Route } from 'next';
 import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 import type { CurrentUser } from '@/lib/auth/types';
+import { useI18n } from '@/i18n/use-i18n';
 
 type SearchResult = components['schemas']['SearchResult'];
 
 const resultsId = 'global-search-results';
 
 export function GlobalSearch({ user: _user }: { user: CurrentUser }) {
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<Array<HTMLAnchorElement | null>>([]);
   const [value, setValue] = useState('');
@@ -86,14 +88,14 @@ export function GlobalSearch({ user: _user }: { user: CurrentUser }) {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-xl">
-      <label className="sr-only" htmlFor="global-search">Tìm kiếm toàn hệ thống</label>
+      <label className="sr-only" htmlFor="global-search">{t('common.search.label')}</label>
       <input
         id="global-search"
         name="global-search"
         autoComplete="off"
         spellCheck={false}
         role="combobox"
-        aria-label="Tìm kiếm toàn hệ thống"
+        aria-label={t('common.search.label')}
         aria-autocomplete="list"
         aria-controls={resultsId}
         aria-expanded={showResults}
@@ -106,13 +108,13 @@ export function GlobalSearch({ user: _user }: { user: CurrentUser }) {
           setValue(nextValue);
           setOpen(nextValue.trim().length >= 2);
         }}
-        placeholder="Tìm ứng viên, khách hàng, đơn hàng"
+        placeholder={t('common.search.placeholder')}
         className="min-h-10 w-full rounded-control border border-border bg-panel px-3 text-sm text-text outline-none placeholder:text-text-muted focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       />
       {showResults ? (
-        <div id={resultsId} role="listbox" aria-label="Kết quả tìm kiếm" aria-busy={search.isPending} className="absolute left-0 right-0 top-12 z-20 rounded-lg border border-border bg-panel p-2 shadow-panel">
-          {search.isPending ? <p className="px-3 py-2 text-sm text-text-muted">Đang tìm kiếm</p> : null}
-          {search.data?.length === 0 ? <p className="px-3 py-2 text-sm text-text-muted">Không tìm thấy kết quả</p> : null}
+        <div id={resultsId} role="listbox" aria-label={t('common.search.results')} aria-busy={search.isPending} className="absolute left-0 right-0 top-12 z-20 rounded-lg border border-border bg-panel p-2 shadow-panel">
+          {search.isPending ? <p className="px-3 py-2 text-sm text-text-muted">{t('common.search.loading')}</p> : null}
+          {search.data?.length === 0 ? <p className="px-3 py-2 text-sm text-text-muted">{t('common.search.empty')}</p> : null}
           {results.map((result, index) => (
             <GlobalSearchResult
               key={result.id}
