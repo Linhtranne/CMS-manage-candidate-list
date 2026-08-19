@@ -79,3 +79,8 @@ Mỗi chương mô tả:
 - trạng thái loading/empty/error/permission/conflict;
 - quy tắc phân quyền và audit;
 - tiêu chí nghiệm thu UI.
+
+## 8. Tài liệu hệ thống
+
+- [UX-07. Hệ thống giao diện và chất lượng](./07-he-thong-giao-dien-va-chat-luong.md)
+- [UX-08. Kiến trúc i18n ba ngôn ngữ](./08-i18n-da-ngon-ngu.md)
