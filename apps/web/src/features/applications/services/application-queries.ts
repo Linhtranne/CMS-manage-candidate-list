@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 
-type ApplicationListParams = { query?: string; view?: 'screening' | 'waiting-interview' | 'interviewed' | 'waiting-result' | 'passed' | 'closed' | 'overdue'; orderId?: string; ownerId?: string; cursor?: string };
+type ApplicationListParams = { query?: string; view?: 'screening' | 'waiting-interview' | 'interviewed' | 'waiting-result' | 'passed' | 'failed' | 'withdrawn' | 'closed' | 'overdue'; orderId?: string; ownerId?: string; cursor?: string };
 
 export async function fetchApplications(params: ApplicationListParams = {}) {
   const response = await apiClient.GET('/applications', { params: { query: params } });

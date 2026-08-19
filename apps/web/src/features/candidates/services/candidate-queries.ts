@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 
-export type CandidateView = 'all' | 'potential' | 'applying' | 'passed' | 'supplying' | 'supplied' | 'missing-contact' | 'duplicates';
+export type CandidateView = 'all' | 'potential' | 'new-unassigned' | 'ready-to-match' | 'applying' | 'passed' | 'supplying' | 'supplied' | 'paused' | 'archived' | 'missing-contact' | 'missing-documents' | 'duplicates';
 
 export type CandidateListParams = {
   query?: string;
@@ -12,6 +12,12 @@ export type CandidateListParams = {
   industry?: string;
   readiness?: string;
   contactability?: string;
+  occupation?: string;
+  skill?: string;
+  desiredLocation?: string;
+  source?: string;
+  recordStatus?: string;
+  experience?: string;
   cursor?: string;
 };
 

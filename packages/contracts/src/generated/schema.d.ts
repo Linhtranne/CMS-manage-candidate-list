@@ -109,7 +109,7 @@ export interface paths {
         };
         get: operations["listWorkItems"];
         put?: never;
-        post?: never;
+        post: operations["createWorkItem"];
         delete?: never;
         options?: never;
         head?: never;
@@ -157,7 +157,7 @@ export interface paths {
         };
         get: operations["listClients"];
         put?: never;
-        post?: never;
+        post: operations["createClient"];
         delete?: never;
         options?: never;
         head?: never;
@@ -177,7 +177,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateClient"];
         trace?: never;
     };
     "/orders": {
@@ -189,7 +189,7 @@ export interface paths {
         };
         get: operations["listOrders"];
         put?: never;
-        post?: never;
+        post: operations["createOrder"];
         delete?: never;
         options?: never;
         head?: never;
@@ -685,7 +685,7 @@ export interface paths {
         };
         get: operations["listAdminUsers"];
         put?: never;
-        post?: never;
+        post: operations["inviteAdminUser"];
         delete?: never;
         options?: never;
         head?: never;
@@ -749,7 +749,7 @@ export interface paths {
         };
         get: operations["listAdminCatalogs"];
         put?: never;
-        post?: never;
+        post: operations["createAdminCatalog"];
         delete?: never;
         options?: never;
         head?: never;
@@ -781,7 +781,7 @@ export interface paths {
         };
         get: operations["listAdminTemplates"];
         put?: never;
-        post?: never;
+        post: operations["createAdminTemplate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -817,7 +817,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateAdminMailboxSettings"];
         trace?: never;
     };
     "/admin/audit": {
@@ -968,6 +968,32 @@ export interface components {
             region: string;
             contactName?: string;
             notes?: string;
+            version: number;
+        };
+        CreateWorkItemRequest: {
+            title: string;
+            /** @enum {string} */
+            priority: "URGENT" | "HIGH" | "NORMAL";
+            /** Format: date-time */
+            dueAt: string;
+            candidateId: string;
+            orderId?: string | null;
+            clientId?: string | null;
+            notes?: string | null;
+        };
+        CreateClientRequest: {
+            name: string;
+            organizationType: string;
+            industryLabels: string[];
+            region: string;
+            ownerId: string;
+            contactName?: string | null;
+            notes?: string | null;
+        };
+        ClientUpdateRequest: components["schemas"]["CreateClientRequest"] & {
+            version: number;
+            /** @enum {string} */
+            status?: "PROSPECT" | "ACTIVE" | "PAUSED" | "INACTIVE";
         };
         ClientsResponse: {
             items: components["schemas"]["Client"][];
@@ -1001,6 +1027,21 @@ export interface components {
             japaneseLevel?: string;
             criteria?: string[];
         };
+        CreateOrderRequest: {
+            position: string;
+            clientId: string;
+            industryLabel: string;
+            occupation: string;
+            location: string;
+            target: number;
+            /** Format: date-time */
+            deadline: string;
+            ownerId: string;
+            salary?: string;
+            contractType?: string;
+            japaneseLevel?: string;
+            criteria?: string[];
+        };
         OrdersResponse: {
             items: components["schemas"]["JobOrder"][];
         };
@@ -1014,6 +1055,10 @@ export interface components {
             readiness: string;
             hasActiveApplicationInOrder: boolean;
             hasActiveJourney: boolean;
+            skills?: string[];
+            yearsExperience?: number;
+            /** @enum {string} */
+            recordStatus?: "ACTIVE" | "ARCHIVED";
         };
         CandidateSearchResponse: {
             items: components["schemas"]["CandidateMatch"][];
@@ -1073,6 +1118,10 @@ export interface components {
             emailMasked?: string | null;
             phoneMasked?: string | null;
             source?: string;
+            skills?: string[];
+            yearsExperience?: number;
+            desiredLocation?: string | null;
+            missingDocumentCount?: number;
         };
         CandidateDetail: components["schemas"]["Candidate"] & {
             /** Format: email */
@@ -1560,6 +1609,13 @@ export interface components {
             status: "ACTIVE" | "LOCKED" | "INVITED";
             version: number;
         };
+        CreateAdminUserRequest: {
+            displayName: string;
+            /** Format: email */
+            email: string;
+            teamId: string;
+            roleIds: string[];
+        };
         AdminRole: {
             id: string;
             name: string;
@@ -1599,6 +1655,12 @@ export interface components {
             status: "ACTIVE" | "RETIRED";
             usageCount: number;
         };
+        CreateAdminCatalogRequest: {
+            /** @enum {string} */
+            type: "INDUSTRY" | "OCCUPATION" | "VISA_ROUTE" | "SOURCE";
+            code: string;
+            label: string;
+        };
         AdminCatalogsResponse: {
             items: components["schemas"]["AdminCatalogItem"][];
         };
@@ -1617,6 +1679,20 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             previewText?: string;
+            subject?: string;
+            body?: string;
+            variables?: string[];
+            milestones?: string[];
+        };
+        CreateAdminTemplateRequest: {
+            /** @enum {string} */
+            type: "JOURNEY" | "EMAIL";
+            name: string;
+            previewText: string;
+            subject?: string;
+            body?: string;
+            variables?: string[];
+            milestones?: string[];
         };
         AdminTemplatesResponse: {
             items: components["schemas"]["AdminTemplate"][];
@@ -1633,6 +1709,24 @@ export interface components {
             /** Format: date-time */
             lastCheckedAt: string;
             credentialConfigured: boolean;
+            signature?: string;
+            receiveFolder?: string;
+            sentFolder?: string;
+            retryLimit?: number;
+            /** Format: email */
+            alertAddress?: string;
+        };
+        MailboxSettingsUpdate: {
+            senderName: string;
+            /** @enum {string} */
+            adapter: "MICROSOFT_365" | "GOOGLE_WORKSPACE" | "SMTP_IMAP";
+            maxAttachmentBytes: number;
+            signature?: string;
+            receiveFolder?: string;
+            sentFolder?: string;
+            retryLimit?: number;
+            /** Format: email */
+            alertAddress?: string;
         };
         AdminAuditEvent: {
             id: string;
@@ -1890,6 +1984,32 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    createWorkItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWorkItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Created manual work item */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkItem"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     getWorkSummary: {
         parameters: {
             query?: {
@@ -1988,6 +2108,32 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    createClient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateClientRequest"];
+            };
+        };
+        responses: {
+            /** @description Client created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     getClient: {
         parameters: {
             query?: never;
@@ -2008,6 +2154,34 @@ export interface operations {
                     "application/json": components["schemas"]["Client"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    updateClient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Client updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            409: components["responses"]["Conflict"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -2033,6 +2207,32 @@ export interface operations {
                     "application/json": components["schemas"]["OrdersResponse"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Recruitment order created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobOrder"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -2121,6 +2321,11 @@ export interface operations {
                 orderId: string;
                 query?: string;
                 industry?: string;
+                occupation?: string;
+                skill?: string;
+                japaneseLevel?: string;
+                readiness?: string;
+                hasActiveJourney?: string;
             };
             header?: never;
             path?: never;
@@ -2144,10 +2349,16 @@ export interface operations {
         parameters: {
             query?: {
                 query?: string;
-                view?: "all" | "potential" | "applying" | "passed" | "supplying" | "supplied" | "missing-contact" | "duplicates";
+                view?: "all" | "potential" | "new-unassigned" | "ready-to-match" | "applying" | "passed" | "supplying" | "supplied" | "paused" | "archived" | "missing-contact" | "missing-documents" | "duplicates";
                 industry?: string;
                 readiness?: string;
                 contactability?: string;
+                occupation?: string;
+                skill?: string;
+                desiredLocation?: string;
+                source?: string;
+                recordStatus?: string;
+                experience?: string;
                 cursor?: string;
             };
             header?: never;
@@ -2310,7 +2521,7 @@ export interface operations {
         parameters: {
             query?: {
                 query?: string;
-                view?: "screening" | "waiting-interview" | "interviewed" | "waiting-result" | "passed" | "closed" | "overdue";
+                view?: "screening" | "waiting-interview" | "interviewed" | "waiting-result" | "passed" | "failed" | "withdrawn" | "closed" | "overdue";
                 orderId?: string;
                 ownerId?: string;
                 cursor?: string;
@@ -2598,7 +2809,7 @@ export interface operations {
         parameters: {
             query?: {
                 query?: string;
-                view?: "all" | "active" | "on-hold" | "at-risk" | "waiting-candidate" | "waiting-external" | "completed";
+                view?: "all" | "active" | "on-hold" | "at-risk" | "overdue" | "waiting-candidate" | "waiting-external" | "near-complete" | "completed" | "cancelled";
                 ownerId?: string;
             };
             header?: never;
@@ -2710,7 +2921,8 @@ export interface operations {
         parameters: {
             query?: {
                 query?: string;
-                view?: "all" | "needs-action" | "unmatched" | "sent" | "received";
+                view?: "all" | "needs-action" | "unmatched" | "sent" | "received" | "waiting-candidate" | "waiting-internal" | "completed" | "failed";
+                journeyId?: string;
             };
             header?: never;
             path?: never;
@@ -2952,6 +3164,33 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    inviteAdminUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminUserRequest"];
+            };
+        };
+        responses: {
+            /** @description Internal user invitation created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUser"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     updateAdminUser: {
         parameters: {
             query?: never;
@@ -3056,6 +3295,32 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    createAdminCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminCatalogRequest"];
+            };
+        };
+        responses: {
+            /** @description Catalog value created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCatalogItem"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     retireAdminCatalog: {
         parameters: {
             query?: never;
@@ -3109,6 +3374,31 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    createAdminTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminTemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description Template created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTemplate"];
+                };
+            };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     retireAdminTemplate: {
         parameters: {
             query?: never;
@@ -3148,6 +3438,32 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Shared mailbox health without credential material */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MailboxSettingsView"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    updateAdminMailboxSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MailboxSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Updated shared mailbox settings without credential material */
             200: {
                 headers: {
                     [name: string]: unknown;

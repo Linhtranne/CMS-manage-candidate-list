@@ -61,3 +61,18 @@ export function useUpdateWorkItem() {
   });
 }
 
+export function useCreateWorkItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: components['schemas']['CreateWorkItemRequest']) => {
+      const response = await apiClient.POST('/work-items', { body });
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['work-items'] });
+      void queryClient.invalidateQueries({ queryKey: ['work-summary'] });
+    }
+  });
+}
+

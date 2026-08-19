@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api/client';
 
 type UpdateMilestoneRequest = components['schemas']['UpdateMilestoneRequest'];
 type WaiveMilestoneRequest = components['schemas']['WaiveMilestoneRequest'];
-type JourneyView = 'all' | 'active' | 'on-hold' | 'at-risk' | 'waiting-candidate' | 'waiting-external' | 'completed';
+type JourneyView = 'all' | 'active' | 'on-hold' | 'at-risk' | 'overdue' | 'waiting-candidate' | 'waiting-external' | 'near-complete' | 'completed' | 'cancelled';
 
 export function useJourneys({ query = '', view = 'all', ownerId }: { query?: string; view?: string; ownerId?: string }) {
   const normalizedView = view as JourneyView;

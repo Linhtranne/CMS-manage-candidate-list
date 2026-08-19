@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { conversationDetails } from '@/mocks/fixtures/mail';
 import { EmailComposer } from './email-composer';
 
@@ -14,5 +14,14 @@ describe('EmailComposer', () => {
     await userEvent.type(screen.getByLabelText('Nội dung'), 'Xin chào');
     await userEvent.click(screen.getByRole('button', { name: 'Gửi email' }));
     expect(screen.getByText('Thiếu thời gian phỏng vấn')).toBeVisible();
+  });
+
+  it('reports unsaved changes after the composer is edited', async () => {
+    const conversation = { ...conversationDetails[0] };
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const onDirtyChange = vi.fn();
+    render(<QueryClientProvider client={client}><EmailComposer conversation={conversation} onDirtyChange={onDirtyChange} /></QueryClientProvider>);
+    await userEvent.type(screen.getByLabelText('Nội dung'), 'Nội dung phản hồi');
+    expect(onDirtyChange).toHaveBeenLastCalledWith(true);
   });
 });

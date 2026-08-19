@@ -8,11 +8,13 @@ import { LoadingState } from '@/components/ui/loading-state';
 import { StatusLabel } from '@/components/ui/status-label';
 import { useUpdateWorkItem, useWorkItem } from '../services/work-queries';
 import { WorkActions } from './work-actions';
+import { WorkEditDialog } from './work-edit-dialog';
 
 export function WorkDrawer({ workItemId, open, onClose }: { workItemId?: string; open: boolean; onClose: () => void }) {
   const query = useWorkItem(workItemId);
   const mutation = useUpdateWorkItem();
   const [success, setSuccess] = useState(false);
+  const [editMode, setEditMode] = useState<'due' | 'assignee'>();
   const item = query.data;
 
   return (
@@ -25,7 +27,8 @@ export function WorkDrawer({ workItemId, open, onClose }: { workItemId?: string;
           {mutation.error && (mutation.error as Error & { code?: string }).code === 'VERSION_CONFLICT' ? <div role="alert" className="space-y-2 rounded-lg border border-[#efc3bf] bg-[#fff8f7] p-4"><p className="text-sm font-semibold text-danger">Dữ liệu vừa được cập nhật</p><Button variant="secondary" size="sm" onClick={() => void query.refetch()}>Tải lại</Button></div> : null}
           {success ? <p role="status" className="rounded-lg border border-[#b8dfc8] bg-[#f3fbf6] p-3 text-sm font-semibold text-success">Đã hoàn thành công việc</p> : null}
           <div className="flex items-center gap-2"><StatusLabel tone={item.status === 'DONE' ? 'success' : 'info'}>{item.status === 'DONE' ? 'Đã hoàn thành' : 'Đang chờ xử lý'}</StatusLabel><span className="text-xs text-text-muted">Phiên bản {item.version}</span></div>
-          <WorkActions disabled={mutation.isPending || item.status === 'DONE'} onComplete={() => mutation.mutate({ id: item.id, body: { status: 'DONE', version: item.version } }, { onSuccess: () => setSuccess(true) })} />
+          <WorkActions disabled={mutation.isPending || item.status === 'DONE'} sendEmailHref={`/mailbox?query=${encodeURIComponent(item.candidate.name)}`} onComplete={() => mutation.mutate({ id: item.id, body: { status: 'DONE', version: item.version } }, { onSuccess: () => setSuccess(true) })} onChangeDue={() => { setEditMode('due'); setSuccess(false); }} onChangeAssignee={() => { setEditMode('assignee'); setSuccess(false); }} />
+          <WorkEditDialog mode={editMode ?? 'due'} item={item} open={Boolean(editMode)} isSaving={mutation.isPending} error={mutation.error ? (mutation.error as Error).message : undefined} onClose={() => setEditMode(undefined)} onSave={(value) => mutation.mutate({ id: item.id, body: editMode === 'due' ? { dueAt: new Date(value).toISOString(), version: item.version } : { assigneeId: value, version: item.version } }, { onSuccess: () => { setEditMode(undefined); setSuccess(false); } })} />
         </div>
       )}
     </DetailDrawer>

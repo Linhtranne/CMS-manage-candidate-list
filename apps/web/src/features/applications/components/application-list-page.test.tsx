@@ -30,4 +30,17 @@ describe('ApplicationListPage', () => {
     expect(window.location.search).toContain('view=waiting-interview');
     expect(window.location.search).toContain('query=UV-0001');
   });
+
+  it('opens interview operations in a focused modal instead of below the fold', async () => {
+    window.history.replaceState({}, '', '/applications?view=waiting-interview');
+    renderPage();
+
+    await userEvent.click(await screen.findByText('Nguyễn Minh An'));
+    await userEvent.click(screen.getByRole('button', { name: 'Lên lịch phỏng vấn' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Lên lịch vòng 2' });
+    expect(dialog).toBeVisible();
+    expect(dialog).toHaveFocus();
+    expect(dialog).toContainElement(screen.getByLabelText('Thời gian phỏng vấn'));
+  });
 });

@@ -32,7 +32,7 @@ export const journeysHandlers = [
       const summary = toJourneySummary(detail);
       const waitingCandidate = detail.milestones.some((item) => item.status === 'BLOCKED' && item.blockerParty === 'CANDIDATE');
       const waitingExternal = detail.milestones.some((item) => item.status === 'BLOCKED' && item.blockerParty === 'CLIENT_PARTNER');
-      const matchesView = view === 'all' || (view === 'active' && detail.status === 'ACTIVE') || (view === 'on-hold' && detail.status === 'ON_HOLD') || (view === 'completed' && detail.status === 'COMPLETED') || (view === 'at-risk' && summary.health === 'AT_RISK') || (view === 'waiting-candidate' && waitingCandidate) || (view === 'waiting-external' && waitingExternal);
+      const matchesView = view === 'all' || (view === 'active' && detail.status === 'ACTIVE') || (view === 'on-hold' && detail.status === 'ON_HOLD') || (view === 'completed' && detail.status === 'COMPLETED') || (view === 'cancelled' && detail.status === 'CANCELLED') || (view === 'at-risk' && summary.health === 'AT_RISK') || (view === 'overdue' && summary.health === 'OVERDUE') || (view === 'waiting-candidate' && waitingCandidate) || (view === 'waiting-external' && waitingExternal) || (view === 'near-complete' && summary.progress.applicable > 0 && summary.progress.completed >= summary.progress.applicable - 1);
       return (!query || haystack.includes(query)) && (!ownerId || detail.owner.id === ownerId) && matchesView;
     }).map(toJourneySummary);
     return HttpResponse.json({ items, nextCursor: null });

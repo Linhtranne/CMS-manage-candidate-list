@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { CandidateListPage } from './candidate-list-page';
@@ -17,6 +17,9 @@ describe('candidate form modals', () => {
     expect(screen.getByRole('dialog', { name: 'Thêm ứng viên' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Lưu ứng viên' }));
     expect(screen.getByRole('alert')).toHaveTextContent('Vui lòng nhập họ tên');
+    expect(screen.getByLabelText('Họ và tên')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Họ và tên')).toHaveAttribute('aria-describedby', 'create-candidate-error');
+    await waitFor(() => expect(screen.getByLabelText('Họ và tên')).toHaveFocus());
     await user.type(screen.getByLabelText('Họ và tên'), 'Nguyễn Form Mới');
     await user.selectOptions(screen.getByLabelText('Ngành nghề'), 'Điều dưỡng');
     await user.type(screen.getByLabelText('Nghề nghiệp chính'), 'Nhân viên chăm sóc');

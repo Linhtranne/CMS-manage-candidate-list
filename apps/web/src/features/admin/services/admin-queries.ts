@@ -5,6 +5,7 @@ import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 
 type AdminUserUpdate = components['schemas']['AdminUserUpdate'];
+type CreateAdminUserRequest = components['schemas']['CreateAdminUserRequest'];
 type AdminRoleUpdate = components['schemas']['AdminRoleUpdate'];
 type VersionedActionRequest = components['schemas']['VersionedActionRequest'];
 
@@ -30,13 +31,37 @@ export function useAdminMailbox() {
   return useAdminQuery(async () => { const response = await apiClient.GET('/admin/mailbox'); if (response.error) throw new Error(response.error.message); return response.data; }, ['admin-mailbox']);
 }
 
-export function useAdminAudit(filters: { actorId?: string; resourceId?: string; action?: string } = {}) {
+export function useUpdateAdminMailbox() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: components['schemas']['MailboxSettingsUpdate']) => {
+      const response = await apiClient.PATCH('/admin/mailbox', { body });
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+    onSuccess: (data) => { queryClient.setQueryData(['admin-mailbox'], data); void queryClient.invalidateQueries({ queryKey: ['admin-audit'] }); }
+  });
+}
+
+export function useAdminAudit(filters: { actorId?: string; resourceId?: string; action?: string; from?: string; to?: string } = {}) {
   return useAdminQuery(async () => { const response = await apiClient.GET('/admin/audit', { params: { query: filters } }); if (response.error) throw new Error(response.error.message); return response.data; }, ['admin-audit', filters]);
 }
 
 export function useUpdateAdminUser() {
   const queryClient = useQueryClient();
   return useMutation({ mutationFn: async ({ id, body }: { id: string; body: AdminUserUpdate }) => { const response = await apiClient.PATCH('/admin/users/{id}', { params: { path: { id } }, body }); if (response.error) throw new Error(response.error.message); return response.data; }, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-users'] }); } });
+}
+
+export function useInviteAdminUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: CreateAdminUserRequest) => {
+      const response = await apiClient.POST('/admin/users', { body });
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-users'] }); }
+  });
 }
 
 export function useUpdateAdminRole() {
@@ -49,7 +74,17 @@ export function useRetireAdminCatalog() {
   return useMutation({ mutationFn: async ({ id, body }: { id: string; body: VersionedActionRequest }) => { const response = await apiClient.POST('/admin/catalogs/{id}/retire', { params: { path: { id } }, body }); if (response.error) throw new Error(response.error.message); return response.data; }, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-catalogs'] }); } });
 }
 
+export function useCreateAdminCatalog() {
+  const queryClient = useQueryClient();
+  return useMutation({ mutationFn: async (body: components['schemas']['CreateAdminCatalogRequest']) => { const response = await apiClient.POST('/admin/catalogs', { body }); if (response.error) throw new Error(response.error.message); return response.data; }, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-catalogs'] }); } });
+}
+
 export function useRetireAdminTemplate() {
   const queryClient = useQueryClient();
   return useMutation({ mutationFn: async ({ id, body }: { id: string; body: VersionedActionRequest }) => { const response = await apiClient.POST('/admin/templates/{id}/retire', { params: { path: { id } }, body }); if (response.error) throw new Error(response.error.message); return response.data; }, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-templates'] }); } });
+}
+
+export function useCreateAdminTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({ mutationFn: async (body: components['schemas']['CreateAdminTemplateRequest']) => { const response = await apiClient.POST('/admin/templates', { body }); if (response.error) throw new Error(response.error.message); return response.data; }, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['admin-templates'] }); } });
 }

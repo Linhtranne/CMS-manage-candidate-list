@@ -17,8 +17,11 @@ describe('MailboxPage', () => {
     await userEvent.click(screen.getByRole('tab', { name: 'Cần xử lý' }));
     await userEvent.click(await screen.findByText('Xác nhận lịch phỏng vấn'));
     expect(await screen.findByText('Ghi chú nội bộ')).toBeVisible();
+    const conversationDialog = screen.getByRole('dialog', { name: 'Chi tiết hộp thư chung' });
     await userEvent.click(screen.getByRole('button', { name: 'Trả lời' }));
     expect(await screen.findByRole('dialog', { name: 'Soạn email trả lời' })).toBeVisible();
+    expect(conversationDialog).toHaveAttribute('aria-hidden', 'true');
+    expect(conversationDialog).toHaveAttribute('inert');
     await userEvent.type(screen.getByLabelText('Nội dung'), 'Cảm ơn bạn đã phản hồi.');
     await userEvent.click(screen.getByRole('button', { name: 'Gửi email' }));
     expect((await screen.findAllByText('Đang chờ gửi')).length).toBeGreaterThan(0);

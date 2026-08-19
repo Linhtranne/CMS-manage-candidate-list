@@ -22,21 +22,26 @@ export function Sidebar({ user, open = true, mobile = false, onClose }: { user: 
         </div>
       </div>
       <nav className="space-y-1 p-3">
-        {items.map((item) => (
-          <Link
+        {items.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return <Link
             key={item.href}
             href={item.href as Route}
+            aria-current={isActive ? 'page' : undefined}
             onClick={() => { if (mobile) onClose?.(); }}
             className={cn(
               'block rounded-control px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-surface hover:text-text',
-              (pathname === item.href || pathname.startsWith(`${item.href}/`)) && 'bg-[#e8f1fb] text-accent'
+              isActive && 'bg-[#e8f1fb] text-accent'
             )}
           >
             {item.label}
-          </Link>
-        ))}
+          </Link>;
+        })}
         {can(user.permissions, adminNavigation.permission) ? (
-          <Link href={adminNavigation.href as Route} onClick={() => { if (mobile) onClose?.(); }} className="block rounded-control px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-surface hover:text-text">
+          <Link href={adminNavigation.href as Route} aria-current={pathname === adminNavigation.href || pathname.startsWith(`${adminNavigation.href}/`) ? 'page' : undefined} onClick={() => { if (mobile) onClose?.(); }} className={cn(
+            'block rounded-control px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-surface hover:text-text',
+            (pathname === adminNavigation.href || pathname.startsWith(`${adminNavigation.href}/`)) && 'bg-[#e8f1fb] text-accent'
+          )}>
             {adminNavigation.label}
           </Link>
         ) : null}

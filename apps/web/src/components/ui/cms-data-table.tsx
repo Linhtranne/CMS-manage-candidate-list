@@ -36,7 +36,7 @@ export function CmsDataTable<TData>({
         </thead>
         <tbody>
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} tabIndex={onRowClick ? 0 : undefined} onClick={() => onRowClick?.(row.original)} onKeyDown={(event) => { if (event.key === 'Enter') onRowClick?.(row.original); }} className={onRowClick ? 'cursor-pointer border-b border-border last:border-0 hover:bg-surface' : 'border-b border-border last:border-0'}>
+            <tr key={row.id} tabIndex={onRowClick ? 0 : undefined} onClick={() => onRowClick?.(row.original)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onRowClick?.(row.original); } }} className={onRowClick ? 'cursor-pointer border-b border-border last:border-0 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent' : 'border-b border-border last:border-0'}>
               {row.getVisibleCells().map((cell) => <td key={cell.id} className="px-4 py-3 text-text">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}
             </tr>
           ))}

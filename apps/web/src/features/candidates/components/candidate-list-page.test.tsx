@@ -17,7 +17,7 @@ describe('CandidateListPage', () => {
     expect(row).toBeInTheDocument();
     await userEvent.click(row);
     expect(await screen.findByRole('dialog', { name: 'Hồ sơ ứng viên' })).toBeInTheDocument();
-    expect(screen.getByText('Mở hồ sơ đầy đủ')).toBeInTheDocument();
+    expect(screen.queryByText('Mở hồ sơ đầy đủ')).not.toBeInTheDocument();
   });
 
   it('switches saved views through the URL state and filters the list', async () => {
@@ -25,5 +25,16 @@ describe('CandidateListPage', () => {
     await userEvent.click(await screen.findByRole('tab', { name: 'Đang ứng tuyển' }));
     expect(await screen.findByRole('row', { name: /UV-0001/ })).toBeInTheDocument();
     expect(screen.queryByRole('row', { name: /UV-0009/ })).not.toBeInTheDocument();
+  });
+
+  it('switches views with arrow keys when focus stays on the tablist', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    const activeTab = await screen.findByRole('tab', { name: 'Ứng viên tiềm năng' });
+    await user.click(activeTab);
+    await user.keyboard('{ArrowRight}');
+
+    expect(screen.getByRole('tab', { name: 'Mới / chưa phân công' })).toHaveAttribute('aria-selected', 'true');
   });
 });

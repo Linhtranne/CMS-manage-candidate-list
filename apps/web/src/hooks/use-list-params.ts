@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type ListParams = {
   query: string;
@@ -8,6 +8,7 @@ export type ListParams = {
   sort: string;
   cursor?: string;
   selectedId?: string;
+  journeyId?: string;
 };
 
 function readParams(defaultView: string): ListParams {
@@ -17,12 +18,19 @@ function readParams(defaultView: string): ListParams {
     view: search.get('view') ?? defaultView,
     sort: search.get('sort') ?? '',
     cursor: search.get('cursor') ?? undefined,
-    selectedId: search.get('selectedId') ?? undefined
+    selectedId: search.get('selectedId') ?? undefined,
+    journeyId: search.get('journeyId') ?? undefined
   };
 }
 
 export function useListParams({ defaultView }: { defaultView: string }) {
   const [params, setParams] = useState<ListParams>(() => readParams(defaultView));
+
+  useEffect(() => {
+    const syncFromUrl = () => setParams(readParams(defaultView));
+    window.addEventListener('popstate', syncFromUrl);
+    return () => window.removeEventListener('popstate', syncFromUrl);
+  }, [defaultView]);
 
   const update = useCallback((patch: Partial<ListParams>) => {
     const next = { ...params, ...patch };

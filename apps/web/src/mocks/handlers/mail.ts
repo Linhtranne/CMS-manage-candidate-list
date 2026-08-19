@@ -12,10 +12,12 @@ export const mailHandlers = [
     const url = new URL(request.url);
     const query = (url.searchParams.get('query') ?? '').toLowerCase();
     const view = url.searchParams.get('view') ?? 'all';
+    const journeyId = url.searchParams.get('journeyId');
     const items = conversationFixtures.filter((conversation) => {
       const haystack = `${conversation.subject} ${conversation.snippet} ${conversation.candidate.name} ${conversation.candidate.code}`.toLowerCase();
-      const matchesView = view === 'all' || (view === 'needs-action' && conversation.status === 'NEEDS_ACTION') || (view === 'unmatched' && conversation.status === 'UNMATCHED') || (view === 'sent' && conversation.status === 'SENT') || (view === 'received' && conversation.status === 'RECEIVED');
-      return (!query || haystack.includes(query)) && matchesView;
+      const failed = findConversation(conversation.id)?.messages.some((message) => message.status === 'FAILED' || message.status === 'BOUNCED') ?? false;
+      const matchesView = view === 'all' || (view === 'needs-action' && conversation.status === 'NEEDS_ACTION') || (view === 'unmatched' && conversation.status === 'UNMATCHED') || (view === 'sent' && conversation.status === 'SENT') || (view === 'received' && conversation.status === 'RECEIVED') || (view === 'waiting-candidate' && conversation.status === 'RECEIVED') || (view === 'waiting-internal' && conversation.status === 'NEEDS_ACTION') || (view === 'completed' && conversation.status === 'CLOSED') || (view === 'failed' && failed);
+      return (!query || haystack.includes(query)) && (!journeyId || conversation.journeyId === journeyId) && matchesView;
     });
     return HttpResponse.json({ items });
   }),

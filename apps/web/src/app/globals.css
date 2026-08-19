@@ -17,6 +17,7 @@
 }
 
 @theme {
+  --font-sans: 'Be Vietnam Pro', Arial, Helvetica, sans-serif;
   --color-surface: #fbfaf7;
   --color-panel: #ffffff;
   --color-text: #182233;
@@ -49,10 +50,44 @@ body {
   margin: 0;
   background: var(--cms-color-surface);
   color: var(--cms-color-text);
-  font-family: var(--font-sans, 'Be Vietnam Pro'), Arial, Helvetica, sans-serif;
+  font-family: 'Be Vietnam Pro', Arial, Helvetica, sans-serif;
+}
+
+@media (max-width: 1279px) {
+  .cms-saved-view-bar > [data-resource] {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 639px) {
+  .cms-saved-view-bar > label {
+    flex: 1 1 100%;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .cms-saved-view-bar > label > input,
+  .cms-saved-view-bar > label > select {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+  }
+}
+
+button,
+a,
+select,
+summary {
+  touch-action: manipulation;
 }
 
 :focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--cms-color-accent) 40%, transparent);
+  outline-offset: 2px;
+}
+
+label:has(> input[type='file'].sr-only:focus-visible) {
   outline: 3px solid color-mix(in srgb, var(--cms-color-accent) 40%, transparent);
   outline-offset: 2px;
 }
@@ -117,7 +152,7 @@ body {
 
 .cms-drawer-panel {
   animation: cms-slide-in var(--cms-motion-slow) var(--cms-motion-ease) both;
-  will-change: transform, opacity;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
 }
 
 .cms-drawer-layer[data-state='closing'] .cms-drawer-backdrop {
@@ -134,7 +169,6 @@ body {
 
 .cms-modal-panel {
   animation: cms-modal-in var(--cms-motion-normal) var(--cms-motion-ease) both;
-  will-change: transform, opacity;
 }
 
 .cms-modal-layer {
@@ -168,7 +202,12 @@ body {
 
 .cms-mobile-navigation-panel {
   animation: cms-mobile-navigation-in var(--cms-motion-slow) var(--cms-motion-ease) both;
-  will-change: transform, opacity;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.cms-full-bleed-modal-panel {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .cms-mobile-navigation[data-state='closing'] {
@@ -185,12 +224,17 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+  :root {
+    --cms-motion-fast: 1ms;
+    --cms-motion-normal: 1ms;
+    --cms-motion-slow: 1ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .cms-loading-pulse {
+    animation: none;
   }
 }

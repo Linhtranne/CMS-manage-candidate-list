@@ -68,7 +68,7 @@ Docker Compose hiện phục vụ frontend. Production cần API backend tương
 
 ## Thiết kế và tài liệu
 
-- [Thiết kế Figma](https://www.figma.com/design/bbLcUuOo0iyVbgroPGS8Mc)
+- [Thiết kế Figma](https://www.figma.com/design/3ANKdwAmkgK6Bm7LcqgmP4)
 - [Bản trình bày HTML](./presentation/candidate-cms-presentation.html)
 - [PRODUCT.md](./PRODUCT.md) — mục tiêu, người dùng và ranh giới sản phẩm
 - [Tổng quan tài liệu](./docs/00-tong-quan.md)

@@ -6,11 +6,11 @@ import { apiClient } from '@/lib/api/client';
 
 type SendEmailRequest = components['schemas']['SendEmailRequest'];
 type LinkConversationRequest = components['schemas']['LinkConversationRequest'];
-type MailView = 'all' | 'needs-action' | 'unmatched' | 'sent' | 'received';
+type MailView = 'all' | 'needs-action' | 'unmatched' | 'sent' | 'received' | 'waiting-candidate' | 'waiting-internal' | 'completed' | 'failed';
 
-export function useConversations({ query = '', view = 'all' }: { query?: string; view?: string }) {
+export function useConversations({ query = '', view = 'all', journeyId }: { query?: string; view?: string; journeyId?: string }) {
   const normalizedView = view as MailView;
-  return useQuery({ queryKey: ['mailbox-conversations', query, normalizedView], queryFn: async () => { const response = await apiClient.GET('/mailbox/conversations', { params: { query: { query, view: normalizedView } } }); if (response.error) throw new Error(response.error.message); return response.data; } });
+  return useQuery({ queryKey: ['mailbox-conversations', query, normalizedView, journeyId], queryFn: async () => { const response = await apiClient.GET('/mailbox/conversations', { params: { query: { query, view: normalizedView, journeyId } } }); if (response.error) throw new Error(response.error.message); return response.data; } });
 }
 
 export function useConversation(conversationId?: string) {

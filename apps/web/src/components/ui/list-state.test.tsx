@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { recruiterFixture } from '@/mocks/fixtures/users';
 import { useListParams } from '@/hooks/use-list-params';
+import { QueryProvider } from '@/providers/query-provider';
 import { SavedViewMenu } from './saved-view-menu';
 
 function ListHarness() {
@@ -29,7 +30,7 @@ describe('list foundation', () => {
   });
 
   it('saves a private view and only lets managers publish team views', () => {
-    render(<SavedViewMenu resource="candidates" user={recruiterFixture} />);
+    render(<QueryProvider><SavedViewMenu resource="candidates" user={recruiterFixture} /></QueryProvider>);
 
     expect(screen.getByRole('option', { name: 'Dùng riêng' })).toBeVisible();
     expect(screen.queryByRole('option', { name: 'Chia sẻ cho đội' })).not.toBeInTheDocument();

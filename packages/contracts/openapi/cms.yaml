@@ -119,6 +119,21 @@ paths:
         default:
           $ref: '#/components/responses/Unauthorized'
   /work-items:
+    post:
+      operationId: createWorkItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateWorkItemRequest' }
+      responses:
+        '201':
+          description: Created manual work item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkItem' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        default: { $ref: '#/components/responses/Unauthorized' }
     get:
       operationId: listWorkItems
       parameters:
@@ -187,6 +202,21 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ClientsResponse' }
         default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateClientRequest' }
+      responses:
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Client' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        default: { $ref: '#/components/responses/Unauthorized' }
   /clients/{id}:
     get:
       operationId: getClient
@@ -198,6 +228,23 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Client' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      operationId: updateClient
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClientUpdateRequest' }
+      responses:
+        '200':
+          description: Client updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Client' }
+        '409': { $ref: '#/components/responses/Conflict' }
         default: { $ref: '#/components/responses/Unauthorized' }
   /orders:
     get:
@@ -212,6 +259,21 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrdersResponse' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateOrderRequest' }
+      responses:
+        '201':
+          description: Recruitment order created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JobOrder' }
+        '422': { $ref: '#/components/responses/ValidationError' }
         default: { $ref: '#/components/responses/Unauthorized' }
   /orders/{id}:
     get:
@@ -268,6 +330,11 @@ paths:
         - { in: query, name: orderId, required: true, schema: { type: string } }
         - { in: query, name: query, required: false, schema: { type: string } }
         - { in: query, name: industry, required: false, schema: { type: string } }
+        - { in: query, name: occupation, required: false, schema: { type: string } }
+        - { in: query, name: skill, required: false, schema: { type: string } }
+        - { in: query, name: japaneseLevel, required: false, schema: { type: string } }
+        - { in: query, name: readiness, required: false, schema: { type: string } }
+        - { in: query, name: hasActiveJourney, required: false, schema: { type: string } }
       responses:
         '200':
           description: Candidate matches
@@ -280,10 +347,16 @@ paths:
       operationId: listCandidates
       parameters:
         - { in: query, name: query, required: false, schema: { type: string } }
-        - { in: query, name: view, required: false, schema: { type: string, enum: [all, potential, applying, passed, supplying, supplied, missing-contact, duplicates] } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, potential, new-unassigned, ready-to-match, applying, passed, supplying, supplied, paused, archived, missing-contact, missing-documents, duplicates] } }
         - { in: query, name: industry, required: false, schema: { type: string } }
         - { in: query, name: readiness, required: false, schema: { type: string } }
         - { in: query, name: contactability, required: false, schema: { type: string } }
+        - { in: query, name: occupation, required: false, schema: { type: string } }
+        - { in: query, name: skill, required: false, schema: { type: string } }
+        - { in: query, name: desiredLocation, required: false, schema: { type: string } }
+        - { in: query, name: source, required: false, schema: { type: string } }
+        - { in: query, name: recordStatus, required: false, schema: { type: string } }
+        - { in: query, name: experience, required: false, schema: { type: string } }
         - { in: query, name: cursor, required: false, schema: { type: string } }
       responses:
         '200':
@@ -382,7 +455,7 @@ paths:
       operationId: listApplications
       parameters:
         - { in: query, name: query, required: false, schema: { type: string } }
-        - { in: query, name: view, required: false, schema: { type: string, enum: [screening, waiting-interview, interviewed, waiting-result, passed, closed, overdue] } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [screening, waiting-interview, interviewed, waiting-result, passed, failed, withdrawn, closed, overdue] } }
         - { in: query, name: orderId, required: false, schema: { type: string } }
         - { in: query, name: ownerId, required: false, schema: { type: string } }
         - { in: query, name: cursor, required: false, schema: { type: string } }
@@ -567,7 +640,7 @@ paths:
       operationId: listSupplyJourneys
       parameters:
         - { in: query, name: query, required: false, schema: { type: string } }
-        - { in: query, name: view, required: false, schema: { type: string, enum: [all, active, on-hold, at-risk, waiting-candidate, waiting-external, completed] } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, active, on-hold, at-risk, overdue, waiting-candidate, waiting-external, near-complete, completed, cancelled] } }
         - { in: query, name: ownerId, required: false, schema: { type: string } }
       responses:
         '200':
@@ -637,7 +710,8 @@ paths:
       operationId: listMailboxConversations
       parameters:
         - { in: query, name: query, required: false, schema: { type: string } }
-        - { in: query, name: view, required: false, schema: { type: string, enum: [all, needs-action, unmatched, sent, received] } }
+        - { in: query, name: view, required: false, schema: { type: string, enum: [all, needs-action, unmatched, sent, received, waiting-candidate, waiting-internal, completed, failed] } }
+        - { in: query, name: journeyId, required: false, schema: { type: string } }
       responses:
         '200':
           description: Shared mailbox conversations
@@ -782,6 +856,22 @@ paths:
               schema: { $ref: '#/components/schemas/AdminUsersResponse' }
         '403': { $ref: '#/components/responses/Forbidden' }
         default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: inviteAdminUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAdminUserRequest' }
+      responses:
+        '201':
+          description: Internal user invitation created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUser' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        default: { $ref: '#/components/responses/Unauthorized' }
   /admin/users/{id}:
     patch:
       operationId: updateAdminUser
@@ -844,6 +934,21 @@ paths:
               schema: { $ref: '#/components/schemas/AdminCatalogsResponse' }
         '403': { $ref: '#/components/responses/Forbidden' }
         default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createAdminCatalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAdminCatalogRequest' }
+      responses:
+        '201':
+          description: Catalog value created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCatalogItem' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        default: { $ref: '#/components/responses/Unauthorized' }
   /admin/catalogs/{id}/retire:
     post:
       operationId: retireAdminCatalog
@@ -876,6 +981,20 @@ paths:
               schema: { $ref: '#/components/schemas/AdminTemplatesResponse' }
         '403': { $ref: '#/components/responses/Forbidden' }
         default: { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createAdminTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAdminTemplateRequest' }
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminTemplate' }
+        default: { $ref: '#/components/responses/Unauthorized' }
   /admin/templates/{id}/retire:
     post:
       operationId: retireAdminTemplate
@@ -901,6 +1020,21 @@ paths:
       responses:
         '200':
           description: Shared mailbox health without credential material
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MailboxSettingsView' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        default: { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      operationId: updateAdminMailboxSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MailboxSettingsUpdate' }
+      responses:
+        '200':
+          description: Updated shared mailbox settings without credential material
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MailboxSettingsView' }
@@ -1086,7 +1220,7 @@ components:
         version: { type: integer, minimum: 0 }
     Client:
       type: object
-      required: [id, code, name, organizationType, industryLabels, owner, activeOrders, target, passed, lastActivity, status, region]
+      required: [id, code, name, organizationType, industryLabels, owner, activeOrders, target, passed, lastActivity, status, region, version]
       properties:
         id: { type: string }
         code: { type: string }
@@ -1102,6 +1236,37 @@ components:
         region: { type: string }
         contactName: { type: string }
         notes: { type: string }
+        version: { type: integer, minimum: 0 }
+    CreateWorkItemRequest:
+      type: object
+      required: [title, priority, dueAt, candidateId]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 240 }
+        priority: { type: string, enum: [URGENT, HIGH, NORMAL] }
+        dueAt: { type: string, format: date-time }
+        candidateId: { type: string }
+        orderId: { type: string, nullable: true }
+        clientId: { type: string, nullable: true }
+        notes: { type: string, nullable: true, maxLength: 2000 }
+    CreateClientRequest:
+      type: object
+      required: [name, organizationType, industryLabels, region, ownerId]
+      properties:
+        name: { type: string, minLength: 2 }
+        organizationType: { type: string, minLength: 2 }
+        industryLabels: { type: array, minItems: 1, items: { type: string } }
+        region: { type: string, minLength: 2 }
+        ownerId: { type: string }
+        contactName: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+    ClientUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateClientRequest'
+        - type: object
+          required: [version]
+          properties:
+            version: { type: integer, minimum: 0 }
+            status: { type: string, enum: [PROSPECT, ACTIVE, PAUSED, INACTIVE] }
     ClientsResponse:
       type: object
       required: [items]
@@ -1137,6 +1302,22 @@ components:
         contractType: { type: string }
         japaneseLevel: { type: string }
         criteria: { type: array, items: { type: string } }
+    CreateOrderRequest:
+      type: object
+      required: [position, clientId, industryLabel, occupation, location, target, deadline, ownerId]
+      properties:
+        position: { type: string, minLength: 2 }
+        clientId: { type: string }
+        industryLabel: { type: string }
+        occupation: { type: string }
+        location: { type: string }
+        target: { type: integer, minimum: 1 }
+        deadline: { type: string, format: date-time }
+        ownerId: { type: string }
+        salary: { type: string }
+        contractType: { type: string }
+        japaneseLevel: { type: string }
+        criteria: { type: array, items: { type: string } }
     OrdersResponse:
       type: object
       required: [items]
@@ -1155,6 +1336,9 @@ components:
         readiness: { type: string }
         hasActiveApplicationInOrder: { type: boolean }
         hasActiveJourney: { type: boolean }
+        skills: { type: array, items: { type: string } }
+        yearsExperience: { type: number, minimum: 0 }
+        recordStatus: { type: string, enum: [ACTIVE, ARCHIVED] }
     CandidateSearchResponse:
       type: object
       required: [items]
@@ -1212,6 +1396,10 @@ components:
         emailMasked: { type: string, nullable: true }
         phoneMasked: { type: string, nullable: true }
         source: { type: string }
+        skills: { type: array, items: { type: string } }
+        yearsExperience: { type: number, minimum: 0 }
+        desiredLocation: { type: string, nullable: true }
+        missingDocumentCount: { type: integer, minimum: 0 }
     CandidateDetail:
       allOf:
         - $ref: '#/components/schemas/Candidate'
@@ -1739,6 +1927,14 @@ components:
         roleIds: { type: array, items: { type: string } }
         status: { type: string, enum: [ACTIVE, LOCKED, INVITED] }
         version: { type: integer, minimum: 0 }
+    CreateAdminUserRequest:
+      type: object
+      required: [displayName, email, teamId, roleIds]
+      properties:
+        displayName: { type: string, minLength: 2 }
+        email: { type: string, format: email }
+        teamId: { type: string }
+        roleIds: { type: array, minItems: 1, items: { type: string } }
     AdminRole:
       type: object
       required: [id, name, description, actions, scopes, sensitivities, permissionRules, version]
@@ -1785,6 +1981,13 @@ components:
         version: { type: integer, minimum: 0 }
         status: { type: string, enum: [ACTIVE, RETIRED] }
         usageCount: { type: integer, minimum: 0 }
+    CreateAdminCatalogRequest:
+      type: object
+      required: [type, code, label]
+      properties:
+        type: { type: string, enum: [INDUSTRY, OCCUPATION, VISA_ROUTE, SOURCE] }
+        code: { type: string, minLength: 2 }
+        label: { type: string, minLength: 2 }
     AdminCatalogsResponse:
       type: object
       required: [items]
@@ -1807,6 +2010,21 @@ components:
         usedByCount: { type: integer, minimum: 0 }
         updatedAt: { type: string, format: date-time }
         previewText: { type: string }
+        subject: { type: string }
+        body: { type: string }
+        variables: { type: array, items: { type: string } }
+        milestones: { type: array, items: { type: string } }
+    CreateAdminTemplateRequest:
+      type: object
+      required: [type, name, previewText]
+      properties:
+        type: { type: string, enum: [JOURNEY, EMAIL] }
+        name: { type: string, minLength: 2 }
+        previewText: { type: string, minLength: 2 }
+        subject: { type: string }
+        body: { type: string }
+        variables: { type: array, items: { type: string } }
+        milestones: { type: array, items: { type: string } }
     AdminTemplatesResponse:
       type: object
       required: [items]
@@ -1823,6 +2041,23 @@ components:
         health: { type: string, enum: [HEALTHY, DEGRADED, DISCONNECTED] }
         lastCheckedAt: { type: string, format: date-time }
         credentialConfigured: { type: boolean }
+        signature: { type: string }
+        receiveFolder: { type: string }
+        sentFolder: { type: string }
+        retryLimit: { type: integer, minimum: 0 }
+        alertAddress: { type: string, format: email }
+    MailboxSettingsUpdate:
+      type: object
+      required: [senderName, adapter, maxAttachmentBytes]
+      properties:
+        senderName: { type: string, minLength: 2, maxLength: 120 }
+        adapter: { type: string, enum: [MICROSOFT_365, GOOGLE_WORKSPACE, SMTP_IMAP] }
+        maxAttachmentBytes: { type: integer, minimum: 1048576, maximum: 52428800 }
+        signature: { type: string }
+        receiveFolder: { type: string }
+        sentFolder: { type: string }
+        retryLimit: { type: integer, minimum: 0, maximum: 10 }
+        alertAddress: { type: string, format: email }
     AdminAuditEvent:
       type: object
       required: [id, occurredAt, actor, action, resourceType, resourceId, source, summary]

@@ -13,3 +13,9 @@ export async function saveView(input: SaveViewInput) {
   if (response.error) throw new Error(response.error.message);
   return response.data as components['schemas']['SavedView'];
 }
+
+export async function listViews(resource: string) {
+  const response = await apiClient.GET('/saved-views', { params: { query: { resource } } });
+  if (response.error) throw new Error(response.error.message);
+  return response.data;
+}

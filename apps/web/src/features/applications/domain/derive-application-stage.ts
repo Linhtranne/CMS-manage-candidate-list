@@ -33,6 +33,8 @@ export function matchesApplicationView(application: Application, view: string) {
   if (view === 'interviewed') return hasCompletedInterview(application.interviews) || stage === 'INTERVIEWED';
   if (view === 'waiting-result') return hasPendingResult(application.interviews);
   if (view === 'passed') return application.status === 'PASSED';
+  if (view === 'failed') return application.status === 'FAILED';
+  if (view === 'withdrawn') return application.status === 'WITHDRAWN';
   if (view === 'closed') return application.status === 'FAILED' || application.status === 'WITHDRAWN';
   if (view === 'overdue') return Boolean(application.dueAt && new Date(application.dueAt).getTime() < Date.now() && !['PASSED', 'FAILED', 'WITHDRAWN'].includes(application.status));
   return true;

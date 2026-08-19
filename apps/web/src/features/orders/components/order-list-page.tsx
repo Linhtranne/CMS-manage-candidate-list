@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { CmsDataTable } from '@/components/ui/cms-data-table';
@@ -9,6 +10,7 @@ import { useListParams } from '@/hooks/use-list-params';
 import { useOrders } from '../services/order-queries';
 import type { JobOrder } from '@/mocks/fixtures/orders';
 import { OrderDrawer } from './order-drawer';
+import { CreateOrderModal } from './create-order-modal';
 
 const columns: ColumnDef<JobOrder>[] = [
   { accessorKey: 'code', header: 'Mã đơn', cell: ({ row }) => <span className="font-semibold">{row.original.code}</span> },
@@ -26,9 +28,10 @@ const columns: ColumnDef<JobOrder>[] = [
 ];
 
 export function OrderListPage() {
+  const [createOpen, setCreateOpen] = useState(false);
   const { params, setQuery, setView, setSelectedId } = useListParams({ defaultView: 'all' });
   const query = useOrders({ query: params.query, industry: params.view === 'all' ? undefined : params.view });
   const open = (id: string) => setSelectedId(id);
   const close = () => setSelectedId(undefined);
-  return <div className="space-y-6"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-medium text-accent">Nhu cầu tuyển dụng</p><h1 className="mt-1 text-2xl font-bold text-text">Đơn tuyển</h1><p className="mt-2 text-sm text-text-muted">Theo dõi chỉ tiêu, pipeline ứng tuyển và tiến độ cung ứng theo từng ngành.</p></div><Button variant="primary">Tạo đơn tuyển</Button></div><SavedViewBar><label className="flex flex-wrap items-center gap-2 text-sm font-semibold text-text">Tìm đơn tuyển<input aria-label="Tìm đơn tuyển" value={params.query} onChange={(event) => setQuery(event.target.value)} placeholder="Mã đơn, vị trí, khách hàng" className="min-h-10 w-72 rounded-control border border-border bg-panel px-3 font-normal" /></label><label className="flex items-center gap-2 text-sm text-text-muted">Ngành<select aria-label="Ngành nghề" value={params.view} onChange={(event) => setView(event.target.value)} className="min-h-10 rounded-control border border-border bg-panel px-3"><option value="all">Tất cả ngành</option><option value="Công nghệ thông tin">Công nghệ thông tin</option><option value="Cơ khí">Cơ khí</option><option value="Điều dưỡng">Điều dưỡng</option></select></label></SavedViewBar><CmsDataTable data={query.data?.items ?? []} columns={columns} isLoading={query.isPending} error={query.error ? 'Không thể tải danh sách đơn tuyển.' : undefined} onRetry={() => void query.refetch()} emptyTitle="Không có đơn tuyển phù hợp" getRowId={(row) => row.id} onRowClick={(row) => open(row.id)} /><OrderDrawer orderId={params.selectedId} open={Boolean(params.selectedId)} onClose={close} /></div>;
+  return <div className="space-y-6"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-medium text-accent">Nhu cầu tuyển dụng</p><h1 className="mt-1 text-2xl font-bold text-text">Đơn tuyển</h1><p className="mt-2 text-sm text-text-muted">Theo dõi chỉ tiêu, pipeline ứng tuyển và tiến độ cung ứng theo từng ngành.</p></div><Button variant="primary" onClick={() => setCreateOpen(true)}>Tạo đơn tuyển</Button></div><SavedViewBar><label className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm font-semibold text-text">Tìm đơn tuyển<input aria-label="Tìm đơn tuyển" name="tim-don-tuyen" value={params.query} onChange={(event) => setQuery(event.target.value)} placeholder="Mã đơn, vị trí, khách hàng" className="min-h-10 min-w-0 flex-1 rounded-control border border-border bg-panel px-3 font-normal sm:w-72 sm:flex-none" /></label><label className="flex items-center gap-2 text-sm text-text-muted">Ngành<select aria-label="Ngành nghề" name="nganh-nghe" value={params.view} onChange={(event) => setView(event.target.value)} className="min-h-10 rounded-control border border-border bg-panel px-3"><option value="all">Tất cả ngành</option><option value="Công nghệ thông tin">Công nghệ thông tin</option><option value="Cơ khí">Cơ khí</option><option value="Điều dưỡng">Điều dưỡng</option></select></label></SavedViewBar><CmsDataTable data={query.data?.items ?? []} columns={columns} isLoading={query.isPending} error={query.error ? 'Không thể tải danh sách đơn tuyển.' : undefined} onRetry={() => void query.refetch()} emptyTitle="Không có đơn tuyển phù hợp" getRowId={(row) => row.id} onRowClick={(row) => open(row.id)} /><OrderDrawer orderId={params.selectedId} open={Boolean(params.selectedId)} onClose={close} /><CreateOrderModal open={createOpen} onClose={() => setCreateOpen(false)} /></div>;
 }

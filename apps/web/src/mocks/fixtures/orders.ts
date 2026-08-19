@@ -8,8 +8,8 @@ export const orderFixtures: JobOrder[] = [
 ];
 
 export const candidateMatchFixtures: components['schemas']['CandidateMatch'][] = [
-  { id: 'candidate-01', code: 'UV-0001', name: 'Nguyễn Minh An', industryLabel: 'Công nghệ thông tin', occupation: 'Phát triển phần mềm', japaneseLevel: 'N3', readiness: 'Sẵn sàng phỏng vấn', hasActiveApplicationInOrder: true, hasActiveJourney: false },
-  { id: 'candidate-05', code: 'UV-0005', name: 'Võ Thanh Tùng', industryLabel: 'Công nghệ thông tin', occupation: 'QA Engineer', japaneseLevel: 'N3', readiness: 'Đủ hồ sơ', hasActiveApplicationInOrder: false, hasActiveJourney: true },
-  { id: 'candidate-06', code: 'UV-0006', name: 'Đỗ Mai Lan', industryLabel: 'Công nghệ thông tin', occupation: 'Frontend Developer', japaneseLevel: 'N2', readiness: 'Đủ hồ sơ', hasActiveApplicationInOrder: false, hasActiveJourney: false }
+  { id: 'candidate-01', code: 'UV-0001', name: 'Nguyễn Minh An', industryLabel: 'Công nghệ thông tin', occupation: 'Phát triển phần mềm', japaneseLevel: 'N3', readiness: 'Sẵn sàng phỏng vấn', hasActiveApplicationInOrder: true, hasActiveJourney: false, skills: ['TypeScript', 'React', 'SQL'], yearsExperience: 4, recordStatus: 'ACTIVE' },
+  { id: 'candidate-05', code: 'UV-0005', name: 'Võ Thanh Tùng', industryLabel: 'Công nghệ thông tin', occupation: 'QA Engineer', japaneseLevel: 'N3', readiness: 'Đủ hồ sơ', hasActiveApplicationInOrder: false, hasActiveJourney: true, skills: ['Java', 'Spring', 'AWS'], yearsExperience: 5, recordStatus: 'ACTIVE' },
+  { id: 'candidate-06', code: 'UV-0006', name: 'Đỗ Mai Lan', industryLabel: 'Công nghệ thông tin', occupation: 'Frontend Developer', japaneseLevel: 'N2', readiness: 'Đủ hồ sơ', hasActiveApplicationInOrder: false, hasActiveJourney: false, skills: ['React', 'CSS', 'Testing'], yearsExperience: 3, recordStatus: 'ACTIVE' }
 ];
 

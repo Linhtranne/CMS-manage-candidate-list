@@ -61,10 +61,10 @@ export const adminCatalogsFixture: components['schemas']['AdminCatalogItem'][] =
 ];
 
 export const adminTemplatesFixture: components['schemas']['AdminTemplate'][] = [
-  { id: 'journey-japan-new-hire', type: 'JOURNEY', name: 'Tuyển mới tại Việt Nam → Nhật Bản', version: 'v3', status: 'ACTIVE', usedByCount: 12, updatedAt: now, previewText: 'Nhận việc · Hồ sơ · COE · Visa · Chuẩn bị · Tiếp nhận' },
-  { id: 'journey-japan-transfer', type: 'JOURNEY', name: 'Chuyển việc trong Nhật Bản', version: 'v2', status: 'ACTIVE', usedByCount: 4, updatedAt: '2026-08-10T09:30:00+07:00', previewText: 'Hợp đồng mới · Đổi tư cách · Bàn giao · Tiếp nhận' },
-  { id: 'email-interview-reminder', type: 'EMAIL', name: 'Nhắc lịch phỏng vấn', version: 'v5', status: 'ACTIVE', usedByCount: 38, updatedAt: '2026-08-12T14:00:00+07:00', previewText: 'Xác nhận lịch, múi giờ và hướng dẫn tham gia.' },
-  { id: 'email-old-offer', type: 'EMAIL', name: 'Mẫu offer cũ', version: 'v1', status: 'RETIRED', usedByCount: 0, updatedAt: '2026-07-01T08:00:00+07:00', previewText: 'Mẫu đã ngừng sử dụng.' }
+  { id: 'journey-japan-new-hire', type: 'JOURNEY', name: 'Tuyển mới tại Việt Nam → Nhật Bản', version: 'v3', status: 'ACTIVE', usedByCount: 12, updatedAt: now, previewText: 'Nhận việc · Hồ sơ · COE · Visa · Chuẩn bị · Tiếp nhận', milestones: ['Xác nhận nhận việc', 'Bổ sung hồ sơ', 'COE', 'Visa', 'Chuẩn bị bay', 'Tiếp nhận'] },
+  { id: 'journey-japan-transfer', type: 'JOURNEY', name: 'Chuyển việc trong Nhật Bản', version: 'v2', status: 'ACTIVE', usedByCount: 4, updatedAt: '2026-08-10T09:30:00+07:00', previewText: 'Hợp đồng mới · Đổi tư cách · Bàn giao · Tiếp nhận', milestones: ['Hợp đồng mới', 'Đổi tư cách', 'Bàn giao', 'Tiếp nhận'] },
+  { id: 'email-interview-reminder', type: 'EMAIL', name: 'Nhắc lịch phỏng vấn', version: 'v5', status: 'ACTIVE', usedByCount: 38, updatedAt: '2026-08-12T14:00:00+07:00', previewText: 'Xác nhận lịch, múi giờ và hướng dẫn tham gia.', subject: 'Xác nhận lịch phỏng vấn {{candidate.name}}', body: 'Chào {{candidate.name}}, lịch phỏng vấn của bạn…', variables: ['candidate.name', 'interview.scheduledAt', 'order.position'] },
+  { id: 'email-old-offer', type: 'EMAIL', name: 'Mẫu offer cũ', version: 'v1', status: 'RETIRED', usedByCount: 0, updatedAt: '2026-07-01T08:00:00+07:00', previewText: 'Mẫu đã ngừng sử dụng.', subject: 'Offer cũ', body: 'Mẫu đã ngừng sử dụng.', variables: [] }
 ];
 
 export const adminMailboxFixture: components['schemas']['MailboxSettingsView'] = {
@@ -74,7 +74,12 @@ export const adminMailboxFixture: components['schemas']['MailboxSettingsView'] =
   maxAttachmentBytes: 10 * 1024 * 1024,
   health: 'HEALTHY',
   lastCheckedAt: now,
-  credentialConfigured: true
+  credentialConfigured: true,
+  signature: 'Trân trọng,\nCandidate Supply Team',
+  receiveFolder: 'Inbox',
+  sentFolder: 'Sent',
+  retryLimit: 3,
+  alertAddress: 'ops@company.vn'
 };
 
 export const adminAuditFixture: components['schemas']['AdminAuditEvent'][] = [
