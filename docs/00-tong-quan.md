@@ -65,6 +65,7 @@ Hệ thống là **Candidate Operations CMS/ATS nội bộ đa ngành** của b�
 | [Hợp đồng chức năng](./13-hop-dong-chuc-nang.md) | Hành động UI/API và lỗi quan sát được là gì? |
 | [Quyết định kiến trúc](./14-quyet-dinh-kien-truc.md) | Những quyết định nào đã chốt và khi nào cần xem lại? |
 | [Ma trận truy vết](./15-truy-vet-yeu-cau.md) | Mỗi yêu cầu ban đầu được thiết kế và nghiệm thu ở đâu? |
+| [Gói bàn giao backend production](./backend/README.md) | Contract, kiến trúc, dữ liệu, module, security, operations, test và plan nào để đội backend code? |
 
 ## 6. Chỉ số thành công cần đo
 
@@ -79,6 +80,8 @@ Hệ thống là **Candidate Operations CMS/ATS nội bộ đa ngành** của b�
 Mục tiêu số cụ thể chỉ được chốt sau khi đo baseline dữ liệu hiện tại; tài liệu không tự đặt KPI thiếu căn cứ.
 
 ## 7. Quyết định còn cần duyệt trước triển khai
+
+Owner, approver, required gate và safe fallback của các mục dưới đây được quản lý tập trung tại [Backend Decision Register](./backend/12-decision-register.md).
 
 - Nhà cung cấp hộp thư chung: Microsoft 365, Google Workspace hay SMTP/IMAP doanh nghiệp.
 - Danh mục ngành, nghề, tuyến visa và bộ trường/chứng chỉ bắt buộc cho đợt triển khai đầu tiên.

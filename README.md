@@ -19,6 +19,8 @@ Frontend và mock runtime của Sprint 0–4 đã được triển khai bằng N
 
 Phần chưa phải production gồm backend NestJS, database migration, email provider thật, worker gửi email, object storage, persistence cho audit và kết nối dữ liệu thật. MSW chỉ dùng cho development/test.
 
+Gói đặc tả và implementation plan backend production đã được viết ở trạng thái `ready_for_human_approval`. Đội backend bắt đầu Phase 0 sau khi Tech Lead duyệt contract/kiến trúc và chỉ bật SSO, email, dữ liệu thật, export hoặc purge sau các approval gate tương ứng.
+
 ## Chạy local
 
 Yêu cầu Node.js `>=22.15` và pnpm `>=11.6`.
@@ -72,6 +74,8 @@ Docker Compose hiện phục vụ frontend. Production cần API backend tương
 - [Bản trình bày HTML](./presentation/candidate-cms-presentation.html)
 - [PRODUCT.md](./PRODUCT.md) — mục tiêu, người dùng và ranh giới sản phẩm
 - [Tổng quan tài liệu](./docs/00-tong-quan.md)
+- [Gói bàn giao backend production](./docs/backend/README.md)
+- [Implementation plan backend Phase 0–4](./docs/backend/plans/README.md)
 - [Roadmap UI/UX](./docs/backlogs/00-ui-ux-roadmap.md)
 - [OpenAPI contract](./packages/contracts/openapi/cms.yaml)
 
@@ -82,6 +86,7 @@ apps/web/                 Next.js frontend
 packages/contracts/       OpenAPI và generated TypeScript types
 tests/e2e/                Playwright smoke và critical-path tests
 docs/                     SRS, kiến trúc, ERD, UI/UX và backlog
+docs/backend/             Spec và plan bàn giao backend production
 presentation/             HTML deck trình bày dự án
 ```
 
@@ -93,4 +98,4 @@ presentation/             HTML deck trình bày dự án
 - Không dùng AI để tự quyết định đỗ/trượt.
 - Không đưa PII, nội dung email thật, credential, file upload hoặc backup production vào Git.
 
-`.gitignore` loại dependency, build output, secrets, dữ liệu runtime, file agent/skill và script cục bộ khỏi repository.
+`.gitignore` loại dependency, build output, secrets, dữ liệu runtime, file agent/skill và script cục bộ khỏi repository; riêng `scripts/validate-docs.mjs` được version để CI/đội backend kiểm gói tài liệu.

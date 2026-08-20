@@ -6,6 +6,7 @@
     "dev": "next dev",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "next build"

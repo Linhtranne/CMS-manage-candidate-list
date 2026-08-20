@@ -71,8 +71,10 @@ Tên làm việc hiện tại là **Japan Candidate Supply CMS**. Nội dung ngh
 ## Evidence on Hand
 
 - Bộ tài liệu nguồn sự thật từ `docs/00-tong-quan.md` đến `docs/15-truy-vet-yeu-cau.md`.
+- Gói backend production tại `docs/backend/README.md`: contract, kiến trúc, IAM, dữ liệu, module, security, operations, testing, decision register, traceability, DoD và kế hoạch Phase 0–4; trạng thái `ready_for_human_approval`.
 - Bản trình bày tự chứa tại `presentation/candidate-cms-presentation.html`, dùng để truyền đạt baseline chứ chưa phải giao diện sản phẩm.
 - Sprint 0 đã có code Next.js frontend, route `/work`, health route, OpenAPI client, MSW fixture và Docker runtime smoke test. Chưa có backend NestJS/Prisma chạy thật, dữ liệu production, nghiên cứu người dùng, analytics sử dụng hoặc KPI baseline.
+- Các lựa chọn provider/SSO/privacy/retention/topology/KPI vẫn cần đúng owner phê duyệt theo `docs/backend/12-decision-register.md`; tài liệu không tự biến các quyết định đó thành approved.
 - Chưa có logo, ảnh thương hiệu, testimonial, danh sách khách hàng công khai hoặc số liệu hiệu quả được phép dùng. Thiết kế không được tự tạo các bằng chứng này.
 
 ## Product Principles

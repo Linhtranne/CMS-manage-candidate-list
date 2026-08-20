@@ -13,6 +13,7 @@
     "test": "pnpm -r test",
     "build": "pnpm -r build",
     "e2e": "playwright test",
+    "docs:validate": "node scripts/validate-docs.mjs",
     "generate:contracts": "pnpm --filter @cms/contracts generate"
   },
   "devDependencies": {

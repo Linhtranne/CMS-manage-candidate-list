@@ -29,8 +29,10 @@ storage/
 .agent/
 .impeccable/
 .codex/
+.codex-tmp/
 .superpowers/
-scripts/
+scripts/*
+!scripts/validate-docs.mjs
 
 # Agent-generated instruction files
 AGENTS.md

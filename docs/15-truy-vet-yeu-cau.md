@@ -30,12 +30,15 @@
 | Mức | Ý nghĩa | Trạng thái hiện tại |
 |---|---|---|
 | Khớp ý tưởng | Phạm vi đa ngành, vai trò, lộ trình, email và hạ tầng không mâu thuẫn yêu cầu gốc | Đạt ở baseline 1.4 |
-| Đủ lập kế hoạch | Có domain model, quyền, data dictionary, API/UI contract, acceptance và ADR | Đạt để lập kế hoạch Phase 0–1B |
-| Đủ bắt đầu code production | Trường bắt buộc, policy, provider, retention, topology và từng feature spec được business/tech/security phê duyệt | Chưa đạt; còn quyết định mở |
+| Đủ lập kế hoạch | Có domain model, quyền, data dictionary, API/UI contract, acceptance, ADR và plan file-by-file | Đạt cho Phase 0–4 tại [gói backend](./backend/README.md) |
+| Đủ giao review để bắt đầu code production | Có contract/architecture/data/module/security/operations/test/DoD ở trạng thái `ready_for_human_approval` | Đạt; Tech Lead có thể duyệt để mở Phase 0 |
+| Đủ bật integration/dữ liệu production | Required decisions và runtime evidence được đúng owner phê duyệt | Chưa đạt; bị chặn theo [DEC-002–DEC-007](./backend/12-decision-register.md) |
 
 Không dùng việc tài liệu “đủ trình bày” để suy ra hệ thống đã production-ready.
 
 ## 3. Quyết định còn mở và người chịu trách nhiệm duyệt
+
+Danh sách chuẩn có ID, owner, approver, gate và fail-closed behavior nằm tại [Backend Decision Register](./backend/12-decision-register.md). Bảng dưới giữ ngữ cảnh nghiệp vụ; khi có khác biệt, decision register mới hơn được ưu tiên cho implementation.
 
 | Quyết định | Accountable đề xuất | Consulted | Tác động nếu chưa chốt |
 |---|---|---|---|
@@ -56,7 +59,9 @@ Không dùng việc tài liệu “đủ trình bày” để suy ra hệ thốn
 2. Security/IT/Pháp chế duyệt permission, PII, retention, privacy notice/chia sẻ sang Nhật, mailbox provider, DNS authentication và threat controls.
 3. Tech lead duyệt OpenAPI, schema/index/migration, outbox/idempotency và test strategy.
 4. Infrastructure owner duyệt topology, capacity profile, backup/RPO/RTO và monitoring.
-5. Product owner đổi status spec Phase 0–1B từ `reviewed` thành `approved`; các câu hỏi còn mở phải được trả lời hoặc defer có owner/date.
+5. Approver được chỉ định ghi approval record có identity/time/version/checksum; không dùng việc merge Markdown hoặc xác nhận của agent thay phê duyệt con người.
+
+Implementation PR dùng ma trận [backend traceability](./backend/13-traceability.md) và [Definition of Done](./backend/14-definition-of-done.md) để nối RQ/AC với spec, plan task, test và release evidence.
 
 ## 5. Definition of alignment
 
@@ -90,3 +95,15 @@ Kết quả chạy lại ngày **2026-08-14** cho baseline hiện tại:
 | Implementation plan | Đạt — 8 plan, 39 task, 195 bước checkbox; đủ header/spec/global constraints/interface/test/commit; 0 lỗi cấu trúc, 0 placeholder cấm và 0 đường dẫn PowerShell chưa quote |
 | HTML tự chứa | Đạt — không có URL tài nguyên runtime bên ngoài; 4/4 font WOFF2 giải mã đúng header `wOF2`; JavaScript parse thành công |
 | Browser 1366×768 | Đạt — 15 slide, font 400/800 hiển thị tiếng Việt, không slide nào overflow, Next/chấm/Home/End hoạt động, mỗi thời điểm đúng một slide hiển thị và console không có lỗi |
+
+## 7. Bằng chứng QA gói backend production ngày 2026-08-20
+
+| Kiểm tra | Kết quả |
+|---|---|
+| Phạm vi tài liệu | Đạt — 22 file trong `docs/backend/`: README, 15 spec/registry/DoD và 6 file plan/index |
+| Markdown/link/invariant | Đạt — `pnpm docs:validate` quét 61 Markdown, 0 link tương đối gãy, 0 legacy term, 22 domain invariant hiện diện |
+| Placeholder | Đạt — 0 `TODO`, `TBD`, `FIXME`, `implement later`, `fill in` trong gói backend |
+| Implementation plan | Đạt — 5 plan Phase 0–4, 29 task, 193 bước checkbox; mỗi plan có required execution skill, files, interfaces, RED/GREEN verification và commit checkpoint |
+| Contract package hiện hữu | Đạt kiểm tra hồi quy — `@cms/contracts` typecheck và 1/1 test hiện tại pass; việc nâng contract gate toàn diện là Task 1 Phase 0, không được coi test hiện tại là bằng chứng OpenAPI đã alignment xong |
+
+Các kết quả trên chứng minh gói tài liệu nhất quán và có thể giao review; chúng không chứng minh backend, provider, hạ tầng hoặc production runtime đã tồn tại.

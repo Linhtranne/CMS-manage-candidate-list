@@ -7,6 +7,7 @@ import { useDialogFocus } from '@/hooks/use-dialog-focus';
 import { usePresence } from '@/hooks/use-presence';
 import { isTopmostModalLayer, useModalIsolation } from '@/hooks/use-modal-stack';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/i18n/use-i18n';
 import { UnsavedChangesDialog } from './unsaved-changes-dialog';
 
 type ModalProps = {
@@ -21,7 +22,8 @@ type ModalProps = {
   closeConfirmation?: string;
 };
 
-export function Modal({ open, title, description, onClose, children, footer, size = 'md', confirmOnClose = false, closeConfirmation = 'Bạn có thay đổi chưa lưu. Đóng cửa sổ và bỏ thay đổi?' }: ModalProps) {
+export function Modal({ open, title, description, onClose, children, footer, size = 'md', confirmOnClose = false, closeConfirmation }: ModalProps) {
+  const { t } = useI18n();
   const titleId = useId();
   const panelRef = useRef<HTMLElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
@@ -107,14 +109,14 @@ export function Modal({ open, title, description, onClose, children, footer, siz
             <h2 id={titleId} className="text-xl font-bold text-text">{title}</h2>
             {description ? <p className="mt-1 text-sm text-text-muted">{description}</p> : null}
           </div>
-          <button type="button" aria-label={`Đóng ${title}`} title="Đóng" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" onClick={requestClose}>
+          <button type="button" aria-label={t('common.dialog.closeLabel', { title })} title={t('common.actions.close')} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" onClick={requestClose}>
             <X aria-hidden="true" size={20} strokeWidth={1.8} />
           </button>
         </header>
         <div inert={confirmOpen || undefined} aria-hidden={confirmOpen || undefined} className="px-5 py-5 sm:px-6">{children}</div>
         {footer ? <footer inert={confirmOpen || undefined} aria-hidden={confirmOpen || undefined} className="flex flex-wrap justify-end gap-2 border-t border-border px-5 py-4 sm:px-6">{footer}</footer> : null}
         {confirmOpen ? (
-          <UnsavedChangesDialog message={closeConfirmation} onCancel={cancelCloseConfirmation} onConfirm={confirmClose} />
+          <UnsavedChangesDialog message={closeConfirmation ?? t('common.dialog.unsavedMessage')} onCancel={cancelCloseConfirmation} onConfirm={confirmClose} />
         ) : null}
       </section>
     </div>,

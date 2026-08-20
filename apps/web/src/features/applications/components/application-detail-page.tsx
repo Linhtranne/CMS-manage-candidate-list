@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useDetailTab } from '@/hooks/use-detail-tab';
+import { useI18n } from '@/i18n/use-i18n';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { useApplication } from '../services/application-queries';
@@ -11,6 +12,7 @@ import { StartJourneyDialog } from './start-journey-dialog';
 import { ApplicationOperationDialogs } from './application-operation-dialogs';
 
 export function ApplicationDetailPage({ applicationId }: { applicationId: string }) {
+  const { t } = useI18n();
   const query = useApplication(applicationId);
   const [activeTab, setActiveTab] = useDetailTab<ApplicationTab>('overview');
   const [interviewAction, setInterviewAction] = useState<'create' | 'reschedule'>();
@@ -20,7 +22,7 @@ export function ApplicationDetailPage({ applicationId }: { applicationId: string
   const [showJourney, setShowJourney] = useState(false);
   const [attendanceAction, setAttendanceAction] = useState<'cancel' | 'no-show'>();
   if (query.isPending) return <LoadingState />;
-  if (query.error || !query.data) return <ErrorState message="Không thể tải hồ sơ ứng tuyển." onRetry={() => void query.refetch()} />;
+  if (query.error || !query.data) return <ErrorState message={t('validation.runtime.applicationLoadError')} onRetry={() => void query.refetch()} />;
   const application = query.data;
   const selectedInterview = application.interviews.find((item) => item.id === selectedInterviewId);
   const resultInterview = application.interviews.filter((item) => item.scheduleStatus === 'COMPLETED').sort((a, b) => b.round - a.round)[0];

@@ -19,7 +19,7 @@ export function Sidebar({ user, open = true, mobile = false, onClose }: { user: 
     <aside className={cn(mobile ? 'cms-sidebar-mobile h-full min-h-0 w-full' : 'min-h-screen w-64', 'shrink-0 overflow-y-auto border-r border-border bg-panel')} aria-label={t('navigation.ariaLabel')}>
       <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Candidate Supply</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{t('common.brand.name')}</p>
           <p className="mt-1 text-sm text-text-muted">{t('navigation.internalCms')}</p>
         </div>
       </div>

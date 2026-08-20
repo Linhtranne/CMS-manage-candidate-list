@@ -1,8 +1,11 @@
+'use client';
+
 import type { ColumnDef } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { EmptyState } from './empty-state';
 import { ErrorState } from './error-state';
 import { LoadingState } from './loading-state';
+import { useI18n } from '@/i18n/use-i18n';
 
 export function CmsDataTable<TData>({
   data,
@@ -10,7 +13,7 @@ export function CmsDataTable<TData>({
   isLoading = false,
   error,
   onRetry,
-  emptyTitle = 'Chưa có dữ liệu',
+  emptyTitle,
   getRowId,
   onRowClick
 }: {
@@ -23,10 +26,11 @@ export function CmsDataTable<TData>({
   getRowId?: (row: TData) => string;
   onRowClick?: (row: TData) => void;
 }) {
+  const { t } = useI18n();
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel(), getRowId });
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={onRetry} />;
-  if (!data.length) return <EmptyState title={emptyTitle} description="Hãy điều chỉnh bộ lọc hoặc thêm bản ghi mới." />;
+  if (!data.length) return <EmptyState title={emptyTitle ?? t('common.states.emptyTitle')} description={t('common.states.emptyDescription')} />;
 
   return (
     <div className="cms-content-enter overflow-x-auto rounded-lg border border-border bg-panel">

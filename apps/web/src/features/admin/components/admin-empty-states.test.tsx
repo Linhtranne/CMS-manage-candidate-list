@@ -23,8 +23,8 @@ describe('admin empty states', () => {
   it('explains how to start when no templates exist', () => {
     render(<TemplatesPage />);
 
-    expect(screen.getByRole('region', { name: 'Chưa có template' })).toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Chưa có template' })).getByRole('button', { name: 'Tạo template' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Chưa có mẫu' })).toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Chưa có mẫu' })).getByRole('button', { name: 'Tạo mẫu' })).toBeInTheDocument();
   });
 
   it('explains when the audit filter has no matching entries', () => {

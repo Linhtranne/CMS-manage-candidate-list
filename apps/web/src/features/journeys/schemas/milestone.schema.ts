@@ -9,4 +9,4 @@ export const milestoneSchema = z.object({
   version: z.number().int().nonnegative()
 });
 
-export const waiverSchema = z.object({ reason: z.string().min(1, 'Vui lòng nhập lý do miễn trừ'), approverId: z.string().min(1, 'Vui lòng chọn người duyệt'), evidenceIds: z.array(z.string()), version: z.number().int().nonnegative() });
+export const waiverSchema = z.object({ reason: z.string().min(1, 'validation.journey.waiveReason'), approverId: z.string().min(1, 'validation.journey.approver'), evidenceIds: z.array(z.string()), version: z.number().int().nonnegative() });

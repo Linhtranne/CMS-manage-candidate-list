@@ -6,8 +6,10 @@ import { useDialogFocus } from '@/hooks/use-dialog-focus';
 import { usePresence } from '@/hooks/use-presence';
 import { isTopmostModalLayer } from '@/hooks/use-modal-stack';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/i18n/use-i18n';
 
 export function DetailDrawer({ open, title, onClose, size = 'default', children }: { open: boolean; title: string; onClose: () => void; size?: 'default' | 'wide'; children: React.ReactNode }) {
+  const { t } = useI18n();
   const panelRef = useRef<HTMLElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const { mounted, closing, finishExit } = usePresence(open);
@@ -37,7 +39,7 @@ export function DetailDrawer({ open, title, onClose, size = 'default', children 
       <aside ref={panelRef} tabIndex={-1} className={cn('cms-drawer-panel relative z-10 h-full w-full overflow-y-auto overscroll-contain border-l border-border bg-panel p-6 shadow-panel focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40', size === 'wide' ? 'max-w-full md:max-w-[min(86vw,72rem)]' : 'max-w-xl')}>
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-text">{title}</h2>
-          <button type="button" aria-label={`Đóng ${title}`} title="Đóng" className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-control border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" onClick={onClose}>
+          <button type="button" aria-label={t('common.dialog.closeLabel', { title })} title={t('common.actions.close')} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-control border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" onClick={onClose}>
             <X aria-hidden="true" size={20} strokeWidth={1.8} />
           </button>
         </div>

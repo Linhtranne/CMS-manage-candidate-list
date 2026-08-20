@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { MailboxPage } from './mailbox-page';
+import { renderWithI18n } from '@/i18n/test-utils';
 
 function renderPage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -35,5 +36,14 @@ describe('MailboxPage', () => {
     expect(modal.parentElement).toHaveAttribute('data-state', 'open');
     await userEvent.keyboard('{Escape}');
     expect(modal.parentElement).toHaveAttribute('data-state', 'closing');
+  });
+
+  it('localizes conversation statuses with the active locale', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    renderWithI18n(<QueryClientProvider client={client}><MailboxPage /></QueryClientProvider>, 'ja');
+
+    expect(await screen.findByText('対応が必要')).toBeVisible();
+    expect(screen.getByText('未紐付け')).toBeVisible();
+    expect(screen.getByText('送信済み')).toBeVisible();
   });
 });

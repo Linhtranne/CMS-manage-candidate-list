@@ -2,24 +2,12 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { components } from '@cms/contracts';
 import { CmsDataTable } from '@/components/ui/cms-data-table';
 import { StatusLabel } from '@/components/ui/status-label';
-
+import { useI18n } from '@/i18n/use-i18n';
+import type { Translate } from '@/i18n/types';
+import { occupationLabel } from '@/i18n/catalog-options';
+import { getDomainLabel } from '@/i18n/domain-labels';
 type Journey = components['schemas']['SupplyJourneySummary'];
-const formatDate = (value: string | null) => value ? new Date(value).toLocaleDateString('vi-VN') : '—';
-const healthLabel: Record<Journey['health'], string> = { ON_TRACK: 'Đúng tiến độ', OVERDUE: 'Quá hạn', AT_RISK: 'Có rủi ro', COMPLETED: 'Đã hoàn tất' };
+const healthKeys = { ON_TRACK: 'journeys.table.onTrack', OVERDUE: 'journeys.table.overdue', AT_RISK: 'journeys.table.atRisk', COMPLETED: 'journeys.table.completed' } as const;
 const healthTone: Record<Journey['health'], 'success' | 'warning' | 'danger' | 'neutral'> = { ON_TRACK: 'success', OVERDUE: 'warning', AT_RISK: 'danger', COMPLETED: 'neutral' };
-
-const columns: ColumnDef<Journey>[] = [
-  { accessorKey: 'candidate.name', header: 'Ứng viên', cell: ({ row }) => <div><p className="font-semibold">{row.original.candidate.name}</p><p className="text-xs text-text-muted">{row.original.candidate.code}</p></div> },
-  { accessorKey: 'order.code', header: 'Đơn tuyển', cell: ({ row }) => <div><p className="font-semibold">{row.original.order.code}</p><p className="text-xs text-text-muted">{row.original.order.position}</p></div> },
-  { accessorKey: 'client.name', header: 'Khách hàng' },
-  { accessorKey: 'templateName', header: 'Mẫu lộ trình', cell: ({ row }) => <div><p>{row.original.templateName}</p><p className="text-xs text-text-muted">{row.original.templateVersion}</p></div> },
-  { accessorKey: 'currentMilestone', header: 'Mốc hiện tại' },
-  { accessorKey: 'nearestDueAt', header: 'Hạn gần nhất', cell: ({ row }) => formatDate(row.original.nearestDueAt) },
-  { accessorKey: 'progress', header: 'Tiến độ', cell: ({ row }) => `${row.original.progress.completed}/${row.original.progress.applicable} mốc` },
-  { accessorKey: 'health', header: 'Sức khỏe', cell: ({ row }) => <StatusLabel tone={healthTone[row.original.health]}>{healthLabel[row.original.health]}</StatusLabel> },
-  { accessorKey: 'owner.name', header: 'Phụ trách' }
-];
-
-export function JourneyTable({ journeys, isLoading, error, onRetry, onRowClick }: { journeys: Journey[]; isLoading?: boolean; error?: string; onRetry?: () => void; onRowClick?: (journey: Journey) => void }) {
-  return <CmsDataTable data={journeys} columns={columns} isLoading={isLoading} error={error} onRetry={onRetry} emptyTitle="Chưa có lộ trình phù hợp" getRowId={(row) => row.id} onRowClick={onRowClick} />;
-}
+function journeyColumns(t: Translate, formatDate: (value: Date | string | number, options?: Intl.DateTimeFormatOptions) => string): ColumnDef<Journey>[] { return [{ accessorKey: 'candidate.name', header: t('journeys.table.candidate'), cell: ({ row }) => <div><p className="font-semibold">{row.original.candidate.name}</p><p className="text-xs text-text-muted">{row.original.candidate.code}</p></div> }, { accessorKey: 'order.code', header: t('journeys.table.order'), cell: ({ row }) => <div><p className="font-semibold">{row.original.order.code}</p><p className="text-xs text-text-muted">{occupationLabel(t, row.original.order.position)}</p></div> }, { accessorKey: 'client.name', header: t('journeys.table.client') }, { accessorKey: 'templateName', header: t('journeys.table.template'), cell: ({ row }) => <div><p>{getDomainLabel(t, 'journeyTemplate', row.original.templateName)}</p><p className="text-xs text-text-muted">{row.original.templateVersion}</p></div> }, { accessorKey: 'currentMilestone', header: t('journeys.table.milestone'), cell: ({ row }) => getDomainLabel(t, 'milestoneName', row.original.currentMilestone) }, { accessorKey: 'nearestDueAt', header: t('journeys.table.due'), cell: ({ row }) => row.original.nearestDueAt ? formatDate(row.original.nearestDueAt, { dateStyle: 'short' }) : '—' }, { accessorKey: 'progress', header: t('journeys.table.progress'), cell: ({ row }) => t('journeys.table.progress', { completed: row.original.progress.completed, applicable: row.original.progress.applicable }) }, { accessorKey: 'health', header: t('journeys.table.health'), cell: ({ row }) => <StatusLabel tone={healthTone[row.original.health]}>{t(healthKeys[row.original.health])}</StatusLabel> }, { accessorKey: 'owner.name', header: t('journeys.table.owner') }]; }
+export function JourneyTable({ journeys, isLoading, error, onRetry, onRowClick }: { journeys: Journey[]; isLoading?: boolean; error?: string; onRetry?: () => void; onRowClick?: (journey: Journey) => void }) { const { t, formatDate } = useI18n(); return <CmsDataTable data={journeys} columns={journeyColumns(t, formatDate)} isLoading={isLoading} error={error} onRetry={onRetry} emptyTitle={t('journeys.list.empty')} getRowId={(row) => row.id} onRowClick={onRowClick} />; }

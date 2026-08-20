@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
+import { useI18n } from '@/i18n/use-i18n';
 
 const shouldStartMsw =
   process.env.NEXT_PUBLIC_MSW_ENABLED === 'true' ||
@@ -18,6 +19,7 @@ function startWorkerOnce() {
 }
 
 export function MswProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [ready, setReady] = useState(!shouldStartMsw);
   const [error, setError] = useState<Error | undefined>();
 
@@ -30,7 +32,7 @@ export function MswProvider({ children }: { children: ReactNode }) {
         if (active) setReady(true);
       })
       .catch((reason: unknown) => {
-        if (active) setError(reason instanceof Error ? reason : new Error('Không thể khởi tạo mock runtime'));
+        if (active) setError(reason instanceof Error ? reason : new Error(t('validation.runtime.mswError')));
       });
 
     return () => {
@@ -38,6 +40,6 @@ export function MswProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  if (error) return <ErrorState message="Không thể khởi tạo môi trường làm việc. Vui lòng tải lại trang." />;
-  return ready ? children : <LoadingState label="Đang khởi tạo môi trường làm việc" />;
+  if (error) return <ErrorState message={t('validation.runtime.mswLoadError')} />;
+  return ready ? children : <LoadingState label={t('validation.runtime.mswLoading')} />;
 }

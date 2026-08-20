@@ -5,10 +5,13 @@ export function normalizeMetric(input: MetricInput) {
   return { ...input, rate, label: `${input.numerator}/${input.denominator} — ${Math.round(rate * 100)}%` };
 }
 
-export function formatMetricValue(metric: { value: number; numerator?: number; denominator?: number; unit: string }) {
-  if (metric.numerator !== undefined && metric.denominator !== undefined) return `${metric.numerator}/${metric.denominator} — ${Math.round(metric.value * 100)}%`;
-  if (metric.unit === 'DAYS') return `${metric.value} ngày`;
-  if (metric.unit === 'MINUTES') return `${metric.value} phút`;
-  if (metric.unit === 'PERCENT') return `${Math.round(metric.value * 100)}%`;
-  return String(metric.value);
+export function formatMetricValue(
+  metric: { value: number; numerator?: number; denominator?: number; unit: string },
+  options: { days: string; minutes: string; formatNumber: (value: number) => string; formatPercent: (value: number) => string }
+) {
+  if (metric.numerator !== undefined && metric.denominator !== undefined) return `${options.formatNumber(metric.numerator)}/${options.formatNumber(metric.denominator)} — ${options.formatPercent(metric.value)}`;
+  if (metric.unit === 'DAYS') return `${options.formatNumber(metric.value)} ${options.days}`;
+  if (metric.unit === 'MINUTES') return `${options.formatNumber(metric.value)} ${options.minutes}`;
+  if (metric.unit === 'PERCENT') return options.formatPercent(metric.value);
+  return options.formatNumber(metric.value);
 }
