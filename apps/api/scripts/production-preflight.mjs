@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { digestFromImageRef } from './image-reference.mjs';
 import { validateReleaseApprovalArtifact } from './release-approval.mjs';
 
 const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
@@ -60,6 +61,15 @@ for (const [name, value] of [['API_IMAGE', apiImage], ['MIGRATION_IMAGE', migrat
 }
 for (const [name, value] of [['IMAGE_DIGEST', apiDigest], ['MIGRATION_IMAGE_DIGEST', migrationDigest], ['WEB_IMAGE_DIGEST', webDigest], ['POSTGRES_IMAGE_DIGEST', postgresDigest], ['REDIS_IMAGE_DIGEST', redisDigest]]) {
   check(`${name}-valid`, Boolean(value && digestPattern.test(value)), 'digest must be sha256:<64-hex-digest>');
+}
+for (const [name, image, digest] of [
+  ['API_IMAGE', apiImage, apiDigest],
+  ['MIGRATION_IMAGE', migrationImage, migrationDigest],
+  ['WEB_IMAGE', webImage, webDigest],
+  ['POSTGRES_IMAGE', postgresImage, postgresDigest],
+  ['REDIS_IMAGE', redisImage, redisDigest],
+]) {
+  check(`${name}-digest-match`, Boolean(digest && digestFromImageRef(image) === digest.toLowerCase()), 'image reference digest must match the corresponding *_IMAGE_DIGEST');
 }
 check('production-env', process.env.NODE_ENV === 'production', 'NODE_ENV must be production');
 check('required-runtime-inputs', [appVersion, appOrigin, corsOrigins, databaseUrl, redisUrl, encryptionKey, sessionSecret].every(Boolean));

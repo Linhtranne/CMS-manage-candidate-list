@@ -65,7 +65,7 @@ pnpm docs:validate
 IMAGE_DIGEST=sha256:<digest> pnpm --filter @cms/api release:manifest
 ```
 
-CI fail nếu command thiếu, bị skip không có approved waiver, generated OpenAPI/client diff chưa commit, migration deploy lần hai/status không sạch, container health smoke fail, production compose thiếu digest-pinned API/migration/web/PostgreSQL/Redis image, hoặc image SBOM/critical-high scan fail. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
+CI fail nếu command thiếu, bị skip không có approved waiver, generated OpenAPI/client diff chưa commit, migration deploy lần hai/status không sạch, container health smoke fail, production compose thiếu digest-pinned API/migration/web/PostgreSQL/Redis image, image reference không khớp digest manifest, hoặc image SBOM/critical-high scan fail. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
 
 Production manifest phải được tạo từ approval artifact đã ký, không dùng `RELEASE_APPROVED=true` như một bypass:
 
