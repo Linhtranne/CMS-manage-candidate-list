@@ -70,7 +70,7 @@ export const adminTemplatesFixture: components['schemas']['AdminTemplate'][] = [
 export const adminMailboxFixture: components['schemas']['MailboxSettingsView'] = {
   address: 'ungvien@company.vn',
   senderName: 'Candidate Supply',
-  adapter: 'MICROSOFT_365',
+  adapter: 'MICROSOFT_GRAPH',
   maxAttachmentBytes: 10 * 1024 * 1024,
   health: 'HEALTHY',
   lastCheckedAt: now,

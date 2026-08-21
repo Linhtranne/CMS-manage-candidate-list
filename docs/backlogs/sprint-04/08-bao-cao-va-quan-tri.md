@@ -310,7 +310,7 @@ Journey/Email templates có version + preview + retire. Mailbox chỉ hiển th�
 export type MailboxSettingsView = {
   address: string;
   senderName: string;
-  adapter: 'MICROSOFT_365' | 'GOOGLE_WORKSPACE' | 'SMTP_IMAP';
+  adapter: 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
   maxAttachmentBytes: number;
   health: 'HEALTHY' | 'DEGRADED' | 'DISCONNECTED';
   lastCheckedAt: string;

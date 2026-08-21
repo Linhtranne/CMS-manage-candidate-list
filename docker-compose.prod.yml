@@ -13,6 +13,9 @@ services:
       SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set for production}
       COOKIE_SECURE: "true"
       QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+      QUEUE_NAMES: ${QUEUE_NAMES:-outbox,reconcile,mail-ingest,mail-sync,file-scan}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-DISABLED}
+      MAIL_PROVIDER_APPROVAL_RECORD_FILE: ${MAIL_PROVIDER_APPROVAL_RECORD_FILE:-}
     ports: !reset []
   worker:
     extends:
@@ -31,6 +34,9 @@ services:
       SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set for production}
       COOKIE_SECURE: "true"
       QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+      QUEUE_NAMES: ${QUEUE_NAMES:-outbox,reconcile,mail-ingest,mail-sync,file-scan}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-DISABLED}
+      MAIL_PROVIDER_APPROVAL_RECORD_FILE: ${MAIL_PROVIDER_APPROVAL_RECORD_FILE:-}
     ports: !reset []
   scheduler:
     extends:
