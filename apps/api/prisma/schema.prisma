@@ -54,6 +54,7 @@ model User {
   importBatches CandidateImportBatch[] @relation("ImportOwner")
   duplicateResolutions CandidateDuplicateCase[] @relation("DuplicateResolver")
   mergeActions CandidateMergeAlias[] @relation("MergeActor")
+  emailMatchDecisions EmailMatchDecision[] @relation("EmailMatchResolver")
 
   @@index([teamId])
   @@map("users")
@@ -436,6 +437,8 @@ model Candidate {
   duplicateTargets CandidateDuplicateCase[] @relation("DuplicateTarget")
   mergeAliasesAsWinner CandidateMergeAlias[] @relation("MergeWinner")
   mergeAliasesAsLoser CandidateMergeAlias[] @relation("MergeLoser")
+  emailConversations EmailConversation[]
+  emailMatchDecisions EmailMatchDecision[] @relation("EmailMatchCandidate")
 
   @@index([normalizedName])
   @@index([emailBlindIndex])
@@ -581,6 +584,7 @@ model Application {
   team Team? @relation("ApplicationTeam", fields: [teamId], references: [id], onDelete: SetNull)
   interviews Interview[]
   history ApplicationStatusHistory[]
+  emailConversations EmailConversation[]
 
   @@index([candidateId, status, createdAt])
   @@index([jobOrderId, status, createdAt])
@@ -669,4 +673,137 @@ model InterviewHistory {
 
   @@index([interviewId, createdAt, id])
   @@map("interview_history")
+}
+
+model Mailbox {
+  id                 String    @id @default(uuid()) @db.Uuid
+  address            String    @unique @db.VarChar(320)
+  displayName        String    @map("display_name") @db.VarChar(160)
+  provider           String    @default("DISABLED") @db.VarChar(32)
+  status             String    @default("NOT_CONFIGURED") @db.VarChar(32)
+  providerAccountRef String?   @map("provider_account_ref") @db.VarChar(240)
+  syncCursor         String?   @map("sync_cursor") @db.Text
+  syncCursorIssuedAt DateTime? @map("sync_cursor_issued_at") @db.Timestamptz(6)
+  lastSyncAt         DateTime? @map("last_sync_at") @db.Timestamptz(6)
+  lastSendAt         DateTime? @map("last_send_at") @db.Timestamptz(6)
+  version            Int       @default(1)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  conversations EmailConversation[]
+  messages      EmailMessage[]
+
+  @@index([status, lastSyncAt])
+  @@map("mailboxes")
+}
+
+model EmailConversation {
+  id               String    @id @default(uuid()) @db.Uuid
+  mailboxId        String    @map("mailbox_id") @db.Uuid
+  candidateId      String?   @map("candidate_id") @db.Uuid
+  applicationId    String?   @map("application_id") @db.Uuid
+  journeyId        String?   @map("journey_id") @db.Uuid
+  subject          String    @db.VarChar(998)
+  snippet          String    @db.VarChar(500)
+  status           String    @default("NEEDS_ACTION") @db.VarChar(32)
+  lastActivityAt   DateTime  @map("last_activity_at") @db.Timestamptz(6)
+  messageCount     Int       @default(0) @map("message_count")
+  hasUnreadInbound Boolean   @default(false) @map("has_unread_inbound")
+  version          Int       @default(1)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  mailbox     Mailbox       @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+  candidate   Candidate?    @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  application Application?  @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  messages    EmailMessage[]
+
+  @@index([mailboxId, status, lastActivityAt, id])
+  @@index([candidateId, lastActivityAt, id])
+  @@index([applicationId, lastActivityAt, id])
+  @@map("email_conversations")
+}
+
+model EmailMessage {
+  id                 String    @id @default(uuid()) @db.Uuid
+  mailboxId          String    @map("mailbox_id") @db.Uuid
+  conversationId     String    @map("conversation_id") @db.Uuid
+  direction          String    @db.VarChar(16)
+  status             String    @default("DRAFT") @db.VarChar(32)
+  providerMessageId  String?   @map("provider_message_id") @db.VarChar(500)
+  internetMessageId String?   @map("internet_message_id") @db.VarChar(998)
+  idempotencyKey     String?   @map("idempotency_key") @db.VarChar(240)
+  fromAddress        String    @map("from_address") @db.VarChar(320)
+  subject            String    @db.VarChar(998)
+  bodyText           String    @map("body_text") @db.Text
+  sanitizedHtml      String?   @map("sanitized_html") @db.Text
+  sentOrReceivedAt   DateTime  @map("sent_or_received_at") @db.Timestamptz(6)
+  immutable          Boolean   @default(true)
+  version            Int       @default(1)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  mailbox       Mailbox              @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+  conversation EmailConversation    @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  recipients   EmailRecipient[]
+  attachments  EmailAttachment[]
+  matchDecisions EmailMatchDecision[]
+
+  @@unique([mailboxId, providerMessageId])
+  @@unique([mailboxId, idempotencyKey])
+  @@index([conversationId, sentOrReceivedAt, id])
+  @@index([status, sentOrReceivedAt, id])
+  @@map("email_messages")
+}
+
+model EmailRecipient {
+  id        String   @id @default(uuid()) @db.Uuid
+  messageId String   @map("message_id") @db.Uuid
+  kind      String   @db.VarChar(8)
+  address   String   @db.VarChar(320)
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  message EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+
+  @@unique([messageId, kind, address])
+  @@index([messageId, kind, position])
+  @@map("email_recipients")
+}
+
+model EmailAttachment {
+  id           String   @id @default(uuid()) @db.Uuid
+  messageId    String   @map("message_id") @db.Uuid
+  fileName     String   @map("file_name") @db.VarChar(240)
+  contentType  String   @map("content_type") @db.VarChar(160)
+  sizeBytes    BigInt   @map("size_bytes")
+  checksum     String?  @db.VarChar(128)
+  objectKey    String   @map("object_key") @db.VarChar(500)
+  status       String   @default("PENDING") @db.VarChar(32)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  message EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+
+  @@index([messageId, status])
+  @@index([status, createdAt, id])
+  @@map("email_attachments")
+}
+
+model EmailMatchDecision {
+  id            String    @id @default(uuid()) @db.Uuid
+  messageId     String    @map("message_id") @db.Uuid
+  state         String    @default("PENDING") @db.VarChar(32)
+  candidateId   String?   @map("candidate_id") @db.Uuid
+  reason        String?   @db.VarChar(1000)
+  resolvedById  String?   @map("resolved_by_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  message    EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  candidate  Candidate?    @relation("EmailMatchCandidate", fields: [candidateId], references: [id], onDelete: SetNull)
+  resolvedBy User?         @relation("EmailMatchResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([messageId, createdAt, id])
+  @@index([state, createdAt, id])
+  @@map("email_match_decisions")
 }

@@ -83,7 +83,13 @@ export const ModelName = {
   ApplicationStatusHistory: 'ApplicationStatusHistory',
   Interview: 'Interview',
   InterviewParticipant: 'InterviewParticipant',
-  InterviewHistory: 'InterviewHistory'
+  InterviewHistory: 'InterviewHistory',
+  Mailbox: 'Mailbox',
+  EmailConversation: 'EmailConversation',
+  EmailMessage: 'EmailMessage',
+  EmailRecipient: 'EmailRecipient',
+  EmailAttachment: 'EmailAttachment',
+  EmailMatchDecision: 'EmailMatchDecision'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -618,6 +624,109 @@ export const InterviewHistoryScalarFieldEnum = {
 } as const
 
 export type InterviewHistoryScalarFieldEnum = (typeof InterviewHistoryScalarFieldEnum)[keyof typeof InterviewHistoryScalarFieldEnum]
+
+
+export const MailboxScalarFieldEnum = {
+  id: 'id',
+  address: 'address',
+  displayName: 'displayName',
+  provider: 'provider',
+  status: 'status',
+  providerAccountRef: 'providerAccountRef',
+  syncCursor: 'syncCursor',
+  syncCursorIssuedAt: 'syncCursorIssuedAt',
+  lastSyncAt: 'lastSyncAt',
+  lastSendAt: 'lastSendAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MailboxScalarFieldEnum = (typeof MailboxScalarFieldEnum)[keyof typeof MailboxScalarFieldEnum]
+
+
+export const EmailConversationScalarFieldEnum = {
+  id: 'id',
+  mailboxId: 'mailboxId',
+  candidateId: 'candidateId',
+  applicationId: 'applicationId',
+  journeyId: 'journeyId',
+  subject: 'subject',
+  snippet: 'snippet',
+  status: 'status',
+  lastActivityAt: 'lastActivityAt',
+  messageCount: 'messageCount',
+  hasUnreadInbound: 'hasUnreadInbound',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailConversationScalarFieldEnum = (typeof EmailConversationScalarFieldEnum)[keyof typeof EmailConversationScalarFieldEnum]
+
+
+export const EmailMessageScalarFieldEnum = {
+  id: 'id',
+  mailboxId: 'mailboxId',
+  conversationId: 'conversationId',
+  direction: 'direction',
+  status: 'status',
+  providerMessageId: 'providerMessageId',
+  internetMessageId: 'internetMessageId',
+  idempotencyKey: 'idempotencyKey',
+  fromAddress: 'fromAddress',
+  subject: 'subject',
+  bodyText: 'bodyText',
+  sanitizedHtml: 'sanitizedHtml',
+  sentOrReceivedAt: 'sentOrReceivedAt',
+  immutable: 'immutable',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailMessageScalarFieldEnum = (typeof EmailMessageScalarFieldEnum)[keyof typeof EmailMessageScalarFieldEnum]
+
+
+export const EmailRecipientScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  kind: 'kind',
+  address: 'address',
+  position: 'position',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailRecipientScalarFieldEnum = (typeof EmailRecipientScalarFieldEnum)[keyof typeof EmailRecipientScalarFieldEnum]
+
+
+export const EmailAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  fileName: 'fileName',
+  contentType: 'contentType',
+  sizeBytes: 'sizeBytes',
+  checksum: 'checksum',
+  objectKey: 'objectKey',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailAttachmentScalarFieldEnum = (typeof EmailAttachmentScalarFieldEnum)[keyof typeof EmailAttachmentScalarFieldEnum]
+
+
+export const EmailMatchDecisionScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  state: 'state',
+  candidateId: 'candidateId',
+  reason: 'reason',
+  resolvedById: 'resolvedById',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailMatchDecisionScalarFieldEnum = (typeof EmailMatchDecisionScalarFieldEnum)[keyof typeof EmailMatchDecisionScalarFieldEnum]
 
 
 export const SortOrder = {

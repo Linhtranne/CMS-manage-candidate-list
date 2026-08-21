@@ -4813,6 +4813,9 @@ components:
             - DRAFT
             - QUEUED
             - SENDING
+            - RETRY_WAIT
+            - RECONCILING
+            - RECEIVED
             - SENT
             - DELIVERED
             - BOUNCED

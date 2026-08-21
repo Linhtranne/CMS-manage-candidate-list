@@ -365,6 +365,8 @@ export type CandidateWhereInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseListRelationFilter
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasListRelationFilter
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasListRelationFilter
+  emailConversations?: Prisma.EmailConversationListRelationFilter
+  emailMatchDecisions?: Prisma.EmailMatchDecisionListRelationFilter
 }
 
 export type CandidateOrderByWithRelationInput = {
@@ -400,6 +402,8 @@ export type CandidateOrderByWithRelationInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseOrderByRelationAggregateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasOrderByRelationAggregateInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasOrderByRelationAggregateInput
+  emailConversations?: Prisma.EmailConversationOrderByRelationAggregateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionOrderByRelationAggregateInput
 }
 
 export type CandidateWhereUniqueInput = Prisma.AtLeast<{
@@ -438,6 +442,8 @@ export type CandidateWhereUniqueInput = Prisma.AtLeast<{
   duplicateTargets?: Prisma.CandidateDuplicateCaseListRelationFilter
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasListRelationFilter
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasListRelationFilter
+  emailConversations?: Prisma.EmailConversationListRelationFilter
+  emailMatchDecisions?: Prisma.EmailMatchDecisionListRelationFilter
 }, "id" | "code">
 
 export type CandidateOrderByWithAggregationInput = {
@@ -531,6 +537,8 @@ export type CandidateCreateInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateInput = {
@@ -564,6 +572,8 @@ export type CandidateUncheckedCreateInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUpdateInput = {
@@ -597,6 +607,8 @@ export type CandidateUpdateInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateInput = {
@@ -630,6 +642,8 @@ export type CandidateUncheckedUpdateInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateManyInput = {
@@ -998,6 +1012,38 @@ export type CandidateUpdateOneRequiredWithoutApplicationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateUpdateToOneWithWhereWithoutApplicationsInput, Prisma.CandidateUpdateWithoutApplicationsInput>, Prisma.CandidateUncheckedUpdateWithoutApplicationsInput>
 }
 
+export type CandidateCreateNestedOneWithoutEmailConversationsInput = {
+  create?: Prisma.XOR<Prisma.CandidateCreateWithoutEmailConversationsInput, Prisma.CandidateUncheckedCreateWithoutEmailConversationsInput>
+  connectOrCreate?: Prisma.CandidateCreateOrConnectWithoutEmailConversationsInput
+  connect?: Prisma.CandidateWhereUniqueInput
+}
+
+export type CandidateUpdateOneWithoutEmailConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateCreateWithoutEmailConversationsInput, Prisma.CandidateUncheckedCreateWithoutEmailConversationsInput>
+  connectOrCreate?: Prisma.CandidateCreateOrConnectWithoutEmailConversationsInput
+  upsert?: Prisma.CandidateUpsertWithoutEmailConversationsInput
+  disconnect?: Prisma.CandidateWhereInput | boolean
+  delete?: Prisma.CandidateWhereInput | boolean
+  connect?: Prisma.CandidateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateUpdateToOneWithWhereWithoutEmailConversationsInput, Prisma.CandidateUpdateWithoutEmailConversationsInput>, Prisma.CandidateUncheckedUpdateWithoutEmailConversationsInput>
+}
+
+export type CandidateCreateNestedOneWithoutEmailMatchDecisionsInput = {
+  create?: Prisma.XOR<Prisma.CandidateCreateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedCreateWithoutEmailMatchDecisionsInput>
+  connectOrCreate?: Prisma.CandidateCreateOrConnectWithoutEmailMatchDecisionsInput
+  connect?: Prisma.CandidateWhereUniqueInput
+}
+
+export type CandidateUpdateOneWithoutEmailMatchDecisionsNestedInput = {
+  create?: Prisma.XOR<Prisma.CandidateCreateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedCreateWithoutEmailMatchDecisionsInput>
+  connectOrCreate?: Prisma.CandidateCreateOrConnectWithoutEmailMatchDecisionsInput
+  upsert?: Prisma.CandidateUpsertWithoutEmailMatchDecisionsInput
+  disconnect?: Prisma.CandidateWhereInput | boolean
+  delete?: Prisma.CandidateWhereInput | boolean
+  connect?: Prisma.CandidateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CandidateUpdateToOneWithWhereWithoutEmailMatchDecisionsInput, Prisma.CandidateUpdateWithoutEmailMatchDecisionsInput>, Prisma.CandidateUncheckedUpdateWithoutEmailMatchDecisionsInput>
+}
+
 export type CandidateCreateWithoutTeamInput = {
   id?: string
   code: string
@@ -1028,6 +1074,8 @@ export type CandidateCreateWithoutTeamInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutTeamInput = {
@@ -1060,6 +1108,8 @@ export type CandidateUncheckedCreateWithoutTeamInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutTeamInput = {
@@ -1147,6 +1197,8 @@ export type CandidateCreateWithoutOwnerInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutOwnerInput = {
@@ -1179,6 +1231,8 @@ export type CandidateUncheckedCreateWithoutOwnerInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutOwnerInput = {
@@ -1237,6 +1291,8 @@ export type CandidateCreateWithoutProfilesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutProfilesInput = {
@@ -1269,6 +1325,8 @@ export type CandidateUncheckedCreateWithoutProfilesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutProfilesInput = {
@@ -1317,6 +1375,8 @@ export type CandidateUpdateWithoutProfilesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutProfilesInput = {
@@ -1349,6 +1409,8 @@ export type CandidateUncheckedUpdateWithoutProfilesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateWithoutImportsAsCreatedInput = {
@@ -1381,6 +1443,8 @@ export type CandidateCreateWithoutImportsAsCreatedInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutImportsAsCreatedInput = {
@@ -1413,6 +1477,8 @@ export type CandidateUncheckedCreateWithoutImportsAsCreatedInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutImportsAsCreatedInput = {
@@ -1461,6 +1527,8 @@ export type CandidateUpdateWithoutImportsAsCreatedInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutImportsAsCreatedInput = {
@@ -1493,6 +1561,8 @@ export type CandidateUncheckedUpdateWithoutImportsAsCreatedInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateWithoutDuplicateSourcesInput = {
@@ -1525,6 +1595,8 @@ export type CandidateCreateWithoutDuplicateSourcesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutDuplicateSourcesInput = {
@@ -1557,6 +1629,8 @@ export type CandidateUncheckedCreateWithoutDuplicateSourcesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutDuplicateSourcesInput = {
@@ -1594,6 +1668,8 @@ export type CandidateCreateWithoutDuplicateTargetsInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutSourceCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutDuplicateTargetsInput = {
@@ -1626,6 +1702,8 @@ export type CandidateUncheckedCreateWithoutDuplicateTargetsInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutSourceCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutDuplicateTargetsInput = {
@@ -1674,6 +1752,8 @@ export type CandidateUpdateWithoutDuplicateSourcesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutDuplicateSourcesInput = {
@@ -1706,6 +1786,8 @@ export type CandidateUncheckedUpdateWithoutDuplicateSourcesInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUpsertWithoutDuplicateTargetsInput = {
@@ -1749,6 +1831,8 @@ export type CandidateUpdateWithoutDuplicateTargetsInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUpdateManyWithoutSourceCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutDuplicateTargetsInput = {
@@ -1781,6 +1865,8 @@ export type CandidateUncheckedUpdateWithoutDuplicateTargetsInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutSourceCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateWithoutMergeAliasesAsWinnerInput = {
@@ -1813,6 +1899,8 @@ export type CandidateCreateWithoutMergeAliasesAsWinnerInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutSourceCandidateInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutMergeAliasesAsWinnerInput = {
@@ -1845,6 +1933,8 @@ export type CandidateUncheckedCreateWithoutMergeAliasesAsWinnerInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutSourceCandidateInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutMergeAliasesAsWinnerInput = {
@@ -1882,6 +1972,8 @@ export type CandidateCreateWithoutMergeAliasesAsLoserInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutSourceCandidateInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutMergeAliasesAsLoserInput = {
@@ -1914,6 +2006,8 @@ export type CandidateUncheckedCreateWithoutMergeAliasesAsLoserInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutSourceCandidateInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutMergeAliasesAsLoserInput = {
@@ -1962,6 +2056,8 @@ export type CandidateUpdateWithoutMergeAliasesAsWinnerInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUpdateManyWithoutSourceCandidateNestedInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutMergeAliasesAsWinnerInput = {
@@ -1994,6 +2090,8 @@ export type CandidateUncheckedUpdateWithoutMergeAliasesAsWinnerInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutSourceCandidateNestedInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUpsertWithoutMergeAliasesAsLoserInput = {
@@ -2037,6 +2135,8 @@ export type CandidateUpdateWithoutMergeAliasesAsLoserInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUpdateManyWithoutSourceCandidateNestedInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutMergeAliasesAsLoserInput = {
@@ -2069,6 +2169,8 @@ export type CandidateUncheckedUpdateWithoutMergeAliasesAsLoserInput = {
   duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutSourceCandidateNestedInput
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateWithoutApplicationsInput = {
@@ -2101,6 +2203,8 @@ export type CandidateCreateWithoutApplicationsInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateUncheckedCreateWithoutApplicationsInput = {
@@ -2133,6 +2237,8 @@ export type CandidateUncheckedCreateWithoutApplicationsInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type CandidateCreateOrConnectWithoutApplicationsInput = {
@@ -2181,6 +2287,8 @@ export type CandidateUpdateWithoutApplicationsInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutApplicationsInput = {
@@ -2213,6 +2321,312 @@ export type CandidateUncheckedUpdateWithoutApplicationsInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateCreateWithoutEmailConversationsInput = {
+  id?: string
+  code: string
+  name: string
+  normalizedName: string
+  industryLabels: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation: string
+  japaneseLevel: string
+  emailCiphertext?: string | null
+  emailBlindIndex?: string | null
+  phoneCiphertext?: string | null
+  phoneBlindIndex?: string | null
+  addressCiphertext?: string | null
+  passportCiphertext?: string | null
+  passportBlindIndex?: string | null
+  source: string
+  recordStatus?: string
+  readinessStatus?: string
+  contactabilityStatus?: string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedCandidatesInput
+  team?: Prisma.TeamCreateNestedOneWithoutCandidatesInput
+  profiles?: Prisma.CandidateOccupationProfileCreateNestedManyWithoutCandidateInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutCandidateInput
+  importsAsCreated?: Prisma.CandidateImportRowCreateNestedManyWithoutCandidateInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutSourceCandidateInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateUncheckedCreateWithoutEmailConversationsInput = {
+  id?: string
+  code: string
+  name: string
+  normalizedName: string
+  industryLabels: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation: string
+  japaneseLevel: string
+  emailCiphertext?: string | null
+  emailBlindIndex?: string | null
+  phoneCiphertext?: string | null
+  phoneBlindIndex?: string | null
+  addressCiphertext?: string | null
+  passportCiphertext?: string | null
+  passportBlindIndex?: string | null
+  source: string
+  recordStatus?: string
+  readinessStatus?: string
+  contactabilityStatus?: string
+  ownerId: string
+  teamId?: string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profiles?: Prisma.CandidateOccupationProfileUncheckedCreateNestedManyWithoutCandidateInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutCandidateInput
+  importsAsCreated?: Prisma.CandidateImportRowUncheckedCreateNestedManyWithoutCandidateInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutSourceCandidateInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateCreateOrConnectWithoutEmailConversationsInput = {
+  where: Prisma.CandidateWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateCreateWithoutEmailConversationsInput, Prisma.CandidateUncheckedCreateWithoutEmailConversationsInput>
+}
+
+export type CandidateUpsertWithoutEmailConversationsInput = {
+  update: Prisma.XOR<Prisma.CandidateUpdateWithoutEmailConversationsInput, Prisma.CandidateUncheckedUpdateWithoutEmailConversationsInput>
+  create: Prisma.XOR<Prisma.CandidateCreateWithoutEmailConversationsInput, Prisma.CandidateUncheckedCreateWithoutEmailConversationsInput>
+  where?: Prisma.CandidateWhereInput
+}
+
+export type CandidateUpdateToOneWithWhereWithoutEmailConversationsInput = {
+  where?: Prisma.CandidateWhereInput
+  data: Prisma.XOR<Prisma.CandidateUpdateWithoutEmailConversationsInput, Prisma.CandidateUncheckedUpdateWithoutEmailConversationsInput>
+}
+
+export type CandidateUpdateWithoutEmailConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  industryLabels?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation?: Prisma.StringFieldUpdateOperationsInput | string
+  japaneseLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  emailCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  recordStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  readinessStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  contactabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedCandidatesNestedInput
+  team?: Prisma.TeamUpdateOneWithoutCandidatesNestedInput
+  profiles?: Prisma.CandidateOccupationProfileUpdateManyWithoutCandidateNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutCandidateNestedInput
+  importsAsCreated?: Prisma.CandidateImportRowUpdateManyWithoutCandidateNestedInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUpdateManyWithoutSourceCandidateNestedInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateUncheckedUpdateWithoutEmailConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  industryLabels?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation?: Prisma.StringFieldUpdateOperationsInput | string
+  japaneseLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  emailCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  recordStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  readinessStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  contactabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profiles?: Prisma.CandidateOccupationProfileUncheckedUpdateManyWithoutCandidateNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutCandidateNestedInput
+  importsAsCreated?: Prisma.CandidateImportRowUncheckedUpdateManyWithoutCandidateNestedInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutSourceCandidateNestedInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateCreateWithoutEmailMatchDecisionsInput = {
+  id?: string
+  code: string
+  name: string
+  normalizedName: string
+  industryLabels: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation: string
+  japaneseLevel: string
+  emailCiphertext?: string | null
+  emailBlindIndex?: string | null
+  phoneCiphertext?: string | null
+  phoneBlindIndex?: string | null
+  addressCiphertext?: string | null
+  passportCiphertext?: string | null
+  passportBlindIndex?: string | null
+  source: string
+  recordStatus?: string
+  readinessStatus?: string
+  contactabilityStatus?: string
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedCandidatesInput
+  team?: Prisma.TeamCreateNestedOneWithoutCandidatesInput
+  profiles?: Prisma.CandidateOccupationProfileCreateNestedManyWithoutCandidateInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutCandidateInput
+  importsAsCreated?: Prisma.CandidateImportRowCreateNestedManyWithoutCandidateInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutSourceCandidateInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutTargetCandidateInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasCreateNestedManyWithoutWinnerInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateUncheckedCreateWithoutEmailMatchDecisionsInput = {
+  id?: string
+  code: string
+  name: string
+  normalizedName: string
+  industryLabels: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation: string
+  japaneseLevel: string
+  emailCiphertext?: string | null
+  emailBlindIndex?: string | null
+  phoneCiphertext?: string | null
+  phoneBlindIndex?: string | null
+  addressCiphertext?: string | null
+  passportCiphertext?: string | null
+  passportBlindIndex?: string | null
+  source: string
+  recordStatus?: string
+  readinessStatus?: string
+  contactabilityStatus?: string
+  ownerId: string
+  teamId?: string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profiles?: Prisma.CandidateOccupationProfileUncheckedCreateNestedManyWithoutCandidateInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutCandidateInput
+  importsAsCreated?: Prisma.CandidateImportRowUncheckedCreateNestedManyWithoutCandidateInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutSourceCandidateInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutTargetCandidateInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutWinnerInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutLoserInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutCandidateInput
+}
+
+export type CandidateCreateOrConnectWithoutEmailMatchDecisionsInput = {
+  where: Prisma.CandidateWhereUniqueInput
+  create: Prisma.XOR<Prisma.CandidateCreateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedCreateWithoutEmailMatchDecisionsInput>
+}
+
+export type CandidateUpsertWithoutEmailMatchDecisionsInput = {
+  update: Prisma.XOR<Prisma.CandidateUpdateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedUpdateWithoutEmailMatchDecisionsInput>
+  create: Prisma.XOR<Prisma.CandidateCreateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedCreateWithoutEmailMatchDecisionsInput>
+  where?: Prisma.CandidateWhereInput
+}
+
+export type CandidateUpdateToOneWithWhereWithoutEmailMatchDecisionsInput = {
+  where?: Prisma.CandidateWhereInput
+  data: Prisma.XOR<Prisma.CandidateUpdateWithoutEmailMatchDecisionsInput, Prisma.CandidateUncheckedUpdateWithoutEmailMatchDecisionsInput>
+}
+
+export type CandidateUpdateWithoutEmailMatchDecisionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  industryLabels?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation?: Prisma.StringFieldUpdateOperationsInput | string
+  japaneseLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  emailCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  recordStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  readinessStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  contactabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedCandidatesNestedInput
+  team?: Prisma.TeamUpdateOneWithoutCandidatesNestedInput
+  profiles?: Prisma.CandidateOccupationProfileUpdateManyWithoutCandidateNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutCandidateNestedInput
+  importsAsCreated?: Prisma.CandidateImportRowUpdateManyWithoutCandidateNestedInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUpdateManyWithoutSourceCandidateNestedInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+}
+
+export type CandidateUncheckedUpdateWithoutEmailMatchDecisionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedName?: Prisma.StringFieldUpdateOperationsInput | string
+  industryLabels?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  occupation?: Prisma.StringFieldUpdateOperationsInput | string
+  japaneseLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  emailCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportCiphertext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passportBlindIndex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  recordStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  readinessStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  contactabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profiles?: Prisma.CandidateOccupationProfileUncheckedUpdateManyWithoutCandidateNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutCandidateNestedInput
+  importsAsCreated?: Prisma.CandidateImportRowUncheckedUpdateManyWithoutCandidateNestedInput
+  duplicateSources?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutSourceCandidateNestedInput
+  duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
+  mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
+  mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateCreateManyTeamInput = {
@@ -2270,6 +2684,8 @@ export type CandidateUpdateWithoutTeamInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutTeamInput = {
@@ -2302,6 +2718,8 @@ export type CandidateUncheckedUpdateWithoutTeamInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateManyWithoutTeamInput = {
@@ -2384,6 +2802,8 @@ export type CandidateUpdateWithoutOwnerInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateWithoutOwnerInput = {
@@ -2416,6 +2836,8 @@ export type CandidateUncheckedUpdateWithoutOwnerInput = {
   duplicateTargets?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutTargetCandidateNestedInput
   mergeAliasesAsWinner?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutWinnerNestedInput
   mergeAliasesAsLoser?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutLoserNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutCandidateNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type CandidateUncheckedUpdateManyWithoutOwnerInput = {
@@ -2456,6 +2878,8 @@ export type CandidateCountOutputType = {
   duplicateTargets: number
   mergeAliasesAsWinner: number
   mergeAliasesAsLoser: number
+  emailConversations: number
+  emailMatchDecisions: number
 }
 
 export type CandidateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2466,6 +2890,8 @@ export type CandidateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   duplicateTargets?: boolean | CandidateCountOutputTypeCountDuplicateTargetsArgs
   mergeAliasesAsWinner?: boolean | CandidateCountOutputTypeCountMergeAliasesAsWinnerArgs
   mergeAliasesAsLoser?: boolean | CandidateCountOutputTypeCountMergeAliasesAsLoserArgs
+  emailConversations?: boolean | CandidateCountOutputTypeCountEmailConversationsArgs
+  emailMatchDecisions?: boolean | CandidateCountOutputTypeCountEmailMatchDecisionsArgs
 }
 
 /**
@@ -2527,6 +2953,20 @@ export type CandidateCountOutputTypeCountMergeAliasesAsLoserArgs<ExtArgs extends
   where?: Prisma.CandidateMergeAliasWhereInput
 }
 
+/**
+ * CandidateCountOutputType without action
+ */
+export type CandidateCountOutputTypeCountEmailConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailConversationWhereInput
+}
+
+/**
+ * CandidateCountOutputType without action
+ */
+export type CandidateCountOutputTypeCountEmailMatchDecisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailMatchDecisionWhereInput
+}
+
 
 export type CandidateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2561,6 +3001,8 @@ export type CandidateSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   duplicateTargets?: boolean | Prisma.Candidate$duplicateTargetsArgs<ExtArgs>
   mergeAliasesAsWinner?: boolean | Prisma.Candidate$mergeAliasesAsWinnerArgs<ExtArgs>
   mergeAliasesAsLoser?: boolean | Prisma.Candidate$mergeAliasesAsLoserArgs<ExtArgs>
+  emailConversations?: boolean | Prisma.Candidate$emailConversationsArgs<ExtArgs>
+  emailMatchDecisions?: boolean | Prisma.Candidate$emailMatchDecisionsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["candidate"]>
 
@@ -2657,6 +3099,8 @@ export type CandidateInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   duplicateTargets?: boolean | Prisma.Candidate$duplicateTargetsArgs<ExtArgs>
   mergeAliasesAsWinner?: boolean | Prisma.Candidate$mergeAliasesAsWinnerArgs<ExtArgs>
   mergeAliasesAsLoser?: boolean | Prisma.Candidate$mergeAliasesAsLoserArgs<ExtArgs>
+  emailConversations?: boolean | Prisma.Candidate$emailConversationsArgs<ExtArgs>
+  emailMatchDecisions?: boolean | Prisma.Candidate$emailMatchDecisionsArgs<ExtArgs>
   _count?: boolean | Prisma.CandidateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CandidateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2680,6 +3124,8 @@ export type $CandidatePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     duplicateTargets: Prisma.$CandidateDuplicateCasePayload<ExtArgs>[]
     mergeAliasesAsWinner: Prisma.$CandidateMergeAliasPayload<ExtArgs>[]
     mergeAliasesAsLoser: Prisma.$CandidateMergeAliasPayload<ExtArgs>[]
+    emailConversations: Prisma.$EmailConversationPayload<ExtArgs>[]
+    emailMatchDecisions: Prisma.$EmailMatchDecisionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3108,6 +3554,8 @@ export interface Prisma__CandidateClient<T, Null = never, ExtArgs extends runtim
   duplicateTargets<T extends Prisma.Candidate$duplicateTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Candidate$duplicateTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateDuplicateCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mergeAliasesAsWinner<T extends Prisma.Candidate$mergeAliasesAsWinnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Candidate$mergeAliasesAsWinnerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateMergeAliasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mergeAliasesAsLoser<T extends Prisma.Candidate$mergeAliasesAsLoserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Candidate$mergeAliasesAsLoserArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateMergeAliasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emailConversations<T extends Prisma.Candidate$emailConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Candidate$emailConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emailMatchDecisions<T extends Prisma.Candidate$emailMatchDecisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Candidate$emailMatchDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailMatchDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3745,6 +4193,54 @@ export type Candidate$mergeAliasesAsLoserArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.CandidateMergeAliasScalarFieldEnum | Prisma.CandidateMergeAliasScalarFieldEnum[]
+}
+
+/**
+ * Candidate.emailConversations
+ */
+export type Candidate$emailConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailConversation
+   */
+  select?: Prisma.EmailConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailConversation
+   */
+  omit?: Prisma.EmailConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailConversationInclude<ExtArgs> | null
+  where?: Prisma.EmailConversationWhereInput
+  orderBy?: Prisma.EmailConversationOrderByWithRelationInput | Prisma.EmailConversationOrderByWithRelationInput[]
+  cursor?: Prisma.EmailConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailConversationScalarFieldEnum | Prisma.EmailConversationScalarFieldEnum[]
+}
+
+/**
+ * Candidate.emailMatchDecisions
+ */
+export type Candidate$emailMatchDecisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailMatchDecision
+   */
+  select?: Prisma.EmailMatchDecisionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailMatchDecision
+   */
+  omit?: Prisma.EmailMatchDecisionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailMatchDecisionInclude<ExtArgs> | null
+  where?: Prisma.EmailMatchDecisionWhereInput
+  orderBy?: Prisma.EmailMatchDecisionOrderByWithRelationInput | Prisma.EmailMatchDecisionOrderByWithRelationInput[]
+  cursor?: Prisma.EmailMatchDecisionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailMatchDecisionScalarFieldEnum | Prisma.EmailMatchDecisionScalarFieldEnum[]
 }
 
 /**

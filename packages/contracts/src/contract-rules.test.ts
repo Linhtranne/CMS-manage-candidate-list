@@ -181,7 +181,7 @@ describe('canonical OpenAPI rules', () => {
       'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED',
     ]);
     expect(getProperties('EmailMessage').status.enum).toEqual([
-      'DRAFT', 'QUEUED', 'SENDING', 'SENT', 'DELIVERED', 'BOUNCED', 'FAILED', 'CANCELLED',
+      'DRAFT', 'QUEUED', 'SENDING', 'RETRY_WAIT', 'RECONCILING', 'RECEIVED', 'SENT', 'DELIVERED', 'BOUNCED', 'FAILED', 'CANCELLED',
     ]);
   });
 

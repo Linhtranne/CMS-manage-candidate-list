@@ -302,6 +302,7 @@ export type ApplicationWhereInput = {
   team?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
   interviews?: Prisma.InterviewListRelationFilter
   history?: Prisma.ApplicationStatusHistoryListRelationFilter
+  emailConversations?: Prisma.EmailConversationListRelationFilter
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -327,6 +328,7 @@ export type ApplicationOrderByWithRelationInput = {
   team?: Prisma.TeamOrderByWithRelationInput
   interviews?: Prisma.InterviewOrderByRelationAggregateInput
   history?: Prisma.ApplicationStatusHistoryOrderByRelationAggregateInput
+  emailConversations?: Prisma.EmailConversationOrderByRelationAggregateInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +357,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   team?: Prisma.XOR<Prisma.TeamNullableScalarRelationFilter, Prisma.TeamWhereInput> | null
   interviews?: Prisma.InterviewListRelationFilter
   history?: Prisma.ApplicationStatusHistoryListRelationFilter
+  emailConversations?: Prisma.EmailConversationListRelationFilter
 }, "id">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -422,6 +425,7 @@ export type ApplicationCreateInput = {
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateInput = {
@@ -443,6 +447,7 @@ export type ApplicationUncheckedCreateInput = {
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUpdateInput = {
@@ -464,6 +469,7 @@ export type ApplicationUpdateInput = {
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
@@ -485,6 +491,7 @@ export type ApplicationUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationCreateManyInput = {
@@ -614,6 +621,11 @@ export type ApplicationSumOrderByAggregateInput = {
 export type ApplicationScalarRelationFilter = {
   is?: Prisma.ApplicationWhereInput
   isNot?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationNullableScalarRelationFilter = {
+  is?: Prisma.ApplicationWhereInput | null
+  isNot?: Prisma.ApplicationWhereInput | null
 }
 
 export type ApplicationCreateNestedManyWithoutTeamInput = {
@@ -812,6 +824,22 @@ export type ApplicationUpdateOneRequiredWithoutInterviewsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutInterviewsInput, Prisma.ApplicationUpdateWithoutInterviewsInput>, Prisma.ApplicationUncheckedUpdateWithoutInterviewsInput>
 }
 
+export type ApplicationCreateNestedOneWithoutEmailConversationsInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedCreateWithoutEmailConversationsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutEmailConversationsInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+}
+
+export type ApplicationUpdateOneWithoutEmailConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedCreateWithoutEmailConversationsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutEmailConversationsInput
+  upsert?: Prisma.ApplicationUpsertWithoutEmailConversationsInput
+  disconnect?: Prisma.ApplicationWhereInput | boolean
+  delete?: Prisma.ApplicationWhereInput | boolean
+  connect?: Prisma.ApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutEmailConversationsInput, Prisma.ApplicationUpdateWithoutEmailConversationsInput>, Prisma.ApplicationUncheckedUpdateWithoutEmailConversationsInput>
+}
+
 export type ApplicationCreateWithoutTeamInput = {
   id?: string
   status?: string
@@ -830,6 +858,7 @@ export type ApplicationCreateWithoutTeamInput = {
   owner: Prisma.UserCreateNestedOneWithoutOwnedApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutTeamInput = {
@@ -850,6 +879,7 @@ export type ApplicationUncheckedCreateWithoutTeamInput = {
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutTeamInput = {
@@ -918,6 +948,7 @@ export type ApplicationCreateWithoutOwnerInput = {
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutOwnerInput = {
@@ -938,6 +969,7 @@ export type ApplicationUncheckedCreateWithoutOwnerInput = {
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutOwnerInput = {
@@ -984,6 +1016,7 @@ export type ApplicationCreateWithoutJobOrderInput = {
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutJobOrderInput = {
@@ -1004,6 +1037,7 @@ export type ApplicationUncheckedCreateWithoutJobOrderInput = {
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutJobOrderInput = {
@@ -1050,6 +1084,7 @@ export type ApplicationCreateWithoutCandidateInput = {
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutCandidateInput = {
@@ -1070,6 +1105,7 @@ export type ApplicationUncheckedCreateWithoutCandidateInput = {
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutCandidateInput = {
@@ -1116,6 +1152,7 @@ export type ApplicationCreateWithoutHistoryInput = {
   owner: Prisma.UserCreateNestedOneWithoutOwnedApplicationsInput
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutHistoryInput = {
@@ -1136,6 +1173,7 @@ export type ApplicationUncheckedCreateWithoutHistoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutHistoryInput = {
@@ -1172,6 +1210,7 @@ export type ApplicationUpdateWithoutHistoryInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedApplicationsNestedInput
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutHistoryInput = {
@@ -1192,6 +1231,7 @@ export type ApplicationUncheckedUpdateWithoutHistoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationCreateWithoutInterviewsInput = {
@@ -1212,6 +1252,7 @@ export type ApplicationCreateWithoutInterviewsInput = {
   owner: Prisma.UserCreateNestedOneWithoutOwnedApplicationsInput
   team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
   history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutInterviewsInput = {
@@ -1232,6 +1273,7 @@ export type ApplicationUncheckedCreateWithoutInterviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  emailConversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutInterviewsInput = {
@@ -1268,6 +1310,7 @@ export type ApplicationUpdateWithoutInterviewsInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedApplicationsNestedInput
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutInterviewsInput = {
@@ -1287,6 +1330,107 @@ export type ApplicationUncheckedUpdateWithoutInterviewsInput = {
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type ApplicationCreateWithoutEmailConversationsInput = {
+  id?: string
+  status?: string
+  source: string
+  requirementSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  appliedAt?: Date | string
+  lastActivityAt?: Date | string
+  dueAt?: Date | string | null
+  decisionReason?: string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  candidate: Prisma.CandidateCreateNestedOneWithoutApplicationsInput
+  jobOrder: Prisma.JobOrderCreateNestedOneWithoutApplicationsInput
+  owner: Prisma.UserCreateNestedOneWithoutOwnedApplicationsInput
+  team?: Prisma.TeamCreateNestedOneWithoutApplicationsInput
+  interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
+  history?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+}
+
+export type ApplicationUncheckedCreateWithoutEmailConversationsInput = {
+  id?: string
+  candidateId: string
+  jobOrderId: string
+  ownerId: string
+  teamId?: string | null
+  status?: string
+  source: string
+  requirementSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profileSnapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  appliedAt?: Date | string
+  lastActivityAt?: Date | string
+  dueAt?: Date | string | null
+  decisionReason?: string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
+  history?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type ApplicationCreateOrConnectWithoutEmailConversationsInput = {
+  where: Prisma.ApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedCreateWithoutEmailConversationsInput>
+}
+
+export type ApplicationUpsertWithoutEmailConversationsInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedUpdateWithoutEmailConversationsInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedCreateWithoutEmailConversationsInput>
+  where?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationUpdateToOneWithWhereWithoutEmailConversationsInput = {
+  where?: Prisma.ApplicationWhereInput
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutEmailConversationsInput, Prisma.ApplicationUncheckedUpdateWithoutEmailConversationsInput>
+}
+
+export type ApplicationUpdateWithoutEmailConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  requirementSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  candidate?: Prisma.CandidateUpdateOneRequiredWithoutApplicationsNestedInput
+  jobOrder?: Prisma.JobOrderUpdateOneRequiredWithoutApplicationsNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedApplicationsNestedInput
+  team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
+  interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
+  history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+}
+
+export type ApplicationUncheckedUpdateWithoutEmailConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  candidateId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  requirementSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profileSnapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastActivityAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  decisionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
@@ -1326,6 +1470,7 @@ export type ApplicationUpdateWithoutTeamInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutTeamInput = {
@@ -1346,6 +1491,7 @@ export type ApplicationUncheckedUpdateWithoutTeamInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutTeamInput = {
@@ -1402,6 +1548,7 @@ export type ApplicationUpdateWithoutOwnerInput = {
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutOwnerInput = {
@@ -1422,6 +1569,7 @@ export type ApplicationUncheckedUpdateWithoutOwnerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutOwnerInput = {
@@ -1478,6 +1626,7 @@ export type ApplicationUpdateWithoutJobOrderInput = {
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutJobOrderInput = {
@@ -1498,6 +1647,7 @@ export type ApplicationUncheckedUpdateWithoutJobOrderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutJobOrderInput = {
@@ -1554,6 +1704,7 @@ export type ApplicationUpdateWithoutCandidateInput = {
   team?: Prisma.TeamUpdateOneWithoutApplicationsNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutCandidateInput = {
@@ -1574,6 +1725,7 @@ export type ApplicationUncheckedUpdateWithoutCandidateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
   history?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  emailConversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutCandidateInput = {
@@ -1602,11 +1754,13 @@ export type ApplicationUncheckedUpdateManyWithoutCandidateInput = {
 export type ApplicationCountOutputType = {
   interviews: number
   history: number
+  emailConversations: number
 }
 
 export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   interviews?: boolean | ApplicationCountOutputTypeCountInterviewsArgs
   history?: boolean | ApplicationCountOutputTypeCountHistoryArgs
+  emailConversations?: boolean | ApplicationCountOutputTypeCountEmailConversationsArgs
 }
 
 /**
@@ -1633,6 +1787,13 @@ export type ApplicationCountOutputTypeCountHistoryArgs<ExtArgs extends runtime.T
   where?: Prisma.ApplicationStatusHistoryWhereInput
 }
 
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeCountEmailConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailConversationWhereInput
+}
+
 
 export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1657,6 +1818,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   team?: boolean | Prisma.Application$teamArgs<ExtArgs>
   interviews?: boolean | Prisma.Application$interviewsArgs<ExtArgs>
   history?: boolean | Prisma.Application$historyArgs<ExtArgs>
+  emailConversations?: boolean | Prisma.Application$emailConversationsArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
@@ -1733,6 +1895,7 @@ export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.Internal
   team?: boolean | Prisma.Application$teamArgs<ExtArgs>
   interviews?: boolean | Prisma.Application$interviewsArgs<ExtArgs>
   history?: boolean | Prisma.Application$historyArgs<ExtArgs>
+  emailConversations?: boolean | Prisma.Application$emailConversationsArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1757,6 +1920,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     team: Prisma.$TeamPayload<ExtArgs> | null
     interviews: Prisma.$InterviewPayload<ExtArgs>[]
     history: Prisma.$ApplicationStatusHistoryPayload<ExtArgs>[]
+    emailConversations: Prisma.$EmailConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2175,6 +2339,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
   team<T extends Prisma.Application$teamArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$teamArgs<ExtArgs>>): Prisma.Prisma__TeamClient<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   interviews<T extends Prisma.Application$interviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$interviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InterviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   history<T extends Prisma.Application$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationStatusHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emailConversations<T extends Prisma.Application$emailConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$emailConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2685,6 +2850,30 @@ export type Application$historyArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ApplicationStatusHistoryScalarFieldEnum | Prisma.ApplicationStatusHistoryScalarFieldEnum[]
+}
+
+/**
+ * Application.emailConversations
+ */
+export type Application$emailConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailConversation
+   */
+  select?: Prisma.EmailConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailConversation
+   */
+  omit?: Prisma.EmailConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailConversationInclude<ExtArgs> | null
+  where?: Prisma.EmailConversationWhereInput
+  orderBy?: Prisma.EmailConversationOrderByWithRelationInput | Prisma.EmailConversationOrderByWithRelationInput[]
+  cursor?: Prisma.EmailConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailConversationScalarFieldEnum | Prisma.EmailConversationScalarFieldEnum[]
 }
 
 /**

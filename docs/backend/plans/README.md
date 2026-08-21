@@ -32,6 +32,7 @@ Phase 1A và phần adapter-fake của 1B có thể phát triển song song sau 
 - Phase 1A Task 5 technical implementation and regression evidence: **complete**; see [Task 5 evidence](../phase-1a-task-5-evidence.md).
 - Phase 1A Task 6 technical implementation and regression evidence: **complete**; see [Task 6 evidence](../phase-1a-task-6-evidence.md).
 - Phase 1A technical checkpoint: **ready for human approval**; see [checkpoint evidence](../phase-1a-checkpoint-evidence.md). External production promotion is not claimed until named deployment, secrets, approvals and UAT evidence exist.
+- Phase 1B Task 1 technical implementation: **complete**; email schema/domain foundation, immutable message trigger, disabled/fake adapters and PostgreSQL migration evidence are in [Task 1 evidence](../phase-1b-task-1-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
 
 ## Global execution rules
 

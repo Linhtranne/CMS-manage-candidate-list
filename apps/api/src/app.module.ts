@@ -13,9 +13,10 @@ import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { ClientsOrdersModule } from './modules/clients-orders/clients-orders.module.js';
 import { CandidatesModule } from './modules/candidates/candidates.module.js';
 import { ApplicationsInterviewsModule } from './modules/applications-interviews/applications-interviews.module.js';
+import { EmailHubModule } from './modules/email-hub/email-hub.module.js';
 
 @Module({
-  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule],
+  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule, EmailHubModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: EnvelopeInterceptor },

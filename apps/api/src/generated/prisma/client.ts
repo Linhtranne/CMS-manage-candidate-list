@@ -206,3 +206,33 @@ export type InterviewParticipant = Prisma.InterviewParticipantModel
  * 
  */
 export type InterviewHistory = Prisma.InterviewHistoryModel
+/**
+ * Model Mailbox
+ * 
+ */
+export type Mailbox = Prisma.MailboxModel
+/**
+ * Model EmailConversation
+ * 
+ */
+export type EmailConversation = Prisma.EmailConversationModel
+/**
+ * Model EmailMessage
+ * 
+ */
+export type EmailMessage = Prisma.EmailMessageModel
+/**
+ * Model EmailRecipient
+ * 
+ */
+export type EmailRecipient = Prisma.EmailRecipientModel
+/**
+ * Model EmailAttachment
+ * 
+ */
+export type EmailAttachment = Prisma.EmailAttachmentModel
+/**
+ * Model EmailMatchDecision
+ * 
+ */
+export type EmailMatchDecision = Prisma.EmailMatchDecisionModel

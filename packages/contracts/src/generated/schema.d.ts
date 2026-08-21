@@ -2421,7 +2421,7 @@ export interface components {
             /** @enum {string} */
             direction: "INBOUND" | "OUTBOUND";
             /** @enum {string} */
-            status: "DRAFT" | "QUEUED" | "SENDING" | "SENT" | "DELIVERED" | "BOUNCED" | "FAILED" | "CANCELLED";
+            status: "DRAFT" | "QUEUED" | "SENDING" | "RETRY_WAIT" | "RECONCILING" | "RECEIVED" | "SENT" | "DELIVERED" | "BOUNCED" | "FAILED" | "CANCELLED";
             /** Format: email */
             from: string;
             to: string[];

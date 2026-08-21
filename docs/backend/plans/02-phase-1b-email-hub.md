@@ -24,12 +24,13 @@
 
 **Interfaces:** `MailProviderAdapter`, `EmailCommandService`, outbound/inbound state machines and unique provider/idempotency constraints from spec 07.
 
-- [ ] Write failing schema/state/immutability/dedupe tests and disabled-provider health/send behavior.
-- [ ] Run email integration tests; confirm RED.
-- [ ] Implement mailbox/conversation/message/recipient/attachment/match tables, ports, disabled/fake adapters and state transition guards.
-- [ ] Ensure SENT/RECEIVED body/recipient cannot be mutated through repository/service.
-- [ ] Run migration/integration/security redaction tests.
-- [ ] Commit: `feat(email): add immutable email domain foundation`.
+- [x] Write failing schema/state/immutability/dedupe tests and disabled-provider health/send behavior.
+- [x] Run email integration tests; confirm RED.
+- [x] Implement mailbox/conversation/message/recipient/attachment/match tables, ports, disabled/fake adapters and state transition guards.
+- [x] Ensure SENT/RECEIVED body/recipient cannot be mutated through repository/service and PostgreSQL trigger.
+- [x] Run migration/integration/security redaction tests.
+- [x] Commit: `feat(email): add immutable email domain foundation`.
+- [ ] Backend Tech Lead reviews Task 1 evidence before integration.
 
 ### Task 2: Implement preview, enqueue and outbound worker
 
