@@ -133,6 +133,8 @@ Release manifest dùng một aggregate JSON export bất biến từ các decisi
 
 ```json
 {
+  "version": "1.0.0",
+  "artifact_checksum": "sha256:<approved-artifact-digest>",
   "decisions": [
     { "id": "DEC-001", "status": "approved" },
     { "id": "DEC-002", "status": "approved" }
@@ -143,7 +145,7 @@ Release manifest dùng một aggregate JSON export bất biến từ các decisi
 }
 ```
 
-Phase 1A release scope yêu cầu DEC-001, DEC-002, DEC-004, DEC-005, DEC-006 và DEC-007; DEC-003 chỉ bắt buộc khi scope bao gồm Phase 1B/email. Script release kiểm tra đủ decision/role, ghi checksum aggregate artifact và từ chối production manifest nếu thiếu.
+Phase 1A release scope yêu cầu DEC-001, DEC-002, DEC-004, DEC-005, DEC-006 và DEC-007; DEC-003 chỉ bắt buộc khi scope bao gồm Phase 1B/email. Script release kiểm tra version/checksum, đủ decision/role và từ chối production manifest nếu artifact malformed, thiếu approval hoặc có placeholder.
 
 ## 11. Gate enforcement
 

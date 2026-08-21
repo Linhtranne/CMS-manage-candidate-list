@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateReleaseApprovalArtifact } from './release-approval.mjs';
 
 const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const output = resolve(root, process.env.RELEASE_MANIFEST_OUTPUT ?? 'apps/api/ops/evidence/release-manifest.json');
@@ -71,6 +72,8 @@ if (status === 'production' && !webImageDigest) throw new Error('production rele
 if (status === 'production' && !postgresImageDigest) throw new Error('production release manifest requires POSTGRES_IMAGE_DIGEST');
 if (status === 'production' && !redisImageDigest) throw new Error('production release manifest requires REDIS_IMAGE_DIGEST');
 if (status === 'production') {
+  const approvalArtifactIssues = validateReleaseApprovalArtifact(approvalRecord, requiredDecisions, requiredApprovalRoles);
+  if (approvalArtifactIssues.length) throw new Error(`production release approval artifact is invalid: ${approvalArtifactIssues.join('; ')}`);
   const approvedDecisionIds = new Set((approvalRecord?.decisions ?? []).filter((item) => item?.status === 'approved').map((item) => item?.id));
   const missingDecisions = requiredDecisions.filter((id) => !approvedDecisionIds.has(id));
   if (missingDecisions.length) throw new Error(`production release approval artifact is missing approved decisions: ${missingDecisions.join(', ')}`);

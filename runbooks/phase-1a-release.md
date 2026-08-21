@@ -38,7 +38,7 @@ pnpm --filter @cms/api release:preflight
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile queue --profile migration config --quiet
 ```
 
-The release manifest is generated only after the worktree is clean and the approval artifact contains approved DEC-001 through DEC-007 plus all required role signatures:
+The release manifest is generated only after the worktree is clean and the approval artifact is a versioned, checksummed JSON object containing the decisions required by `RELEASE_SCOPE` (Phase 1A: DEC-001, DEC-002, DEC-004, DEC-005, DEC-006 and DEC-007) plus all required role signatures:
 
 ```sh
 RELEASE_STATUS=production \
@@ -53,7 +53,7 @@ REDIS_IMAGE_DIGEST="$REDIS_IMAGE_DIGEST" \
 pnpm --filter @cms/api release:manifest
 ```
 
-Do not set `RELEASE_APPROVED=true` as a bypass. The script independently rejects a dirty checkout, missing decisions, missing identities/timestamps and unapproved roles.
+Do not set `RELEASE_APPROVED=true` as a bypass. The script independently rejects a dirty checkout, malformed/missing artifact version or checksum, missing decisions, missing identities/timestamps and unapproved roles.
 
 ## Backup and migration
 

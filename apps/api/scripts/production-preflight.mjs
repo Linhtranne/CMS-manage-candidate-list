@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateReleaseApprovalArtifact } from './release-approval.mjs';
 
 const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const scope = process.env.RELEASE_SCOPE ?? 'phase-1a';
@@ -72,6 +73,8 @@ if (approvalFile) {
   }
 }
 const approvedDecisions = new Set((approvalRecord?.decisions ?? []).filter((item) => item?.status === 'approved').map((item) => item?.id));
+const approvalArtifactIssues = validateReleaseApprovalArtifact(approvalRecord, requiredDecisions ?? [], requiredRoles);
+check('approval-artifact-shape', approvalArtifactIssues.length === 0, approvalArtifactIssues.join('; '));
 check('approved-decisions', Boolean(approvalRecord) && requiredDecisions.every((id) => approvedDecisions.has(id)), `required=${requiredDecisions.join(',')}`);
 const approvals = Array.isArray(approvalRecord?.approvals) ? approvalRecord.approvals : [];
 check('approved-roles', requiredRoles.every((role) => approvals.some((item) => item?.role === role && item?.status === 'approved' && item?.identity && item?.at)), `required=${requiredRoles.join(',')}`);

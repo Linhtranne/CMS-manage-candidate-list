@@ -77,10 +77,12 @@ RELEASE_APPROVALS_FILE=/secure/release/phase-1a-approvals.json \
 IMAGE_DIGEST=sha256:<api-image-digest> \
 MIGRATION_IMAGE_DIGEST=sha256:<migration-image-digest> \
 WEB_IMAGE_DIGEST=sha256:<web-image-digest> \
+POSTGRES_IMAGE_DIGEST=sha256:<postgres-image-digest> \
+REDIS_IMAGE_DIGEST=sha256:<redis-image-digest> \
 pnpm --filter @cms/api release:manifest
 ```
 
-Artifact phải chứa approved DEC-001 đến DEC-007 và chữ ký có identity + timestamp của Backend Tech Lead, Product Owner, QA Lead, Security Owner và Operations Owner. Script ghi checksum artifact vào manifest và fail-closed nếu thiếu bất kỳ mục nào. Quy trình deploy/rollback chi tiết nằm trong [Phase 1A release runbook](../../runbooks/phase-1a-release.md) và [rollback runbook](../../runbooks/phase-1a-rollback.md).
+Artifact phải là JSON object bất biến có `version`, `artifact_checksum` dạng `sha256:<64-hex-digest>`, các decision đã `approved` theo `RELEASE_SCOPE` (Phase 1A: DEC-001, DEC-002, DEC-004, DEC-005, DEC-006, DEC-007) và chữ ký có identity + timestamp của Backend Tech Lead, Product Owner, QA Lead, Security Owner và Operations Owner. Script ghi checksum file vào manifest và fail-closed nếu thiếu hoặc dùng placeholder ở bất kỳ mục nào. Quy trình deploy/rollback chi tiết nằm trong [Phase 1A release runbook](../../runbooks/phase-1a-release.md) và [rollback runbook](../../runbooks/phase-1a-rollback.md).
 
 ## 4. Coverage requirements
 
