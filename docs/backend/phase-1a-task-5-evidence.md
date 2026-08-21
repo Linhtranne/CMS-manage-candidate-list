@@ -23,7 +23,7 @@ risk: high
 
 ```text
 pnpm --filter @cms/api exec vitest run test/applications/application-concurrency.integration-spec.ts  # passed on PostgreSQL 17
-pnpm --filter @cms/api test                                                                        # 35 files, 95 tests passed
+pnpm --filter @cms/api test                                                                        # 36 files: 32 passed, 4 skipped; 82 passed, 15 skipped (97 total)
 pnpm --filter @cms/api typecheck                                                                   # passed
 pnpm --filter @cms/api lint                                                                        # MODULE_BOUNDARY_VIOLATIONS=0
 pnpm --filter @cms/contracts generate && pnpm --filter @cms/contracts test                       # generated; 7 tests passed

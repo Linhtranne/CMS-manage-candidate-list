@@ -27,9 +27,9 @@ candidate domain + permission tests             # 9 passed on PostgreSQL-backed 
 candidate migration contract                    # included in API suite
 candidate persistence rehearsal                  # encrypted fields, blind index, duplicate passport, audit/outbox, archive passed
 API full suite (no DB)                           # 31 files passed, 4 skipped
-API full suite (PostgreSQL disposable)            # 35 files, 95 tests passed; nine migrations applied/up to date
+API full suite (PostgreSQL disposable)            # 36 files: 32 passed, 4 skipped; 82 passed, 15 skipped (97 total); nine migrations applied/up to date
 API candidate + interview DB suite                # 2 files, 9 passed; schema binding and saved-view coverage included
-cms-api:phase1a production rehearsal              # image ID/digest sha256:3dfbcbc5a334f0153fb029505d0a50846977453aed7e545b1f6eafad30826a1f; live/ready HTTP 200
+cms-api:phase1a production rehearsal              # pinned API digest sha256:26eb1c556d51ef3668801d3c278ef69c1a01f78b9ce53eb757a89a29aa0e6094; live/ready HTTP 200
 pnpm --filter @cms/api typecheck                 # passed
 pnpm --filter @cms/api lint                      # MODULE_BOUNDARY_VIOLATIONS=0
 pnpm --filter @cms/contracts generate/test       # generated contract and 7 tests passed
