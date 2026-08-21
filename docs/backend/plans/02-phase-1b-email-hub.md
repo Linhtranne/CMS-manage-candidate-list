@@ -52,7 +52,7 @@
 - [x] Add versioned conversation reply and manual-link commands with server-owned mailbox identity, attachment safety checks, CAS conflict handling, policy scope, audit and ID-only outbox events.
 - [x] Add kill switch, queue metrics, auth-pause alert and canonical errors; no body/recipient in Redis/log.
 - [x] Run AC-05, AC-08, AC-15, AC-19, EM-AC-01/03/04 and contract/security tests.
-- [ ] Commit: `feat(email): add idempotent outbound delivery` (blocked by the current read-only `.git` mount; working tree is verified).
+- [x] Commit: `feat(email): add idempotent outbound delivery and inbound ingest` (ee07ed0 on feature/phase-1b-email-hub). Fix: added missing EmailDomainError import in email-inbound.service.ts.
 - [ ] Backend Tech Lead reviews Task 2 evidence before integration.
 
 ### Task 3: Implement inbound webhook/poller and matcher
@@ -72,7 +72,7 @@
 - [x] Implement webhook verification/replay cache, change fetch, normalization/sanitization, unique ingest transaction and append-only match decisions.
 - [x] Implement shared inbox/manual resolution permission + reason; inbound event can only create task/stop approved reminder.
 - [x] Run AC-06–08, AC-13–14, AC-16 and EM-AC-02.
-- [ ] Commit: `feat(email): ingest and match mailbox replies safely` (blocked by the current read-only `.git` mount; working tree is verified).
+- [x] Commit: included in ee07ed0 (Tasks 2+3 committed together due to shared infrastructure files).
 - [ ] Backend Tech Lead reviews Task 3 evidence before integration.
 
 ### Task 4: Implement attachment quarantine and document handoff
@@ -91,7 +91,7 @@
 - [x] Implement streaming limits/checksum/private keys, scanner adapter/state transitions, safe metadata endpoints and document candidate handoff.
 - [x] Enforce no raw object key/provider attachment ID in public DTO; audit body/download access.
 - [x] Run AC-09 and attachment portions AC-06/EM-AC-02 plus redaction scan.
-- [ ] Commit: `feat(files): quarantine and scan email attachments` (blocked by the current read-only `.git` mount; working tree is verified).
+- [x] Commit: `feat(files): quarantine and scan email attachments` (ec4201d on feature/phase-1b-email-hub).
 - [ ] Backend Tech Lead reviews Task 4 evidence before integration.
 
 ### Task 5: Implement selected provider and production operations
