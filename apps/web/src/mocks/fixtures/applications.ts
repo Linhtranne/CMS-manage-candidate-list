@@ -13,6 +13,7 @@ function interview(overrides: Partial<Interview> & Pick<Interview, 'id' | 'round
     id: overrides.id,
     round: overrides.round,
     scheduledAt: overrides.scheduledAt,
+    scheduledEndAt: overrides.scheduledEndAt ?? new Date(new Date(overrides.scheduledAt).getTime() + 60 * 60 * 1000).toISOString(),
     timeZone: 'Asia/Ho_Chi_Minh',
     mode: 'ONLINE',
     meetingUrl: 'https://meet.example.com/candidate-supply',

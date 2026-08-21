@@ -1,0 +1,92 @@
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
+const scope = process.env.RELEASE_SCOPE ?? 'phase-1a';
+const requiredDecisions = {
+  'phase-1a': ['DEC-001', 'DEC-002', 'DEC-004', 'DEC-005', 'DEC-006', 'DEC-007'],
+  'phase-1b': ['DEC-001', 'DEC-002', 'DEC-003', 'DEC-004', 'DEC-005', 'DEC-006', 'DEC-007'],
+  full: ['DEC-001', 'DEC-002', 'DEC-003', 'DEC-004', 'DEC-005', 'DEC-006', 'DEC-007'],
+}[scope];
+const requiredRoles = ['Backend Tech Lead', 'Product Owner', 'QA Lead', 'Security Owner', 'Operations Owner'];
+const digestPattern = /^sha256:[0-9a-f]{64}$/i;
+const checks = [];
+const missing = [];
+const failures = [];
+
+function env(name) {
+  const value = process.env[name]?.trim();
+  if (!value) missing.push(name);
+  return value;
+}
+function check(name, passed, detail) {
+  checks.push({ name, status: passed ? 'passed' : 'failed', ...(detail ? { detail } : {}) });
+  if (!passed) failures.push(name);
+}
+function command(name, args) {
+  try {
+    return execFileSync(name, args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+const apiImage = env('API_IMAGE');
+const migrationImage = env('MIGRATION_IMAGE');
+const webImage = env('WEB_IMAGE');
+const postgresImage = env('POSTGRES_IMAGE');
+const redisImage = env('REDIS_IMAGE');
+const appVersion = env('APP_VERSION');
+const appOrigin = env('APP_ORIGIN');
+const corsOrigins = env('CORS_ORIGINS');
+const databaseUrl = env('DATABASE_URL');
+const redisUrl = env('REDIS_URL');
+const encryptionKey = env('ENCRYPTION_KEY');
+const sessionSecret = env('SESSION_SECRET');
+const approvalFile = env('RELEASE_APPROVALS_FILE');
+const apiDigest = env('IMAGE_DIGEST');
+const migrationDigest = env('MIGRATION_IMAGE_DIGEST');
+const webDigest = env('WEB_IMAGE_DIGEST');
+const postgresDigest = env('POSTGRES_IMAGE_DIGEST');
+const redisDigest = env('REDIS_IMAGE_DIGEST');
+
+if (!requiredDecisions) failures.push('RELEASE_SCOPE');
+check('release-scope', Boolean(requiredDecisions), 'scope must be phase-1a, phase-1b or full');
+for (const [name, value] of [['API_IMAGE', apiImage], ['MIGRATION_IMAGE', migrationImage], ['WEB_IMAGE', webImage], ['POSTGRES_IMAGE', postgresImage], ['REDIS_IMAGE', redisImage]]) {
+  check(`${name}-pinned`, Boolean(value && /@sha256:[0-9a-f]{64}$/i.test(value)), 'image must use @sha256:<64-hex-digest>');
+}
+for (const [name, value] of [['IMAGE_DIGEST', apiDigest], ['MIGRATION_IMAGE_DIGEST', migrationDigest], ['WEB_IMAGE_DIGEST', webDigest], ['POSTGRES_IMAGE_DIGEST', postgresDigest], ['REDIS_IMAGE_DIGEST', redisDigest]]) {
+  check(`${name}-valid`, Boolean(value && digestPattern.test(value)), 'digest must be sha256:<64-hex-digest>');
+}
+check('production-env', process.env.NODE_ENV === 'production', 'NODE_ENV must be production');
+check('required-runtime-inputs', [appVersion, appOrigin, corsOrigins, databaseUrl, redisUrl, encryptionKey, sessionSecret].every(Boolean));
+
+let approvalRecord = null;
+if (approvalFile) {
+  try {
+    approvalRecord = JSON.parse(readFileSync(resolve(root, approvalFile), 'utf8'));
+  } catch {
+    failures.push('approval-artifact-readable');
+  }
+}
+const approvedDecisions = new Set((approvalRecord?.decisions ?? []).filter((item) => item?.status === 'approved').map((item) => item?.id));
+check('approved-decisions', Boolean(approvalRecord) && requiredDecisions.every((id) => approvedDecisions.has(id)), `required=${requiredDecisions.join(',')}`);
+const approvals = Array.isArray(approvalRecord?.approvals) ? approvalRecord.approvals : [];
+check('approved-roles', requiredRoles.every((role) => approvals.some((item) => item?.role === role && item?.status === 'approved' && item?.identity && item?.at)), `required=${requiredRoles.join(',')}`);
+
+const gitStatus = command('git', ['status', '--porcelain']);
+check('clean-worktree', gitStatus === '');
+const compose = command('docker', ['compose', '--profile', 'queue', '--profile', 'migration', '-f', 'docker-compose.yml', '-f', 'docker-compose.prod.yml', 'config', '--quiet']);
+check('production-compose-config', compose !== null);
+
+const result = {
+  status: missing.length || failures.length ? 'preflight_blocked' : 'preflight_passed',
+  scope,
+  missing,
+  failed_checks: failures,
+  checks,
+};
+console.log(JSON.stringify(result, null, 2));
+process.exit(result.status === 'preflight_passed' ? 0 : 2);

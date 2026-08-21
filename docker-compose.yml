@@ -1,4 +1,78 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cms_owner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cms_owner_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-cms_candidate_supply}
+    volumes:
+      - cms-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - cms-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      HOST: 0.0.0.0
+      PORT: 3000
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://cms_owner:cms_owner_dev@postgres:5432/cms_candidate_supply}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+      QUEUE_PREFIX: ${QUEUE_PREFIX:-cms}
+      QUEUE_NAMES: ${QUEUE_NAMES:-outbox}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-development-only-encryption-key-32}
+      SESSION_SECRET: ${SESSION_SECRET:-development-only-session-secret-32}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      OIDC_ISSUER: ${OIDC_ISSUER:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:-}
+      OIDC_APPROVAL_RECORD_FILE: ${OIDC_APPROVAL_RECORD_FILE:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    ports: ["3100:3000"]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+  worker:
+    profiles: ["queue"]
+    extends:
+      service: api
+    entrypoint: ["node"]
+    command: ["dist/bootstrap/worker.js"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+  scheduler:
+    profiles: ["queue"]
+    extends:
+      service: api
+    entrypoint: ["node"]
+    command: ["dist/bootstrap/scheduler.js"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
   web:
     build:
       context: .
@@ -16,3 +90,6 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+volumes:
+  cms-postgres:
+  cms-redis:

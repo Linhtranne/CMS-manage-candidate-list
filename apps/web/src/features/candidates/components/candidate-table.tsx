@@ -20,9 +20,9 @@ const phaseTones: Record<Phase, 'neutral' | 'info' | 'success' | 'warning'> = {
   SUPPLIED: 'success'
 };
 
-const readinessKeys = { NOT_READY: 'candidates.table.readinessNotReady', READY_FOR_REVIEW: 'candidates.table.readinessReview', READY_FOR_INTERVIEW: 'candidates.table.readinessInterview' } as const;
+const readinessKeys = { NOT_READY: 'candidates.table.readinessNotReady', READY_FOR_REVIEW: 'candidates.table.readinessReview', READY_FOR_INTERVIEW: 'candidates.table.readinessInterview', POTENTIAL: 'candidates.table.readinessReview', QUALIFIED: 'candidates.table.readinessReview', READY: 'candidates.table.readinessInterview', PAUSED: 'candidates.table.readinessNotReady', NOT_SUITABLE: 'candidates.table.readinessNotReady' } as const;
 
-const contactabilityKeys = { CONTACTABLE: 'candidates.table.contactable', DO_NOT_CONTACT: 'candidates.table.doNotContact', UNKNOWN: 'candidates.table.contactUnknown' } as const;
+const contactabilityKeys = { CONTACTABLE: 'candidates.table.contactable', DO_NOT_CONTACT: 'candidates.table.doNotContact', UNKNOWN: 'candidates.table.contactUnknown', TEMPORARILY_UNREACHABLE: 'candidates.table.contactUnknown' } as const;
 
 export function candidatePhaseLabel(phase: Phase) {
   return phaseKeys[phase];

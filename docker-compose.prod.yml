@@ -1,5 +1,77 @@
 services:
+  api:
+    image: ${API_IMAGE:?API_IMAGE must be set for production}
+    build: !reset null
+    environment:
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION:?APP_VERSION must be set for production}
+      APP_ORIGIN: ${APP_ORIGIN:?APP_ORIGIN must be set for production}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS must be set for production}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set for production}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL must be set for production}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY must be set for production}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set for production}
+      COOKIE_SECURE: "true"
+      QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+    ports: !reset []
+  worker:
+    extends:
+      file: docker-compose.yml
+      service: worker
+    image: ${API_IMAGE:?API_IMAGE must be set for production}
+    build: !reset null
+    environment:
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION:?APP_VERSION must be set for production}
+      APP_ORIGIN: ${APP_ORIGIN:?APP_ORIGIN must be set for production}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS must be set for production}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set for production}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL must be set for production}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY must be set for production}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set for production}
+      COOKIE_SECURE: "true"
+      QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+    ports: !reset []
+  scheduler:
+    extends:
+      file: docker-compose.yml
+      service: scheduler
+    image: ${API_IMAGE:?API_IMAGE must be set for production}
+    build: !reset null
+    environment:
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION:?APP_VERSION must be set for production}
+      APP_ORIGIN: ${APP_ORIGIN:?APP_ORIGIN must be set for production}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS must be set for production}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set for production}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL must be set for production}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY must be set for production}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set for production}
+      COOKIE_SECURE: "true"
+      QUEUE_ENABLED: ${QUEUE_ENABLED:-false}
+    ports: !reset []
+  migrate:
+    image: ${MIGRATION_IMAGE:?MIGRATION_IMAGE must be set for production}
+    build: !reset null
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set for production}
+    working_dir: /app/apps/api
+    command: ["./node_modules/.bin/prisma", "migrate", "deploy"]
+    profiles: ["migration"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+  postgres:
+    image: ${POSTGRES_IMAGE:?POSTGRES_IMAGE must be set for production}
+    ports: !reset []
+  redis:
+    image: ${REDIS_IMAGE:?REDIS_IMAGE must be set for production}
+    ports: !reset []
   web:
     extends:
       file: docker-compose.yml
       service: web
+    image: ${WEB_IMAGE:?WEB_IMAGE must be set for production}
+    build: !reset null
+    ports: !reset []

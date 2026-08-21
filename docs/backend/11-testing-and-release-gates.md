@@ -53,12 +53,34 @@ pnpm --filter @cms/api test:contract
 pnpm --filter @cms/api test:e2e
 pnpm --filter @cms/api test:migration
 pnpm --filter @cms/api test:security
+pnpm --filter @cms/api test
+pnpm --filter @cms/api db:migrate:deploy
+pnpm --filter @cms/api db:migrate:status
+pnpm --filter @cms/api db:query-plan-smoke
+pnpm --filter @cms/api release:preflight
 pnpm --filter @cms/api build
 pnpm --filter @cms/contracts generate
 pnpm --filter @cms/contracts test
+pnpm docs:validate
+IMAGE_DIGEST=sha256:<digest> pnpm --filter @cms/api release:manifest
 ```
 
-CI fail nếu command thiếu, bị skip không có approved waiver, hoặc generated OpenAPI/client diff chưa commit. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
+CI fail nếu command thiếu, bị skip không có approved waiver, generated OpenAPI/client diff chưa commit, migration deploy lần hai/status không sạch, container health smoke fail, production compose thiếu digest-pinned API/migration/web/PostgreSQL/Redis image, hoặc image SBOM/critical-high scan fail. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
+
+Production manifest phải được tạo từ approval artifact đã ký, không dùng `RELEASE_APPROVED=true` như một bypass:
+
+```sh
+RELEASE_STATUS=production \
+RELEASE_SCOPE=phase-1a \
+RELEASE_APPROVED=true \
+RELEASE_APPROVALS_FILE=/secure/release/phase-1a-approvals.json \
+IMAGE_DIGEST=sha256:<api-image-digest> \
+MIGRATION_IMAGE_DIGEST=sha256:<migration-image-digest> \
+WEB_IMAGE_DIGEST=sha256:<web-image-digest> \
+pnpm --filter @cms/api release:manifest
+```
+
+Artifact phải chứa approved DEC-001 đến DEC-007 và chữ ký có identity + timestamp của Backend Tech Lead, Product Owner, QA Lead, Security Owner và Operations Owner. Script ghi checksum artifact vào manifest và fail-closed nếu thiếu bất kỳ mục nào. Quy trình deploy/rollback chi tiết nằm trong [Phase 1A release runbook](../../runbooks/phase-1a-release.md) và [rollback runbook](../../runbooks/phase-1a-rollback.md).
 
 ## 4. Coverage requirements
 

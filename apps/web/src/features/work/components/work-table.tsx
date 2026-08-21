@@ -9,7 +9,7 @@ import { occupationLabel } from '@/i18n/catalog-options';
 
 const priorityTone = { URGENT: 'danger', HIGH: 'warning', NORMAL: 'neutral' } as const;
 const priorityKeys = { URGENT: 'work.table.priorities.urgent', HIGH: 'work.table.priorities.high', NORMAL: 'work.table.priorities.normal' } as const;
-const statusKeys = { TODO: 'work.table.statuses.todo', IN_PROGRESS: 'work.table.statuses.inProgress', WAITING_REPLY: 'work.table.statuses.waitingReply', DONE: 'work.table.statuses.done' } as const;
+const statusKeys = { TODO: 'work.table.statuses.todo', NEW: 'work.table.statuses.todo', IN_PROGRESS: 'work.table.statuses.inProgress', WAITING_REPLY: 'work.table.statuses.waitingReply', DONE: 'work.table.statuses.done', CANCELLED: 'work.table.statuses.done' } as const;
 
 function workColumns(t: Translate, formatDateTime: (value: Date | string | number, options?: Intl.DateTimeFormatOptions) => string): ColumnDef<WorkItem>[] {
   return [

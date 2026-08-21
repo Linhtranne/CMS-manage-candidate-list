@@ -101,7 +101,7 @@ export const clientsOrdersHandlers = [
     if (!order) return HttpResponse.json({ code: 'NOT_FOUND', message: 'Không tìm thấy đơn tuyển' }, { status: 404 });
     const body = (await request.json()) as OrderStatusUpdate;
     if (body.version !== order.version) return HttpResponse.json({ code: 'VERSION_CONFLICT', message: 'Đơn tuyển vừa được cập nhật, hãy tải lại.' }, { status: 409 });
-    const allowed: Record<JobOrder['status'], JobOrder['status'][]> = { DRAFT: ['DRAFT', 'RECRUITING'], RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'], PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'], FILLED: ['FILLED', 'CLOSED'], CLOSED: ['CLOSED'] };
+    const allowed: Record<JobOrder['status'], JobOrder['status'][]> = { DRAFT: ['DRAFT', 'RECRUITING'], RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'], PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'], FILLED: ['FILLED', 'CLOSED'], CLOSED: ['CLOSED'], OPEN: ['OPEN', 'PAUSED', 'FILLED'], ON_HOLD: ['ON_HOLD', 'OPEN', 'FILLED'], CANCELLED: ['CANCELLED'] };
     if (!allowed[order.status].includes(body.status)) return HttpResponse.json({ code: 'INVALID_TRANSITION', message: 'Trạng thái không hợp lệ theo lộ trình DRAFT → RECRUITING → PAUSED → FILLED → CLOSED.' }, { status: 422 });
     order.status = body.status;
     order.version += 1;

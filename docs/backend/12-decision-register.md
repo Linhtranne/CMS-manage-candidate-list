@@ -129,6 +129,22 @@ approvals:
 
 Giá trị trong angle brackets là schema; approval thật không được để placeholder. Thay đổi materially khác cần version mới và impact review; không sửa âm thầm record đã approved.
 
+Release manifest dùng một aggregate JSON export bất biến từ các decision records (không phải file do developer tự tạo):
+
+```json
+{
+  "decisions": [
+    { "id": "DEC-001", "status": "approved" },
+    { "id": "DEC-002", "status": "approved" }
+  ],
+  "approvals": [
+    { "role": "Backend Tech Lead", "status": "approved", "identity": "...", "at": "2026-08-21T00:00:00Z" }
+  ]
+}
+```
+
+Phase 1A release scope yêu cầu DEC-001, DEC-002, DEC-004, DEC-005, DEC-006 và DEC-007; DEC-003 chỉ bắt buộc khi scope bao gồm Phase 1B/email. Script release kiểm tra đủ decision/role, ghi checksum aggregate artifact và từ chối production manifest nếu thiếu.
+
 ## 11. Gate enforcement
 
 - CI kiểm decision ID/status/version được manifest release tham chiếu.

@@ -36,22 +36,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/auth/logout": {
         parameters: {
             query?: never;
@@ -228,6 +212,22 @@ export interface paths {
         patch: operations["updateOrderStatus"];
         trace?: never;
     };
+    "/orders/{id}/requirements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateOrderRequirement"];
+        trace?: never;
+    };
     "/orders/{id}/applications": {
         parameters: {
             query?: never;
@@ -292,6 +292,22 @@ export interface paths {
         patch: operations["updateCandidate"];
         trace?: never;
     };
+    "/candidates/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["archiveCandidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/candidates/imports": {
         parameters: {
             query?: never;
@@ -332,6 +348,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["listApplications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/views/waiting-interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listWaitingInterviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/views/interviewed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listInterviewedApplications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/views/passed-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPassedApplications"];
         put?: never;
         post?: never;
         delete?: never;
@@ -756,6 +820,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/catalogs/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["activateAdminCatalog"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/catalogs/{id}/retire": {
         parameters: {
             query?: never;
@@ -836,6 +916,870 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/oidc/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["startOidcLogin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/oidc/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["completeOidcLogin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAuthSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/csrf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCsrfToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/authz/audit-scope": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAuditScope"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLiveness"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getReadiness"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/startup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStartup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/mail/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["receiveMailWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/industry-sectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listIndustrySectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/occupations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listOccupations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visa-routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listVisaRoutes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/industry-sectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminIndustrySectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/occupations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminOccupations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/visa-routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminVisaRoutes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/industry-field-definitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminIndustryFieldDefinitions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/interview-question-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminInterviewQuestionTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/supply-journey-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminSupplyJourneyTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/email-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminEmailTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminTeams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{id}/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listClientContacts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listJobOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJobOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-orders/{id}/status-transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["transitionJobOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidates/{id}/occupation-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCandidateOccupationProfiles"];
+        put?: never;
+        post: operations["addCandidateOccupationProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createCandidateImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-imports/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["previewCandidateImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-imports/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["commitCandidateImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCandidateImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-imports/{id}/error-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCandidateImportErrorReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidate-duplicate-cases/{id}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["decideCandidateDuplicateCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/applications/{id}/withdrawals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["withdrawApplication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/interviews/{id}/question-snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInterviewQuestionSnapshots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/applications/{id}/eligible-supply-journey-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEligibleSupplyJourneyTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supply-journeys/{id}/completion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeSupplyJourney"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supply-journeys/{id}/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelSupplyJourney"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supply-journeys/{id}/hold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["holdSupplyJourney"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supply-journeys/{id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resumeSupplyJourney"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/journey-milestones/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getJourneyMilestone"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/journey-milestones/{id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["openJourneyMilestoneAttempt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createDocumentUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDocument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/downloads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createDocumentDownload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["linkDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/email-previews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createEmailPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/email-drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createEmailDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conversations/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listConversationMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/email-messages/{id}/cancellations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelEmailMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/email-messages/{id}/retry-attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retryEmailMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inbox/messages/{id}/match-decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resolveInboxMessageMatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/report-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createReportExportJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/report-exports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getReportExportJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -848,9 +1792,8 @@ export interface components {
             permissions: string[];
         };
         ApiProblem: {
-            code: string;
-            message: string;
-            traceId?: string;
+            error: components["schemas"]["ApiError"];
+            requestId: string;
         };
         SearchResult: {
             id: string;
@@ -863,11 +1806,6 @@ export interface components {
         };
         SearchResponse: {
             items: components["schemas"]["SearchResult"][];
-        };
-        LoginRequest: {
-            /** Format: email */
-            email: string;
-            password: string;
         };
         Session: {
             user: components["schemas"]["CurrentUser"];
@@ -913,7 +1851,7 @@ export interface components {
             /** @enum {string} */
             priority: "URGENT" | "HIGH" | "NORMAL";
             /** @enum {string} */
-            status: "TODO" | "IN_PROGRESS" | "WAITING_REPLY" | "DONE";
+            status: "NEW" | "IN_PROGRESS" | "DONE" | "CANCELLED";
             /** Format: date-time */
             dueAt: string;
             assignee: components["schemas"]["PersonRef"];
@@ -927,10 +1865,11 @@ export interface components {
             version: number;
             lastActivity?: string;
             notes?: string;
+            /** @enum {string} */
+            waitingOn: "NONE" | "CANDIDATE" | "CLIENT_PARTNER" | "INTERNAL" | "SYSTEM";
         };
         WorkItemsResponse: {
             items: components["schemas"]["WorkItem"][];
-            nextCursor: string | null;
         };
         WorkSummary: {
             overdue: number;
@@ -944,12 +1883,14 @@ export interface components {
         };
         WorkItemUpdate: {
             /** @enum {string} */
-            status?: "TODO" | "IN_PROGRESS" | "WAITING_REPLY" | "DONE";
+            status?: "NEW" | "IN_PROGRESS" | "DONE" | "CANCELLED";
             /** Format: date-time */
             dueAt?: string;
             assigneeId?: string;
             reason?: string;
             version: number;
+            /** @enum {string} */
+            waitingOn?: "NONE" | "CANDIDATE" | "CLIENT_PARTNER" | "INTERNAL" | "SYSTEM";
         };
         Client: {
             id: string;
@@ -1017,7 +1958,7 @@ export interface components {
             deadline: string;
             owner: components["schemas"]["PersonRef"];
             /** @enum {string} */
-            status: "DRAFT" | "RECRUITING" | "PAUSED" | "FILLED" | "CLOSED";
+            status: "DRAFT" | "OPEN" | "ON_HOLD" | "FILLED" | "CANCELLED" | "CLOSED";
             metrics: components["schemas"]["OrderMetrics"];
             /** @enum {string} */
             health: "EXPIRING" | "UNDER_TARGET" | "INTERVIEW_DELAY" | "RESULT_DELAY" | "FILLED" | "CLIENT_PAUSED";
@@ -1037,6 +1978,8 @@ export interface components {
             /** Format: date-time */
             deadline: string;
             ownerId: string;
+            /** Format: uuid */
+            occupationCatalogVersionId?: string;
             salary?: string;
             contractType?: string;
             japaneseLevel?: string;
@@ -1045,6 +1988,13 @@ export interface components {
         OrdersResponse: {
             items: components["schemas"]["JobOrder"][];
         };
+        OrderRequirementUpdate: {
+            version: number;
+            /** Format: uuid */
+            occupationCatalogVersionId: string;
+            occupation: string;
+            criteria: string[];
+        };
         CandidateMatch: {
             id: string;
             code: string;
@@ -1052,13 +2002,14 @@ export interface components {
             industryLabel: string;
             occupation: string;
             japaneseLevel: string;
-            readiness: string;
             hasActiveApplicationInOrder: boolean;
             hasActiveJourney: boolean;
             skills?: string[];
             yearsExperience?: number;
             /** @enum {string} */
             recordStatus?: "ACTIVE" | "ARCHIVED";
+            /** @enum {string} */
+            readinessStatus: "POTENTIAL" | "QUALIFIED" | "READY" | "PAUSED" | "NOT_SUITABLE";
         };
         CandidateSearchResponse: {
             items: components["schemas"]["CandidateMatch"][];
@@ -1070,6 +2021,22 @@ export interface components {
             skills: string[];
             /** @enum {string} */
             status: "PRIMARY" | "SECONDARY" | "ARCHIVED";
+        };
+        CandidateOccupationProfileRequest: {
+            industryLabel: string;
+            occupation: string;
+            yearsExperience: number;
+            skills: string[];
+            desiredLocation?: string | null;
+            attributes?: {
+                [key: string]: unknown;
+            };
+            schemaVersionId?: string | null;
+        };
+        CandidateArchiveRequest: {
+            version: number;
+            reason: string;
+            approvalId?: string;
         };
         CandidateFile: {
             id: string;
@@ -1102,9 +2069,9 @@ export interface components {
             /** @enum {string} */
             recordStatus: "ACTIVE" | "ARCHIVED";
             /** @enum {string} */
-            readinessStatus: "NOT_READY" | "READY_FOR_REVIEW" | "READY_FOR_INTERVIEW";
+            readinessStatus: "POTENTIAL" | "QUALIFIED" | "READY" | "PAUSED" | "NOT_SUITABLE";
             /** @enum {string} */
-            contactabilityStatus: "CONTACTABLE" | "DO_NOT_CONTACT" | "UNKNOWN";
+            contactabilityStatus: "CONTACTABLE" | "TEMPORARILY_UNREACHABLE" | "DO_NOT_CONTACT";
             /** @enum {string} */
             operationalPhase: "POTENTIAL" | "APPLYING" | "PASSED" | "SUPPLYING" | "SUPPLIED";
             owner: components["schemas"]["PersonRef"];
@@ -1138,7 +2105,6 @@ export interface components {
         };
         CandidatesResponse: {
             items: components["schemas"]["Candidate"][];
-            nextCursor: string | null;
         };
         CreateCandidateRequest: {
             name: string;
@@ -1148,12 +2114,13 @@ export interface components {
             /** Format: email */
             email?: string | null;
             phone?: string | null;
+            passportNumber?: string | null;
             address?: string | null;
             source: string;
             /** @enum {string} */
-            readinessStatus?: "NOT_READY" | "READY_FOR_REVIEW" | "READY_FOR_INTERVIEW";
+            readinessStatus?: "POTENTIAL" | "QUALIFIED" | "READY" | "PAUSED" | "NOT_SUITABLE";
             /** @enum {string} */
-            contactabilityStatus?: "CONTACTABLE" | "DO_NOT_CONTACT" | "UNKNOWN";
+            contactabilityStatus?: "CONTACTABLE" | "TEMPORARILY_UNREACHABLE" | "DO_NOT_CONTACT";
             version: number;
         };
         CandidateUpdateRequest: components["schemas"]["CreateCandidateRequest"];
@@ -1178,6 +2145,7 @@ export interface components {
             action: "MARK_REVIEWED" | "KEEP_SEPARATE" | "MERGE";
             targetCandidateId?: string | null;
             reason?: string | null;
+            approvalId?: string | null;
             version: number;
         };
         AddCandidatesRequest: {
@@ -1190,7 +2158,7 @@ export interface components {
         };
         OrderStatusUpdate: {
             /** @enum {string} */
-            status: "DRAFT" | "RECRUITING" | "PAUSED" | "FILLED" | "CLOSED";
+            status: "DRAFT" | "OPEN" | "ON_HOLD" | "FILLED" | "CANCELLED" | "CLOSED";
             reasonCode: string;
             note?: string;
             version: number;
@@ -1212,6 +2180,8 @@ export interface components {
             round: number;
             /** Format: date-time */
             scheduledAt: string;
+            /** Format: date-time */
+            scheduledEndAt: string;
             timeZone: string;
             /** @enum {string} */
             mode: "ONLINE" | "IN_PERSON";
@@ -1220,9 +2190,9 @@ export interface components {
             location?: string | null;
             participants: components["schemas"]["PersonRef"][];
             /** @enum {string} */
-            scheduleStatus: "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+            scheduleStatus: "DRAFT" | "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
             /** @enum {string} */
-            result: "PENDING" | "PASS" | "FAIL";
+            result: "PENDING" | "ADVANCE_NEXT_ROUND" | "PASS" | "FAIL";
             feedback?: string | null;
             strengths?: string[];
             concerns?: string[];
@@ -1241,9 +2211,9 @@ export interface components {
             client: components["schemas"]["ClientRef"];
             owner: components["schemas"]["PersonRef"];
             /** @enum {string} */
-            status: "MATCHED" | "IN_INTERVIEW_PROCESS" | "PASSED" | "FAILED" | "WITHDRAWN" | "ON_HOLD";
+            status: "MATCHED" | "IN_INTERVIEW_PROCESS" | "ON_HOLD" | "PASSED" | "FAILED" | "WITHDRAWN";
             /** @enum {string} */
-            source: "MANUAL_MATCH" | "REFERRAL" | "IMPORT" | "PORTAL";
+            source: "MANUAL_MATCH" | "REFERRAL" | "IMPORT";
             /** Format: date-time */
             appliedAt: string;
             /** Format: date-time */
@@ -1273,11 +2243,12 @@ export interface components {
         };
         ApplicationsResponse: {
             items: components["schemas"]["Application"][];
-            nextCursor: string | null;
         };
         CreateInterviewRequest: {
             /** Format: date-time */
             scheduledAt: string;
+            /** Format: date-time */
+            scheduledEndAt: string;
             timeZone: string;
             /** @enum {string} */
             mode: "ONLINE" | "IN_PERSON";
@@ -1419,7 +2390,6 @@ export interface components {
         };
         SupplyJourneysResponse: {
             items: components["schemas"]["SupplyJourneySummary"][];
-            nextCursor: string | null;
         };
         UpdateMilestoneRequest: {
             /** @enum {string} */
@@ -1451,7 +2421,7 @@ export interface components {
             /** @enum {string} */
             direction: "INBOUND" | "OUTBOUND";
             /** @enum {string} */
-            status: "RECEIVED" | "QUEUED" | "SENDING" | "SENT" | "FAILED" | "BOUNCED";
+            status: "DRAFT" | "QUEUED" | "SENDING" | "SENT" | "DELIVERED" | "BOUNCED" | "FAILED" | "CANCELLED";
             /** Format: email */
             from: string;
             to: string[];
@@ -1501,7 +2471,7 @@ export interface components {
         EmailSendResult: {
             messageId: string;
             /** @enum {string} */
-            status: "QUEUED" | "SENDING" | "SENT" | "FAILED" | "BOUNCED";
+            status: "DRAFT" | "QUEUED" | "SENDING" | "SENT" | "DELIVERED" | "BOUNCED" | "FAILED" | "CANCELLED";
             /** Format: date-time */
             queuedAt: string;
         };
@@ -1652,7 +2622,7 @@ export interface components {
             label: string;
             version: number;
             /** @enum {string} */
-            status: "ACTIVE" | "RETIRED";
+            status: "DRAFT" | "ACTIVE" | "RETIRED";
             usageCount: number;
         };
         CreateAdminCatalogRequest: {
@@ -1745,7 +2715,270 @@ export interface components {
         };
         AdminAuditResponse: {
             items: components["schemas"]["AdminAuditEvent"][];
+        };
+        ApiPage: {
             nextCursor: string | null;
+            hasMore: boolean;
+        };
+        ApiError: {
+            code: string;
+            messageKey: string;
+            params?: {
+                [key: string]: unknown;
+            };
+            fieldErrors?: {
+                [key: string]: string[];
+            };
+            currentVersion?: number | null;
+        };
+        GenericObject: {
+            [key: string]: unknown;
+        };
+        GenericList: {
+            items: components["schemas"]["GenericObject"][];
+        };
+        SavedViewsResponse: {
+            items: components["schemas"]["SavedView"][];
+        };
+        HealthStatus: {
+            /** @enum {string} */
+            status: "ok" | "degraded" | "not_configured";
+            service: string;
+            version: string;
+        };
+        CsrfToken: {
+            token: string;
+        };
+        OidcRedirect: {
+            /** Format: uri */
+            redirectUrl: string;
+        };
+        WebhookAccepted: {
+            /** @constant */
+            accepted: true;
+        };
+        ApiCurrentUserEnvelope: {
+            data: components["schemas"]["CurrentUser"];
+            requestId: string;
+        };
+        ApiSearchResponseEnvelope: {
+            data: components["schemas"]["SearchResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiSessionEnvelope: {
+            data: components["schemas"]["Session"];
+            requestId: string;
+        };
+        ApiSavedViewsResponseEnvelope: {
+            data: components["schemas"]["SavedViewsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiSavedViewEnvelope: {
+            data: components["schemas"]["SavedView"];
+            requestId: string;
+        };
+        ApiWorkItemEnvelope: {
+            data: components["schemas"]["WorkItem"];
+            requestId: string;
+        };
+        ApiWorkItemsResponseEnvelope: {
+            data: components["schemas"]["WorkItemsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiWorkSummaryResponseEnvelope: {
+            data: components["schemas"]["WorkSummaryResponse"];
+            requestId: string;
+        };
+        ApiClientsResponseEnvelope: {
+            data: components["schemas"]["ClientsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiClientEnvelope: {
+            data: components["schemas"]["Client"];
+            requestId: string;
+        };
+        ApiOrdersResponseEnvelope: {
+            data: components["schemas"]["OrdersResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiJobOrderEnvelope: {
+            data: components["schemas"]["JobOrder"];
+            requestId: string;
+        };
+        ApiAddCandidatesResponseEnvelope: {
+            data: components["schemas"]["AddCandidatesResponse"];
+            requestId: string;
+        };
+        ApiCandidateSearchResponseEnvelope: {
+            data: components["schemas"]["CandidateSearchResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiCandidatesResponseEnvelope: {
+            data: components["schemas"]["CandidatesResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiCandidateEnvelope: {
+            data: components["schemas"]["Candidate"];
+            requestId: string;
+        };
+        ApiCandidateDetailEnvelope: {
+            data: components["schemas"]["CandidateDetail"];
+            requestId: string;
+        };
+        ApiImportCandidatesResponseEnvelope: {
+            data: components["schemas"]["ImportCandidatesResponse"];
+            requestId: string;
+        };
+        ApiApplicationsResponseEnvelope: {
+            data: components["schemas"]["ApplicationsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiApplicationDetailEnvelope: {
+            data: components["schemas"]["ApplicationDetail"];
+            requestId: string;
+        };
+        ApiInterviewEnvelope: {
+            data: components["schemas"]["Interview"];
+            requestId: string;
+        };
+        ApiApplicationEnvelope: {
+            data: components["schemas"]["Application"];
+            requestId: string;
+        };
+        ApiJourneyEligibilityEnvelope: {
+            data: components["schemas"]["JourneyEligibility"];
+            requestId: string;
+        };
+        ApiSupplyJourneyEnvelope: {
+            data: components["schemas"]["SupplyJourney"];
+            requestId: string;
+        };
+        ApiSupplyJourneysResponseEnvelope: {
+            data: components["schemas"]["SupplyJourneysResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiSupplyJourneyDetailEnvelope: {
+            data: components["schemas"]["SupplyJourneyDetail"];
+            requestId: string;
+        };
+        ApiJourneyMilestoneEnvelope: {
+            data: components["schemas"]["JourneyMilestone"];
+            requestId: string;
+        };
+        ApiConversationsResponseEnvelope: {
+            data: components["schemas"]["ConversationsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiConversationDetailEnvelope: {
+            data: components["schemas"]["ConversationDetail"];
+            requestId: string;
+        };
+        ApiEmailSendResultEnvelope: {
+            data: components["schemas"]["EmailSendResult"];
+            requestId: string;
+        };
+        ApiConversationEnvelope: {
+            data: components["schemas"]["Conversation"];
+            requestId: string;
+        };
+        ApiReportSummaryEnvelope: {
+            data: components["schemas"]["ReportSummary"];
+            requestId: string;
+        };
+        ApiReportFunnelResponseEnvelope: {
+            data: components["schemas"]["ReportFunnelResponse"];
+            requestId: string;
+        };
+        ApiReportExportJobEnvelope: {
+            data: components["schemas"]["ReportExportJob"];
+            requestId: string;
+        };
+        ApiAdminUsersResponseEnvelope: {
+            data: components["schemas"]["AdminUsersResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiAdminUserEnvelope: {
+            data: components["schemas"]["AdminUser"];
+            requestId: string;
+        };
+        ApiAdminRolesResponseEnvelope: {
+            data: components["schemas"]["AdminRolesResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiAdminRoleEnvelope: {
+            data: components["schemas"]["AdminRole"];
+            requestId: string;
+        };
+        ApiAdminCatalogsResponseEnvelope: {
+            data: components["schemas"]["AdminCatalogsResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiAdminCatalogItemEnvelope: {
+            data: components["schemas"]["AdminCatalogItem"];
+            requestId: string;
+        };
+        ApiAdminTemplatesResponseEnvelope: {
+            data: components["schemas"]["AdminTemplatesResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiAdminTemplateEnvelope: {
+            data: components["schemas"]["AdminTemplate"];
+            requestId: string;
+        };
+        ApiMailboxSettingsViewEnvelope: {
+            data: components["schemas"]["MailboxSettingsView"];
+            requestId: string;
+        };
+        ApiAdminAuditResponseEnvelope: {
+            data: components["schemas"]["AdminAuditResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        GenericCommand: {
+            [key: string]: unknown;
+        };
+        ApiOidcRedirectEnvelope: {
+            data: components["schemas"]["OidcRedirect"];
+            requestId: string;
+        };
+        ApiCsrfTokenEnvelope: {
+            data: components["schemas"]["CsrfToken"];
+            requestId: string;
+        };
+        ApiGenericObjectEnvelope: {
+            data: components["schemas"]["GenericObject"];
+            requestId: string;
+        };
+        ApiHealthStatusEnvelope: {
+            data: components["schemas"]["HealthStatus"];
+            requestId: string;
+        };
+        ApiWebhookAcceptedEnvelope: {
+            data: components["schemas"]["WebhookAccepted"];
+            requestId: string;
+        };
+        ApiGenericListEnvelope: {
+            data: components["schemas"]["GenericList"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
+        ApiEmailMessageEnvelope: {
+            data: components["schemas"]["EmailMessage"];
+            requestId: string;
         };
     };
     responses: {
@@ -1808,7 +3041,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CurrentUser"];
+                    "application/json": components["schemas"]["ApiCurrentUserEnvelope"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -1831,32 +3064,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SearchResponse"];
-                };
-            };
-            default: components["responses"]["Unauthorized"];
-        };
-    };
-    login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Authenticated internal session */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Session"];
+                    "application/json": components["schemas"]["ApiSearchResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -1872,13 +3080,14 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Session revoked */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
             };
-            default: components["responses"]["Unauthorized"];
         };
     };
     listSavedViews: {
@@ -1898,9 +3107,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        items: components["schemas"]["SavedView"][];
-                    };
+                    "application/json": components["schemas"]["ApiSavedViewsResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -1925,7 +3132,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SavedView"];
+                    "application/json": components["schemas"]["ApiSavedViewEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -1952,7 +3159,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SavedView"];
+                    "application/json": components["schemas"]["ApiSavedViewEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -1965,6 +3172,7 @@ export interface operations {
                 sort?: string;
                 query?: string;
                 cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -1978,7 +3186,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkItemsResponse"];
+                    "application/json": components["schemas"]["ApiWorkItemsResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2003,7 +3211,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkItem"];
+                    "application/json": components["schemas"]["ApiWorkItemEnvelope"];
                 };
             };
             422: components["responses"]["ValidationError"];
@@ -2027,7 +3235,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkSummaryResponse"];
+                    "application/json": components["schemas"]["ApiWorkSummaryResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2050,7 +3258,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkItem"];
+                    "application/json": components["schemas"]["ApiWorkItemEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2077,7 +3285,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkItem"];
+                    "application/json": components["schemas"]["ApiWorkItemEnvelope"];
                 };
             };
             409: components["responses"]["Conflict"];
@@ -2089,6 +3297,8 @@ export interface operations {
             query?: {
                 query?: string;
                 status?: string;
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -2102,7 +3312,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClientsResponse"];
+                    "application/json": components["schemas"]["ApiClientsResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2127,7 +3337,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Client"];
+                    "application/json": components["schemas"]["ApiClientEnvelope"];
                 };
             };
             422: components["responses"]["ValidationError"];
@@ -2151,7 +3361,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Client"];
+                    "application/json": components["schemas"]["ApiClientEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2178,7 +3388,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Client"];
+                    "application/json": components["schemas"]["ApiClientEnvelope"];
                 };
             };
             409: components["responses"]["Conflict"];
@@ -2191,6 +3401,8 @@ export interface operations {
                 query?: string;
                 status?: string;
                 industry?: string;
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -2204,7 +3416,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrdersResponse"];
+                    "application/json": components["schemas"]["ApiOrdersResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2229,7 +3441,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JobOrder"];
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
                 };
             };
             422: components["responses"]["ValidationError"];
@@ -2253,7 +3465,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JobOrder"];
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2280,10 +3492,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JobOrder"];
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
                 };
             };
             409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    updateOrderRequirement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderRequirementUpdate"];
+            };
+        };
+        responses: {
+            /** @description Updated order requirement snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -2308,7 +3549,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AddCandidatesResponse"];
+                    "application/json": components["schemas"]["ApiAddCandidatesResponseEnvelope"];
                 };
             };
             409: components["responses"]["Conflict"];
@@ -2320,11 +3561,11 @@ export interface operations {
             query: {
                 orderId: string;
                 query?: string;
-                industry?: string;
-                occupation?: string;
+                industrySectorId?: string;
+                occupationId?: string;
                 skill?: string;
                 japaneseLevel?: string;
-                readiness?: string;
+                readinessStatus?: string;
                 hasActiveJourney?: string;
             };
             header?: never;
@@ -2339,7 +3580,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CandidateSearchResponse"];
+                    "application/json": components["schemas"]["ApiCandidateSearchResponseEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -2350,10 +3591,10 @@ export interface operations {
             query?: {
                 query?: string;
                 view?: "all" | "potential" | "new-unassigned" | "ready-to-match" | "applying" | "passed" | "supplying" | "supplied" | "paused" | "archived" | "missing-contact" | "missing-documents" | "duplicates";
-                industry?: string;
-                readiness?: string;
-                contactability?: string;
-                occupation?: string;
+                industrySectorId?: string;
+                readinessStatus?: string;
+                contactabilityStatus?: string;
+                occupationId?: string;
                 skill?: string;
                 desiredLocation?: string;
                 source?: string;
@@ -2373,7 +3614,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CandidatesResponse"];
+                    "application/json": components["schemas"]["ApiCandidatesResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2399,7 +3640,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Candidate"];
+                    "application/json": components["schemas"]["ApiCandidateEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2424,7 +3665,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CandidateDetail"];
+                    "application/json": components["schemas"]["ApiCandidateDetailEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2452,12 +3693,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CandidateDetail"];
+                    "application/json": components["schemas"]["ApiCandidateDetailEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    archiveCandidate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CandidateArchiveRequest"];
+            };
+        };
+        responses: {
+            /** @description Candidate archived */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiCandidateDetailEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -2480,7 +3750,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ImportCandidatesResponse"];
+                    "application/json": components["schemas"]["ApiImportCandidatesResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2509,7 +3779,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Candidate"];
+                    "application/json": components["schemas"]["ApiCandidateEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2538,7 +3808,85 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationsResponse"];
+                    "application/json": components["schemas"]["ApiApplicationsResponseEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    listWaitingInterviews: {
+        parameters: {
+            query?: {
+                query?: string;
+                orderId?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active applications waiting for a scheduled interview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiApplicationsResponseEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    listInterviewedApplications: {
+        parameters: {
+            query?: {
+                query?: string;
+                orderId?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applications with a completed interview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiApplicationsResponseEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    listPassedApplications: {
+        parameters: {
+            query?: {
+                query?: string;
+                orderId?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applications passed by decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiApplicationsResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2562,7 +3910,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApplicationDetail"];
+                    "application/json": components["schemas"]["ApiApplicationDetailEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2590,7 +3938,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Interview"];
+                    "application/json": components["schemas"]["ApiInterviewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2621,7 +3969,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Interview"];
+                    "application/json": components["schemas"]["ApiInterviewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2652,7 +4000,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Interview"];
+                    "application/json": components["schemas"]["ApiInterviewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2682,7 +4030,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Interview"];
+                    "application/json": components["schemas"]["ApiInterviewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2712,7 +4060,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Interview"];
+                    "application/json": components["schemas"]["ApiInterviewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2742,7 +4090,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Application"];
+                    "application/json": components["schemas"]["ApiApplicationEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2768,7 +4116,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JourneyEligibility"];
+                    "application/json": components["schemas"]["ApiJourneyEligibilityEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2796,7 +4144,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SupplyJourney"];
+                    "application/json": components["schemas"]["ApiSupplyJourneyEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2824,7 +4172,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SupplyJourneysResponse"];
+                    "application/json": components["schemas"]["ApiSupplyJourneysResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2848,7 +4196,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SupplyJourneyDetail"];
+                    "application/json": components["schemas"]["ApiSupplyJourneyDetailEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2877,7 +4225,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JourneyMilestone"];
+                    "application/json": components["schemas"]["ApiJourneyMilestoneEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2908,7 +4256,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["JourneyMilestone"];
+                    "application/json": components["schemas"]["ApiJourneyMilestoneEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2936,7 +4284,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConversationsResponse"];
+                    "application/json": components["schemas"]["ApiConversationsResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2960,7 +4308,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConversationDetail"];
+                    "application/json": components["schemas"]["ApiConversationDetailEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -2988,7 +4336,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EmailSendResult"];
+                    "application/json": components["schemas"]["ApiEmailSendResultEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3018,7 +4366,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["ApiConversationEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3051,7 +4399,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportSummary"];
+                    "application/json": components["schemas"]["ApiReportSummaryEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3082,7 +4430,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportFunnelResponse"];
+                    "application/json": components["schemas"]["ApiReportFunnelResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3108,7 +4456,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportExportJob"];
+                    "application/json": components["schemas"]["ApiReportExportJobEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3132,7 +4480,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReportExportJob"];
+                    "application/json": components["schemas"]["ApiReportExportJobEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3157,7 +4505,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUsersResponse"];
+                    "application/json": components["schemas"]["ApiAdminUsersResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3183,7 +4531,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["ApiAdminUserEnvelope"];
                 };
             };
             409: components["responses"]["Conflict"];
@@ -3212,7 +4560,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["ApiAdminUserEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3235,7 +4583,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminRolesResponse"];
+                    "application/json": components["schemas"]["ApiAdminRolesResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3263,7 +4611,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminRole"];
+                    "application/json": components["schemas"]["ApiAdminRoleEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3288,7 +4636,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminCatalogsResponse"];
+                    "application/json": components["schemas"]["ApiAdminCatalogsResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3314,9 +4662,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminCatalogItem"];
+                    "application/json": components["schemas"]["ApiAdminCatalogItemEnvelope"];
                 };
             };
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    activateAdminCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Activated catalog value */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiAdminCatalogItemEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
             default: components["responses"]["Unauthorized"];
         };
@@ -3342,7 +4719,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminCatalogItem"];
+                    "application/json": components["schemas"]["ApiAdminCatalogItemEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3367,7 +4744,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminTemplatesResponse"];
+                    "application/json": components["schemas"]["ApiAdminTemplatesResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3393,7 +4770,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminTemplate"];
+                    "application/json": components["schemas"]["ApiAdminTemplateEnvelope"];
                 };
             };
             default: components["responses"]["Unauthorized"];
@@ -3420,7 +4797,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminTemplate"];
+                    "application/json": components["schemas"]["ApiAdminTemplateEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3443,7 +4820,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MailboxSettingsView"];
+                    "application/json": components["schemas"]["ApiMailboxSettingsViewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3469,7 +4846,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MailboxSettingsView"];
+                    "application/json": components["schemas"]["ApiMailboxSettingsViewEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
@@ -3497,11 +4874,1211 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminAuditResponse"];
+                    "application/json": components["schemas"]["ApiAdminAuditResponseEnvelope"];
                 };
             };
             403: components["responses"]["Forbidden"];
             default: components["responses"]["Unauthorized"];
+        };
+    };
+    startOidcLogin: {
+        parameters: {
+            query?: {
+                returnTo?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OIDC redirect */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiOidcRedirectEnvelope"];
+                };
+            };
+        };
+    };
+    completeOidcLogin: {
+        parameters: {
+            query: {
+                code: string;
+                state: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OIDC callback completed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSessionEnvelope"];
+                };
+            };
+        };
+    };
+    getAuthSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getAuthSession */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSessionEnvelope"];
+                };
+            };
+        };
+    };
+    getCsrfToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getCsrfToken */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiCsrfTokenEnvelope"];
+                };
+            };
+        };
+    };
+    getAuditScope: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getAuditScope */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    getLiveness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getLiveness */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiHealthStatusEnvelope"];
+                };
+            };
+        };
+    };
+    getReadiness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getReadiness */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiHealthStatusEnvelope"];
+                };
+            };
+        };
+    };
+    getStartup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getStartup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiHealthStatusEnvelope"];
+                };
+            };
+        };
+    };
+    getMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getMetrics */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    receiveMailWebhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description Webhook accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiWebhookAcceptedEnvelope"];
+                };
+            };
+        };
+    };
+    listIndustrySectors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listIndustrySectors */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listOccupations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listOccupations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listVisaRoutes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listVisaRoutes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminIndustrySectors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminIndustrySectors */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminOccupations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminOccupations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminVisaRoutes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminVisaRoutes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminIndustryFieldDefinitions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminIndustryFieldDefinitions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminInterviewQuestionTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminInterviewQuestionTemplates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminSupplyJourneyTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminSupplyJourneyTemplates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminEmailTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminEmailTemplates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listAdminTeams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listAdminTeams */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listClientContacts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listClientContacts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listJobOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listJobOrders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    getJobOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getJobOrder */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    transitionJobOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description transitionJobOrder */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
+                };
+            };
+        };
+    };
+    listCandidateOccupationProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listCandidateOccupationProfiles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    addCandidateOccupationProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CandidateOccupationProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Candidate occupation profile created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createCandidateImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description createCandidateImport */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiImportCandidatesResponseEnvelope"];
+                };
+            };
+        };
+    };
+    previewCandidateImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description previewCandidateImport */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    commitCandidateImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description commitCandidateImport */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiImportCandidatesResponseEnvelope"];
+                };
+            };
+        };
+    };
+    getCandidateImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getCandidateImport */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    getCandidateImportErrorReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getCandidateImportErrorReport */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    decideCandidateDuplicateCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description decideCandidateDuplicateCase */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiCandidateEnvelope"];
+                };
+            };
+        };
+    };
+    withdrawApplication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description withdrawApplication */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiApplicationEnvelope"];
+                };
+            };
+        };
+    };
+    getInterviewQuestionSnapshots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getInterviewQuestionSnapshots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    listEligibleSupplyJourneyTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listEligibleSupplyJourneyTemplates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJourneyEligibilityEnvelope"];
+                };
+            };
+        };
+    };
+    completeSupplyJourney: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description completeSupplyJourney */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSupplyJourneyEnvelope"];
+                };
+            };
+        };
+    };
+    cancelSupplyJourney: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description cancelSupplyJourney */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSupplyJourneyEnvelope"];
+                };
+            };
+        };
+    };
+    holdSupplyJourney: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description holdSupplyJourney */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSupplyJourneyEnvelope"];
+                };
+            };
+        };
+    };
+    resumeSupplyJourney: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description resumeSupplyJourney */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSupplyJourneyEnvelope"];
+                };
+            };
+        };
+    };
+    getJourneyMilestone: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getJourneyMilestone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJourneyMilestoneEnvelope"];
+                };
+            };
+        };
+    };
+    openJourneyMilestoneAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description openJourneyMilestoneAttempt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJourneyMilestoneEnvelope"];
+                };
+            };
+        };
+    };
+    createDocumentUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description createDocumentUpload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    getDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getDocument */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    createDocumentDownload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description createDocumentDownload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    linkDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description linkDocument */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    verifyDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description verifyDocument */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    createEmailPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description createEmailPreview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    createEmailDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description createEmailDraft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+        };
+    };
+    listConversationMessages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description listConversationMessages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericListEnvelope"];
+                };
+            };
+        };
+    };
+    cancelEmailMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description cancelEmailMessage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
+                };
+            };
+        };
+    };
+    retryEmailMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description retryEmailMessage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
+                };
+            };
+        };
+    };
+    resolveInboxMessageMatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description resolveInboxMessageMatch */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
+                };
+            };
+        };
+    };
+    createReportExportJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericCommand"];
+            };
+        };
+        responses: {
+            /** @description createReportExportJob */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiReportExportJobEnvelope"];
+                };
+            };
+        };
+    };
+    getReportExportJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description getReportExportJob */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiReportExportJobEnvelope"];
+                };
+            };
         };
     };
 }

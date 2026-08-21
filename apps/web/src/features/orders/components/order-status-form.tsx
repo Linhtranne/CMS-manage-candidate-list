@@ -14,7 +14,10 @@ const allowedTransitions: Record<JobOrder['status'], JobOrder['status'][]> = {
   RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'],
   PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'],
   FILLED: ['FILLED', 'CLOSED'],
-  CLOSED: ['CLOSED']
+  CLOSED: ['CLOSED'],
+  OPEN: ['OPEN', 'PAUSED', 'FILLED'],
+  ON_HOLD: ['ON_HOLD', 'OPEN', 'FILLED'],
+  CANCELLED: ['CANCELLED']
 };
 
 export function OrderStatusForm({ order, onSaved }: { order: JobOrder; onSaved: () => void }) {

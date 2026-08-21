@@ -115,6 +115,8 @@ Alert phải actionable, có runbook URL, owner, dedupe/suppression và recovery
 
 Production handoff bắt buộc có executable runbooks dưới `runbooks/` khi code:
 
+Phase 1A release/rollback runbooks: [release](../../runbooks/phase-1a-release.md), [rollback](../../runbooks/phase-1a-rollback.md). Các incident runbook còn lại phải được bổ sung trước khi bật queue/mail/storage/report production tương ứng.
+
 - API/DB/Redis/object storage unavailable;
 - queue backlog/stuck/DLQ replay;
 - mailbox auth expiry, webhook failure, sync cursor recovery, uncertain send;

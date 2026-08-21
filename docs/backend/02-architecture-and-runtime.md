@@ -47,8 +47,13 @@ apps/api/
 │   │   ├── worker.ts
 │   │   └── scheduler.ts
 │   ├── app.module.ts
-│   ├── config/
-│   ├── database/
+│   ├── platform/
+│   │   ├── config/
+│   │   ├── database/
+│   │   ├── http/
+│   │   ├── idempotency/
+│   │   ├── observability/
+│   │   └── outbox/
 │   ├── common/
 │   │   ├── auth/
 │   │   ├── errors/
@@ -144,6 +149,8 @@ Dependency cycle làm architecture test fail.
 - Validation whitelist và exception filter chuẩn.
 - Graceful shutdown; readiness false trước khi đóng connection.
 
+Phase 0 Task 4 wires `RequestContextMiddleware`, `EnvelopeInterceptor` and `ProblemFilter` globally. Every HTTP response carries the canonical envelope/request ID; unexpected errors are mapped to stable error codes without raw database/provider text.
+
 ### Worker
 
 - Chỉ load job processors và provider adapters cần thiết.
@@ -164,6 +171,8 @@ Dependency cycle làm architecture test fail.
 - Provider call dùng persisted intent trước, result update sau.
 - Cross-module synchronous command gọi application port trong cùng process và truyền transaction context khi cần.
 - Eventual consistency chỉ dùng cho read model, email/file job và report aggregate; UI phải hiển thị trạng thái pending.
+
+`CommandTransactionService` executes aggregate, `AuditWriter` and `OutboxRepository` writes through the same Prisma transaction callback. `OutboxDispatcher` claims pending/retry rows with `FOR UPDATE SKIP LOCKED`, increments attempt metadata, rejects unsupported schema versions and stores only redacted failure markers.
 
 ## 8. Idempotency
 
@@ -193,6 +202,8 @@ Nhóm biến:
 - observability endpoints;
 - feature activation flags có decision record.
 
+Phase 0 hiện thực hóa `apps/api/src/platform/config/config.schema.ts`: local `development/test` có safe defaults, còn `staging/production` fail-closed nếu thiếu `APP_ORIGIN`, database/Redis URL, `ENCRYPTION_KEY` hoặc `SESSION_SECRET`. OIDC chỉ enabled khi đủ issuer/client/redirect/audience và có JSON approval record DEC-002 đúng scope; trước approval API vẫn boot safe với OIDC disabled. Staging/production bắt buộc issuer và redirect URI dùng HTTPS; approval checksum phải là SHA-256 đầy đủ. Partial OIDC config hoặc approval record không hợp lệ làm process fail trước listen. Queue transport mặc định tắt; strict environment không được bật queue cho tới khi có consumer handler production. `MAIL_PROVIDER=DISABLED` là safe mode hợp lệ; secret không xuất hiện trong lỗi validation.
+
 Không log giá trị config secret. `/admin/mailbox` chỉ trả `credentialConfigured`.
 
 ## 10. Health
@@ -213,6 +224,8 @@ Mailbox/S3 degradation xuất hiện trong admin/metrics và chỉ làm `ready=f
 - Worker job payload có `schemaVersion`; worker cũ không nhận payload không hỗ trợ.
 - Migration deploy là job riêng có lock; API không tự migrate.
 - Rollback app không được yêu cầu rollback schema phá hủy.
+
+Phase 0 database foundation exposes a bounded PostgreSQL pool (`DB_POOL_MAX`) and connection/statement timeouts (`DB_CONNECT_TIMEOUT_MS`, `DB_STATEMENT_TIMEOUT_MS`) through the validated runtime config. `PrismaService.assertReady()` performs a bounded `SELECT 1` check and redacts connection URLs from readiness errors.
 
 ## 12. Architecture tests
 

@@ -21,6 +21,18 @@ risk: high
 
 Phase 1A và phần adapter-fake của 1B có thể phát triển song song sau Phase 0, nhưng email staging thật không được chạy trước approvals. Mỗi plan thực thi task-by-task, mỗi task giữ test-first evidence và commit nhỏ; không gom migration, auth và business behavior không liên quan vào một commit.
 
+## Current handoff state
+
+- Phase 0 technical implementation and regression evidence: **complete**.
+- DEC-001/DEC-002 human approval: **pending**; runtime remains deny-by-default/OIDC-disabled until external records exist.
+- Phase 1A Task 1 technical implementation and regression evidence: **complete**; see [Task 1 evidence](../phase-1a-task-1-evidence.md). Production catalog/template activation remains blocked by DEC-004.
+- Phase 1A Task 2 technical implementation and runtime regression evidence: **complete**; see [Task 2 evidence](../phase-1a-task-2-evidence.md).
+- Phase 1A Task 3 technical implementation and regression evidence: **complete**; see [Task 3 evidence](../phase-1a-task-3-evidence.md). Archive approval, fuzzy threshold and reviewer-owned AC-28/AC-31 sign-off remain fail-closed gates.
+- Phase 1A Task 4 technical implementation and regression evidence: **complete**; see [Task 4 evidence](../phase-1a-task-4-evidence.md).
+- Phase 1A Task 5 technical implementation and regression evidence: **complete**; see [Task 5 evidence](../phase-1a-task-5-evidence.md).
+- Phase 1A Task 6 technical implementation and regression evidence: **complete**; see [Task 6 evidence](../phase-1a-task-6-evidence.md).
+- Phase 1A technical checkpoint: **ready for human approval**; see [checkpoint evidence](../phase-1a-checkpoint-evidence.md). External production promotion is not claimed until named deployment, secrets, approvals and UAT evidence exist.
+
 ## Global execution rules
 
 - Đọc [governance](../00-governance-and-source-of-truth.md), spec owning module và [DoD](../14-definition-of-done.md) trước khi code.

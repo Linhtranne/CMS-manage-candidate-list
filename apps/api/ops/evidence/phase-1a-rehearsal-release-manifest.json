@@ -1,0 +1,61 @@
+{
+  "release": "phase-1a-candidate-recruitment",
+  "scope": "phase-1a",
+  "status": "rehearsal",
+  "commit": "c9cf96973c2bc3abf3edd91843db488e8cc0dedf",
+  "worktree_dirty": true,
+  "image_digest": "sha256:3dfbcbc5a334f0153fb029505d0a50846977453aed7e545b1f6eafad30826a1f",
+  "openapi_checksum": "sha256:f471944996d1e045d6d99c592f028008fd8b935cff0e19fb3cde8bdb19925271",
+  "migration_head": "20260820010600_interviews",
+  "decisions": [
+    "DEC-001",
+    "DEC-002",
+    "DEC-004",
+    "DEC-005",
+    "DEC-006",
+    "DEC-007"
+  ],
+  "test_runs": [
+    {
+      "suite": "root-ci",
+      "command": "pnpm typecheck && pnpm lint && pnpm test",
+      "result": "passed"
+    },
+    {
+      "suite": "database-migrations",
+      "command": "pnpm --filter @cms/api db:migrate:deploy && pnpm --filter @cms/api db:migrate:status",
+      "result": "passed"
+    },
+    {
+      "suite": "production-smoke",
+      "command": "health/live + health/ready + protected-route deny",
+      "result": "passed"
+    }
+  ],
+  "approvals": [
+    {
+      "role": "Backend Tech Lead",
+      "status": "pending"
+    },
+    {
+      "role": "Product Owner",
+      "status": "pending"
+    },
+    {
+      "role": "QA Lead",
+      "status": "pending"
+    },
+    {
+      "role": "Security Owner",
+      "status": "pending"
+    },
+    {
+      "role": "Operations Owner",
+      "status": "pending"
+    }
+  ],
+  "migration_image_digest": "sha256:6e38c12a303d99fbf02b877a6d9dce8000da6d33c02b505ae952b29ac42fa2e6",
+  "web_image_digest": "sha256:c2dcbce2e1d9fe5072c87bd007ad8691aa4559a0fbad59f5899e80cac49fd0f1",
+  "postgres_image_digest": "sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+  "redis_image_digest": "sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf"
+}
