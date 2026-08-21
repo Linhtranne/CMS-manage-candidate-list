@@ -112,6 +112,32 @@ describe('runtime configuration', () => {
     expect(config.mail.enabled).toBe(false);
   });
 
+  it('enables a mail provider only with a scoped DEC-003 approval', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'cms-dec-003-'));
+    const file = join(directory, 'dec-003.json');
+    writeFileSync(file, JSON.stringify({
+      id: 'DEC-003', status: 'approved', version: '1.0.0', scope: 'staging-and-production', provider: 'MICROSOFT_GRAPH', artifact_checksum: `sha256:${'b'.repeat(64)}`,
+      approvals: [
+        { role: 'Security Owner', identity: 'security@example.com', at: '2026-08-20T10:00:00Z' },
+        { role: 'Business Owner', identity: 'business@example.com', at: '2026-08-20T10:01:00Z' },
+      ],
+    }));
+    try {
+      const config = loadConfig(productionEnv({ MAIL_PROVIDER: 'MICROSOFT_GRAPH', MAIL_PROVIDER_APPROVAL_RECORD_FILE: file }));
+      expect(config.mail).toMatchObject({ provider: 'MICROSOFT_GRAPH', enabled: true, approved: true });
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects an enabled mail provider without DEC-003 approval', () => {
+    expect(() => loadConfig(productionEnv({ MAIL_PROVIDER: 'MICROSOFT_GRAPH' }))).toThrow(/MAIL_PROVIDER_APPROVAL_RECORD_FILE/);
+  });
+
+  it.each(['MICROSOFT_365', 'GOOGLE_WORKSPACE'])('rejects legacy provider identifier %s', (provider) => {
+    expect(() => loadConfig(productionEnv({ MAIL_PROVIDER: provider }))).toThrow(/MAIL_PROVIDER/);
+  });
+
   it('keeps queue transport disabled until a real consumer is explicitly enabled', () => {
     expect(loadConfig(productionEnv()).queue.enabled).toBe(false);
     expect(() => loadConfig(productionEnv({ QUEUE_ENABLED: 'true' }))).toThrow(/QUEUE_ENABLED/);

@@ -692,6 +692,7 @@ model Mailbox {
 
   conversations EmailConversation[]
   messages      EmailMessage[]
+  webhookNotifications EmailWebhookNotification[]
 
   @@index([status, lastSyncAt])
   @@map("mailboxes")
@@ -731,7 +732,10 @@ model EmailMessage {
   direction          String    @db.VarChar(16)
   status             String    @default("DRAFT") @db.VarChar(32)
   providerMessageId  String?   @map("provider_message_id") @db.VarChar(500)
+  providerThreadId   String?   @map("provider_thread_id") @db.VarChar(500)
   internetMessageId String?   @map("internet_message_id") @db.VarChar(998)
+  inReplyTo         String?   @map("in_reply_to") @db.VarChar(998)
+  referencesJson    Json?     @map("references_json")
   idempotencyKey     String?   @map("idempotency_key") @db.VarChar(240)
   fromAddress        String    @map("from_address") @db.VarChar(320)
   subject            String    @db.VarChar(998)
@@ -756,6 +760,22 @@ model EmailMessage {
   @@map("email_messages")
 }
 
+model EmailWebhookNotification {
+  id                String   @id @default(uuid()) @db.Uuid
+  provider          String   @db.VarChar(32)
+  mailboxId         String   @map("mailbox_id") @db.Uuid
+  notificationId    String   @map("notification_id") @db.VarChar(500)
+  providerMessageId String   @map("provider_message_id") @db.VarChar(500)
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  mailbox Mailbox @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, mailboxId, notificationId])
+  @@index([expiresAt, createdAt])
+  @@map("email_webhook_notifications")
+}
+
 model EmailRecipient {
   id        String   @id @default(uuid()) @db.Uuid
   messageId String   @map("message_id") @db.Uuid
@@ -772,16 +792,21 @@ model EmailRecipient {
 }
 
 model EmailAttachment {
-  id           String   @id @default(uuid()) @db.Uuid
-  messageId    String   @map("message_id") @db.Uuid
-  fileName     String   @map("file_name") @db.VarChar(240)
-  contentType  String   @map("content_type") @db.VarChar(160)
-  sizeBytes    BigInt   @map("size_bytes")
-  checksum     String?  @db.VarChar(128)
-  objectKey    String   @map("object_key") @db.VarChar(500)
-  status       String   @default("PENDING") @db.VarChar(32)
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                    String   @id @default(uuid()) @db.Uuid
+  messageId             String   @map("message_id") @db.Uuid
+  providerAttachmentId  String?  @map("provider_attachment_id") @db.VarChar(500)
+  fileName              String   @map("file_name") @db.VarChar(240)
+  contentType           String   @map("content_type") @db.VarChar(160)
+  detectedContentType   String?  @map("detected_content_type") @db.VarChar(160)
+  sizeBytes             BigInt   @map("size_bytes")
+  checksum              String?  @db.VarChar(128)
+  objectKey             String   @map("object_key") @db.VarChar(500)
+  status                String   @default("DISCOVERED") @db.VarChar(32)
+  scanReason            String?  @map("scan_reason") @db.VarChar(240)
+  quarantinedAt         DateTime? @map("quarantined_at") @db.Timestamptz(6)
+  scannedAt             DateTime? @map("scanned_at") @db.Timestamptz(6)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   message EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
 

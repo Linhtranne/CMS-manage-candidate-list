@@ -186,11 +186,11 @@ Không log token, raw MIME hoặc signed URL. Credential reference lưu trong DB
 
 ## 13. Endpoints và errors
 
-- `POST /emails/previews`, `POST /emails`, `POST /emails/{id}/retry`, `POST /emails/{id}/cancellation`.
-- `GET /conversations`, `GET /conversations/{id}`, `GET /shared-inbox`.
+- `POST /emails/previews`, `POST /emails`, `POST /email-messages/{id}/retry-attempts`, `POST /email-messages/{id}/cancellations`.
+- `GET /mailbox/conversations`, `GET /mailbox/conversations/{id}`; the legacy message view remains `GET /conversations/{id}/messages`.
 - `POST /emails/{id}/match-resolution`.
 - `POST /webhooks/mail/{provider}` không dùng session auth nhưng bắt buộc provider verification.
-- `GET /admin/mailbox/health`, `POST /admin/mailbox/{pause|resume|sync}`.
+- `GET /mailboxes/{id}/health`, `POST /mailboxes/{id}/{pause|resume|sync}`.
 
 Errors: `MAIL_PROVIDER_DISABLED`, `MAILBOX_UNHEALTHY`, `EMAIL_PREVIEW_EXPIRED`, `DO_NOT_CONTACT`, `EMAIL_TEMPLATE_NOT_APPLICABLE`, `EMAIL_TEMPLATE_AMBIGUOUS`, `EMAIL_SEND_UNCERTAIN`, `EMAIL_ALREADY_TERMINAL`, `EMAIL_MATCH_AMBIGUOUS`, `ATTACHMENT_NOT_SAFE`, `RATE_LIMITED`.
 

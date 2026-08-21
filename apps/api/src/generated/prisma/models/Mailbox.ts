@@ -282,6 +282,7 @@ export type MailboxWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Mailbox"> | Date | string
   conversations?: Prisma.EmailConversationListRelationFilter
   messages?: Prisma.EmailMessageListRelationFilter
+  webhookNotifications?: Prisma.EmailWebhookNotificationListRelationFilter
 }
 
 export type MailboxOrderByWithRelationInput = {
@@ -300,6 +301,7 @@ export type MailboxOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   conversations?: Prisma.EmailConversationOrderByRelationAggregateInput
   messages?: Prisma.EmailMessageOrderByRelationAggregateInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationOrderByRelationAggregateInput
 }
 
 export type MailboxWhereUniqueInput = Prisma.AtLeast<{
@@ -321,6 +323,7 @@ export type MailboxWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Mailbox"> | Date | string
   conversations?: Prisma.EmailConversationListRelationFilter
   messages?: Prisma.EmailMessageListRelationFilter
+  webhookNotifications?: Prisma.EmailWebhookNotificationListRelationFilter
 }, "id" | "address">
 
 export type MailboxOrderByWithAggregationInput = {
@@ -379,6 +382,7 @@ export type MailboxCreateInput = {
   updatedAt?: Date | string
   conversations?: Prisma.EmailConversationCreateNestedManyWithoutMailboxInput
   messages?: Prisma.EmailMessageCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxUncheckedCreateInput = {
@@ -397,6 +401,7 @@ export type MailboxUncheckedCreateInput = {
   updatedAt?: Date | string
   conversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutMailboxInput
   messages?: Prisma.EmailMessageUncheckedCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxUpdateInput = {
@@ -415,6 +420,7 @@ export type MailboxUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.EmailConversationUpdateManyWithoutMailboxNestedInput
   messages?: Prisma.EmailMessageUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUpdateManyWithoutMailboxNestedInput
 }
 
 export type MailboxUncheckedUpdateInput = {
@@ -433,6 +439,7 @@ export type MailboxUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutMailboxNestedInput
   messages?: Prisma.EmailMessageUncheckedUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedUpdateManyWithoutMailboxNestedInput
 }
 
 export type MailboxCreateManyInput = {
@@ -572,6 +579,20 @@ export type MailboxUpdateOneRequiredWithoutMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MailboxUpdateToOneWithWhereWithoutMessagesInput, Prisma.MailboxUpdateWithoutMessagesInput>, Prisma.MailboxUncheckedUpdateWithoutMessagesInput>
 }
 
+export type MailboxCreateNestedOneWithoutWebhookNotificationsInput = {
+  create?: Prisma.XOR<Prisma.MailboxCreateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedCreateWithoutWebhookNotificationsInput>
+  connectOrCreate?: Prisma.MailboxCreateOrConnectWithoutWebhookNotificationsInput
+  connect?: Prisma.MailboxWhereUniqueInput
+}
+
+export type MailboxUpdateOneRequiredWithoutWebhookNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.MailboxCreateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedCreateWithoutWebhookNotificationsInput>
+  connectOrCreate?: Prisma.MailboxCreateOrConnectWithoutWebhookNotificationsInput
+  upsert?: Prisma.MailboxUpsertWithoutWebhookNotificationsInput
+  connect?: Prisma.MailboxWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MailboxUpdateToOneWithWhereWithoutWebhookNotificationsInput, Prisma.MailboxUpdateWithoutWebhookNotificationsInput>, Prisma.MailboxUncheckedUpdateWithoutWebhookNotificationsInput>
+}
+
 export type MailboxCreateWithoutConversationsInput = {
   id?: string
   address: string
@@ -587,6 +608,7 @@ export type MailboxCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   messages?: Prisma.EmailMessageCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxUncheckedCreateWithoutConversationsInput = {
@@ -604,6 +626,7 @@ export type MailboxUncheckedCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   messages?: Prisma.EmailMessageUncheckedCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxCreateOrConnectWithoutConversationsInput = {
@@ -637,6 +660,7 @@ export type MailboxUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messages?: Prisma.EmailMessageUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUpdateManyWithoutMailboxNestedInput
 }
 
 export type MailboxUncheckedUpdateWithoutConversationsInput = {
@@ -654,6 +678,7 @@ export type MailboxUncheckedUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messages?: Prisma.EmailMessageUncheckedUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedUpdateManyWithoutMailboxNestedInput
 }
 
 export type MailboxCreateWithoutMessagesInput = {
@@ -671,6 +696,7 @@ export type MailboxCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.EmailConversationCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxUncheckedCreateWithoutMessagesInput = {
@@ -688,6 +714,7 @@ export type MailboxUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutMailboxInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedCreateNestedManyWithoutMailboxInput
 }
 
 export type MailboxCreateOrConnectWithoutMessagesInput = {
@@ -721,6 +748,7 @@ export type MailboxUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.EmailConversationUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUpdateManyWithoutMailboxNestedInput
 }
 
 export type MailboxUncheckedUpdateWithoutMessagesInput = {
@@ -738,6 +766,95 @@ export type MailboxUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutMailboxNestedInput
+  webhookNotifications?: Prisma.EmailWebhookNotificationUncheckedUpdateManyWithoutMailboxNestedInput
+}
+
+export type MailboxCreateWithoutWebhookNotificationsInput = {
+  id?: string
+  address: string
+  displayName: string
+  provider?: string
+  status?: string
+  providerAccountRef?: string | null
+  syncCursor?: string | null
+  syncCursorIssuedAt?: Date | string | null
+  lastSyncAt?: Date | string | null
+  lastSendAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.EmailConversationCreateNestedManyWithoutMailboxInput
+  messages?: Prisma.EmailMessageCreateNestedManyWithoutMailboxInput
+}
+
+export type MailboxUncheckedCreateWithoutWebhookNotificationsInput = {
+  id?: string
+  address: string
+  displayName: string
+  provider?: string
+  status?: string
+  providerAccountRef?: string | null
+  syncCursor?: string | null
+  syncCursorIssuedAt?: Date | string | null
+  lastSyncAt?: Date | string | null
+  lastSendAt?: Date | string | null
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversations?: Prisma.EmailConversationUncheckedCreateNestedManyWithoutMailboxInput
+  messages?: Prisma.EmailMessageUncheckedCreateNestedManyWithoutMailboxInput
+}
+
+export type MailboxCreateOrConnectWithoutWebhookNotificationsInput = {
+  where: Prisma.MailboxWhereUniqueInput
+  create: Prisma.XOR<Prisma.MailboxCreateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedCreateWithoutWebhookNotificationsInput>
+}
+
+export type MailboxUpsertWithoutWebhookNotificationsInput = {
+  update: Prisma.XOR<Prisma.MailboxUpdateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedUpdateWithoutWebhookNotificationsInput>
+  create: Prisma.XOR<Prisma.MailboxCreateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedCreateWithoutWebhookNotificationsInput>
+  where?: Prisma.MailboxWhereInput
+}
+
+export type MailboxUpdateToOneWithWhereWithoutWebhookNotificationsInput = {
+  where?: Prisma.MailboxWhereInput
+  data: Prisma.XOR<Prisma.MailboxUpdateWithoutWebhookNotificationsInput, Prisma.MailboxUncheckedUpdateWithoutWebhookNotificationsInput>
+}
+
+export type MailboxUpdateWithoutWebhookNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSendAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.EmailConversationUpdateManyWithoutMailboxNestedInput
+  messages?: Prisma.EmailMessageUpdateManyWithoutMailboxNestedInput
+}
+
+export type MailboxUncheckedUpdateWithoutWebhookNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSendAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.EmailConversationUncheckedUpdateManyWithoutMailboxNestedInput
+  messages?: Prisma.EmailMessageUncheckedUpdateManyWithoutMailboxNestedInput
 }
 
 
@@ -748,11 +865,13 @@ export type MailboxUncheckedUpdateWithoutMessagesInput = {
 export type MailboxCountOutputType = {
   conversations: number
   messages: number
+  webhookNotifications: number
 }
 
 export type MailboxCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | MailboxCountOutputTypeCountConversationsArgs
   messages?: boolean | MailboxCountOutputTypeCountMessagesArgs
+  webhookNotifications?: boolean | MailboxCountOutputTypeCountWebhookNotificationsArgs
 }
 
 /**
@@ -779,6 +898,13 @@ export type MailboxCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Type
   where?: Prisma.EmailMessageWhereInput
 }
 
+/**
+ * MailboxCountOutputType without action
+ */
+export type MailboxCountOutputTypeCountWebhookNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailWebhookNotificationWhereInput
+}
+
 
 export type MailboxSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -796,6 +922,7 @@ export type MailboxSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   conversations?: boolean | Prisma.Mailbox$conversationsArgs<ExtArgs>
   messages?: boolean | Prisma.Mailbox$messagesArgs<ExtArgs>
+  webhookNotifications?: boolean | Prisma.Mailbox$webhookNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.MailboxCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["mailbox"]>
 
@@ -851,6 +978,7 @@ export type MailboxOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type MailboxInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | Prisma.Mailbox$conversationsArgs<ExtArgs>
   messages?: boolean | Prisma.Mailbox$messagesArgs<ExtArgs>
+  webhookNotifications?: boolean | Prisma.Mailbox$webhookNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.MailboxCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MailboxIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -861,6 +989,7 @@ export type $MailboxPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     conversations: Prisma.$EmailConversationPayload<ExtArgs>[]
     messages: Prisma.$EmailMessagePayload<ExtArgs>[]
+    webhookNotifications: Prisma.$EmailWebhookNotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1272,6 +1401,7 @@ export interface Prisma__MailboxClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   conversations<T extends Prisma.Mailbox$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Mailbox$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.Mailbox$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Mailbox$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  webhookNotifications<T extends Prisma.Mailbox$webhookNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Mailbox$webhookNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailWebhookNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1752,6 +1882,30 @@ export type Mailbox$messagesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.EmailMessageScalarFieldEnum | Prisma.EmailMessageScalarFieldEnum[]
+}
+
+/**
+ * Mailbox.webhookNotifications
+ */
+export type Mailbox$webhookNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailWebhookNotification
+   */
+  select?: Prisma.EmailWebhookNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailWebhookNotification
+   */
+  omit?: Prisma.EmailWebhookNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailWebhookNotificationInclude<ExtArgs> | null
+  where?: Prisma.EmailWebhookNotificationWhereInput
+  orderBy?: Prisma.EmailWebhookNotificationOrderByWithRelationInput | Prisma.EmailWebhookNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.EmailWebhookNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailWebhookNotificationScalarFieldEnum | Prisma.EmailWebhookNotificationScalarFieldEnum[]
 }
 
 /**

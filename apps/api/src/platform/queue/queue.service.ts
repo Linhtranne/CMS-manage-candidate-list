@@ -1,7 +1,7 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy, Optional } from '@nestjs/common';
 import { Queue, Worker, type ConnectionOptions, type JobsOptions } from 'bullmq';
 import { RUNTIME_CONFIG, type RuntimeConfig } from '../config/config.module.js';
-import { Inject } from '@nestjs/common';
+import { TelemetryService } from '../telemetry/telemetry.service.js';
 
 export interface QueuePayload {
   schemaVersion: number;
@@ -11,7 +11,7 @@ export interface QueuePayload {
   [key: string]: unknown;
 }
 
-const SENSITIVE_KEYS = /(token|secret|password|authorization|cookie|email|phone|address|access[_-]?key)/i;
+const SENSITIVE_KEYS = /(token|secret|password|authorization|cookie|email|phone|address|object[_-]?key|signed[_-]?url|access[_-]?key)/i;
 
 function connectionFromUrl(raw: string): ConnectionOptions {
   const url = new URL(raw);
@@ -45,7 +45,7 @@ export class QueueService implements OnModuleDestroy {
   private readonly queues = new Map<string, Queue<QueuePayload>>();
   private readonly workers = new Map<string, Worker<QueuePayload>>();
 
-  constructor(@Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig) {
+  constructor(@Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig, @Optional() private readonly telemetry?: TelemetryService) {
     this.connection = connectionFromUrl(config.redis.url);
   }
 
@@ -67,6 +67,7 @@ export class QueueService implements OnModuleDestroy {
     }
     assertNoSensitivePayload(payload);
     await this.queue(name).add(payload.eventId, payload, { jobId: payload.eventId, removeOnComplete: 1000, removeOnFail: 5000, ...options });
+    this.telemetry?.increment(`queue.${name}.enqueued`);
   }
 
   async assertReady(): Promise<void> {
@@ -82,7 +83,11 @@ export class QueueService implements OnModuleDestroy {
       prefix: this.config.queue.prefix,
       concurrency: this.config.queue.concurrency,
     });
-    worker.on('failed', (job, error) => console.error(JSON.stringify({ event: 'queue_job_failed', queue: name, jobId: job?.id, error: error.message })));
+    this.telemetry?.increment(`queue.${name}.worker_started`);
+    worker.on('failed', (job, error) => {
+      this.telemetry?.increment(`queue.${name}.failed`);
+      console.error(JSON.stringify({ event: 'queue_job_failed', queue: name, jobId: job?.id, error: error.message }));
+    });
     this.workers.set(name, worker);
   }
 

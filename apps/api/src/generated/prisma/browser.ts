@@ -198,6 +198,11 @@ export type EmailConversation = Prisma.EmailConversationModel
  */
 export type EmailMessage = Prisma.EmailMessageModel
 /**
+ * Model EmailWebhookNotification
+ * 
+ */
+export type EmailWebhookNotification = Prisma.EmailWebhookNotificationModel
+/**
  * Model EmailRecipient
  * 
  */

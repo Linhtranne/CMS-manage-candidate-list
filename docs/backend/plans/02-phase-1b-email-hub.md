@@ -44,12 +44,16 @@
 
 **Interfaces:** `POST /emails/previews`, `POST /emails`, retry/cancel; stable provider idempotency key; states include `RECONCILING` for uncertain outcome.
 
-- [ ] Write failing tests for expired/tampered preview, DNC, template mismatch, same-key replay, provider timeout after accept, transient/permanent/auth failure and auto-reply loop.
-- [ ] Run focused suites and retain RED evidence.
-- [ ] Implement specificity resolver, signed preview, transaction enqueue + outbox, send CAS, retry classifier and reconciliation-before-retry.
-- [ ] Add kill switch, queue metrics, auth-pause alert and canonical errors; no body/recipient in Redis/log.
-- [ ] Run AC-05, AC-08, AC-15, AC-19, EM-AC-01/03/04 and contract/security tests.
-- [ ] Commit: `feat(email): add idempotent outbound delivery`.
+- [x] Write failing tests for expired/tampered preview, DNC, template mismatch, same-key replay, provider timeout after accept, transient/permanent/auth failure and auto-reply loop.
+- [x] Run focused suites and retain RED evidence.
+- [x] Implement specificity resolver, signed preview, transaction enqueue + outbox, send CAS, retry classifier and reconciliation-before-retry.
+- [x] Add auditable cancellation and manual retry commands; cancellation is limited to `QUEUED|RETRY_WAIT`, while `RECONCILING` is never retried blindly.
+- [x] Implement scoped shared-inbox conversation list/detail queries with allowlisted views, stable `(lastActivityAt,id)` cursor pagination, candidate context and immutable message/attachment serializers; unmatched rows require the explicit manual-link permission.
+- [x] Add versioned conversation reply and manual-link commands with server-owned mailbox identity, attachment safety checks, CAS conflict handling, policy scope, audit and ID-only outbox events.
+- [x] Add kill switch, queue metrics, auth-pause alert and canonical errors; no body/recipient in Redis/log.
+- [x] Run AC-05, AC-08, AC-15, AC-19, EM-AC-01/03/04 and contract/security tests.
+- [ ] Commit: `feat(email): add idempotent outbound delivery` (blocked by the current read-only `.git` mount; working tree is verified).
+- [ ] Backend Tech Lead reviews Task 2 evidence before integration.
 
 ### Task 3: Implement inbound webhook/poller and matcher
 
@@ -63,12 +67,13 @@
 
 **Interfaces:** verified webhook signal -> fetch queue; transactional cursor; priority reply token -> headers -> provider thread -> unique sender conversation -> manual inbox.
 
-- [ ] Write failing tests for invalid/replayed webhook, duplicate webhook+poll, crash before/after cursor commit, token/header/thread matches and ambiguous sender.
-- [ ] Run tests and confirm duplicate/cursor/matcher assertions fail.
-- [ ] Implement webhook verification/replay cache, change fetch, normalization/sanitization, unique ingest transaction and append-only match decisions.
-- [ ] Implement shared inbox/manual resolution permission + reason; inbound event can only create task/stop approved reminder.
-- [ ] Run AC-06–08, AC-13–14, AC-16 and EM-AC-02.
-- [ ] Commit: `feat(email): ingest and match mailbox replies safely`.
+- [x] Write failing tests for invalid/replayed webhook, duplicate webhook+poll, crash before/after cursor commit, token/header/thread matches and ambiguous sender.
+- [x] Run tests and confirm duplicate/cursor/matcher assertions fail.
+- [x] Implement webhook verification/replay cache, change fetch, normalization/sanitization, unique ingest transaction and append-only match decisions.
+- [x] Implement shared inbox/manual resolution permission + reason; inbound event can only create task/stop approved reminder.
+- [x] Run AC-06–08, AC-13–14, AC-16 and EM-AC-02.
+- [ ] Commit: `feat(email): ingest and match mailbox replies safely` (blocked by the current read-only `.git` mount; working tree is verified).
+- [ ] Backend Tech Lead reviews Task 3 evidence before integration.
 
 ### Task 4: Implement attachment quarantine and document handoff
 
@@ -81,14 +86,17 @@
 
 **Interfaces:** streaming download -> checksum/quarantine -> MIME/AV scan -> `SAFE|REJECTED|FAILED`; signed download only after permission.
 
-- [ ] Write failing tests for oversize stream, forged MIME, malware, archive bomb, scan outage, signed URL expiry and cross-scope access.
-- [ ] Run file security tests and confirm RED.
-- [ ] Implement streaming limits/checksum/private keys, scanner adapter/state transitions, safe metadata endpoints and document candidate handoff.
-- [ ] Enforce no raw object key/provider attachment ID in public DTO; audit body/download access.
-- [ ] Run AC-09 and attachment portions AC-06/EM-AC-02 plus redaction scan.
-- [ ] Commit: `feat(files): quarantine and scan email attachments`.
+- [x] Write failing tests for oversize stream, forged MIME, malware, archive bomb, scan outage, signed URL expiry and cross-scope access.
+- [x] Run file security tests and confirm RED.
+- [x] Implement streaming limits/checksum/private keys, scanner adapter/state transitions, safe metadata endpoints and document candidate handoff.
+- [x] Enforce no raw object key/provider attachment ID in public DTO; audit body/download access.
+- [x] Run AC-09 and attachment portions AC-06/EM-AC-02 plus redaction scan.
+- [ ] Commit: `feat(files): quarantine and scan email attachments` (blocked by the current read-only `.git` mount; working tree is verified).
+- [ ] Backend Tech Lead reviews Task 4 evidence before integration.
 
 ### Task 5: Implement selected provider and production operations
+
+> Technical preparation is complete; concrete provider binding and staging smoke are blocked until DEC-003 selects and approves the provider/mailbox/credential/DNS scope. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
 
 **Files:**
 

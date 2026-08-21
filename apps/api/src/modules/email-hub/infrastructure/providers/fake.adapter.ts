@@ -30,10 +30,15 @@ export class FakeMailProviderAdapter implements MailProviderAdapter {
       to: input.to,
       subject: input.subject,
       bodyText: input.bodyText,
+      ...(input.sanitizedHtml ? { bodyHtml: input.sanitizedHtml } : {}),
       receivedAt: acceptedAt,
       input,
     });
     return result;
+  }
+
+  async findByClientReference(clientReference: string): Promise<ProviderSendResult | null> {
+    return this.sentByKey.get(clientReference) ?? null;
   }
 
   async fetchChanges(cursor: MailCursor | null, limit: number): Promise<ProviderChangePage> {
@@ -49,7 +54,7 @@ export class FakeMailProviderAdapter implements MailProviderAdapter {
   async fetchMessage(providerMessageId: string): Promise<ProviderMessage> {
     const message = this.messages.get(providerMessageId);
     if (!message) throw new Error('FAKE_MESSAGE_NOT_FOUND');
-    return { providerMessageId: message.providerMessageId, from: message.from, to: message.to, subject: message.subject, bodyText: message.bodyText, receivedAt: message.receivedAt };
+    return { providerMessageId: message.providerMessageId, from: message.from, to: message.to, subject: message.subject, bodyText: message.bodyText, ...(message.bodyHtml ? { bodyHtml: message.bodyHtml } : {}), receivedAt: message.receivedAt, attachments: [] };
   }
 
   async fetchAttachment(_providerMessageId: string, attachmentId: string): Promise<Readable> {

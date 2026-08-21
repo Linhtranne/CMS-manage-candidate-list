@@ -24,6 +24,7 @@
     "test:migration": "vitest run test/migrations",
     "test:security": "vitest run test/security",
     "smoke:provider": "node scripts/provider-smoke.mjs",
+    "smoke:mail-provider": "node scripts/mail-provider-smoke.mjs",
     "smoke:container": "node scripts/container-smoke.mjs",
     "release:preflight": "node scripts/production-preflight.mjs",
     "release:manifest": "node scripts/create-release-manifest.mjs"

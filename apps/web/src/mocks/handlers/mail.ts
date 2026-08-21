@@ -19,9 +19,9 @@ export const mailHandlers = [
       const matchesView = view === 'all' || (view === 'needs-action' && conversation.status === 'NEEDS_ACTION') || (view === 'unmatched' && conversation.status === 'UNMATCHED') || (view === 'sent' && conversation.status === 'SENT') || (view === 'received' && conversation.status === 'RECEIVED') || (view === 'waiting-candidate' && conversation.status === 'RECEIVED') || (view === 'waiting-internal' && conversation.status === 'NEEDS_ACTION') || (view === 'completed' && conversation.status === 'CLOSED') || (view === 'failed' && failed);
       return (!query || haystack.includes(query)) && (!journeyId || conversation.journeyId === journeyId) && matchesView;
     });
-    return HttpResponse.json({ items });
+    return HttpResponse.json({ data: { items }, page: { nextCursor: null, hasMore: false }, requestId: 'mock-mailbox-list' });
   }),
-  http.get('*/api/v1/mailbox/conversations/:id', ({ params }) => { const conversation = findConversation(String(params.id)); return conversation ? HttpResponse.json(conversation) : problem('NOT_FOUND', 'Không tìm thấy chuỗi email', 404); }),
+  http.get('*/api/v1/mailbox/conversations/:id', ({ params }) => { const conversation = findConversation(String(params.id)); return conversation ? HttpResponse.json({ data: conversation, requestId: 'mock-mailbox-detail' }) : problem('NOT_FOUND', 'Không tìm thấy chuỗi email', 404); }),
   http.post('*/api/v1/mailbox/conversations/:id/send', async ({ params, request }) => {
     const conversation = findConversation(String(params.id));
     if (!conversation) return problem('NOT_FOUND', 'Không tìm thấy chuỗi email', 404);
@@ -42,7 +42,7 @@ export const mailHandlers = [
     conversation.snippet = body.body.slice(0, 120);
     conversation.status = 'SENT';
     conversation.version += 1;
-    return HttpResponse.json(result, { status: 202 });
+    return HttpResponse.json({ data: result, requestId: 'mock-mail-send' }, { status: 202 });
   }),
   http.post('*/api/v1/mailbox/conversations/:id/link', async ({ params, request }) => {
     const conversation = findConversation(String(params.id));
@@ -55,6 +55,6 @@ export const mailHandlers = [
     conversation.journeyId = body.journeyId ?? null;
     conversation.status = 'MATCHED';
     conversation.version += 1;
-    return HttpResponse.json(conversation);
+    return HttpResponse.json({ data: conversation, requestId: 'mock-mail-link' });
   })
 ];

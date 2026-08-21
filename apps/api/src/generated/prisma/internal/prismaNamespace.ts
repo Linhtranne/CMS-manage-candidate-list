@@ -433,6 +433,7 @@ export const ModelName = {
   Mailbox: 'Mailbox',
   EmailConversation: 'EmailConversation',
   EmailMessage: 'EmailMessage',
+  EmailWebhookNotification: 'EmailWebhookNotification',
   EmailRecipient: 'EmailRecipient',
   EmailAttachment: 'EmailAttachment',
   EmailMatchDecision: 'EmailMatchDecision'
@@ -451,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "team" | "user" | "identityLink" | "role" | "permission" | "rolePermission" | "userRole" | "session" | "auditEvent" | "outboxEvent" | "jobAttempt" | "idempotencyRecord" | "oidcLoginState" | "catalogItem" | "catalogVersion" | "interviewQuestionTemplate" | "interviewQuestionTemplateVersion" | "client" | "clientContact" | "jobOrder" | "jobOrderRequirementVersion" | "jobOrderStatusHistory" | "candidate" | "candidateOccupationProfile" | "candidateImportBatch" | "candidateImportRow" | "candidateDuplicateCase" | "candidateMergeAlias" | "application" | "applicationStatusHistory" | "interview" | "interviewParticipant" | "interviewHistory" | "mailbox" | "emailConversation" | "emailMessage" | "emailRecipient" | "emailAttachment" | "emailMatchDecision"
+    modelProps: "team" | "user" | "identityLink" | "role" | "permission" | "rolePermission" | "userRole" | "session" | "auditEvent" | "outboxEvent" | "jobAttempt" | "idempotencyRecord" | "oidcLoginState" | "catalogItem" | "catalogVersion" | "interviewQuestionTemplate" | "interviewQuestionTemplateVersion" | "client" | "clientContact" | "jobOrder" | "jobOrderRequirementVersion" | "jobOrderStatusHistory" | "candidate" | "candidateOccupationProfile" | "candidateImportBatch" | "candidateImportRow" | "candidateDuplicateCase" | "candidateMergeAlias" | "application" | "applicationStatusHistory" | "interview" | "interviewParticipant" | "interviewHistory" | "mailbox" | "emailConversation" | "emailMessage" | "emailWebhookNotification" | "emailRecipient" | "emailAttachment" | "emailMatchDecision"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3119,6 +3120,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EmailWebhookNotification: {
+      payload: Prisma.$EmailWebhookNotificationPayload<ExtArgs>
+      fields: Prisma.EmailWebhookNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailWebhookNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailWebhookNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailWebhookNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailWebhookNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.EmailWebhookNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.EmailWebhookNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.EmailWebhookNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmailWebhookNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.EmailWebhookNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        update: {
+          args: Prisma.EmailWebhookNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailWebhookNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailWebhookNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmailWebhookNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmailWebhookNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailWebhookNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailWebhookNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmailWebhookNotification>
+        }
+        groupBy: {
+          args: Prisma.EmailWebhookNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailWebhookNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailWebhookNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailWebhookNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
     EmailRecipient: {
       payload: Prisma.$EmailRecipientPayload<ExtArgs>
       fields: Prisma.EmailRecipientFieldRefs
@@ -3944,7 +4019,10 @@ export const EmailMessageScalarFieldEnum = {
   direction: 'direction',
   status: 'status',
   providerMessageId: 'providerMessageId',
+  providerThreadId: 'providerThreadId',
   internetMessageId: 'internetMessageId',
+  inReplyTo: 'inReplyTo',
+  referencesJson: 'referencesJson',
   idempotencyKey: 'idempotencyKey',
   fromAddress: 'fromAddress',
   subject: 'subject',
@@ -3958,6 +4036,19 @@ export const EmailMessageScalarFieldEnum = {
 } as const
 
 export type EmailMessageScalarFieldEnum = (typeof EmailMessageScalarFieldEnum)[keyof typeof EmailMessageScalarFieldEnum]
+
+
+export const EmailWebhookNotificationScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  mailboxId: 'mailboxId',
+  notificationId: 'notificationId',
+  providerMessageId: 'providerMessageId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailWebhookNotificationScalarFieldEnum = (typeof EmailWebhookNotificationScalarFieldEnum)[keyof typeof EmailWebhookNotificationScalarFieldEnum]
 
 
 export const EmailRecipientScalarFieldEnum = {
@@ -3975,12 +4066,17 @@ export type EmailRecipientScalarFieldEnum = (typeof EmailRecipientScalarFieldEnu
 export const EmailAttachmentScalarFieldEnum = {
   id: 'id',
   messageId: 'messageId',
+  providerAttachmentId: 'providerAttachmentId',
   fileName: 'fileName',
   contentType: 'contentType',
+  detectedContentType: 'detectedContentType',
   sizeBytes: 'sizeBytes',
   checksum: 'checksum',
   objectKey: 'objectKey',
   status: 'status',
+  scanReason: 'scanReason',
+  quarantinedAt: 'quarantinedAt',
+  scannedAt: 'scannedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4332,6 +4428,7 @@ export type GlobalOmitConfig = {
   mailbox?: Prisma.MailboxOmit
   emailConversation?: Prisma.EmailConversationOmit
   emailMessage?: Prisma.EmailMessageOmit
+  emailWebhookNotification?: Prisma.EmailWebhookNotificationOmit
   emailRecipient?: Prisma.EmailRecipientOmit
   emailAttachment?: Prisma.EmailAttachmentOmit
   emailMatchDecision?: Prisma.EmailMatchDecisionOmit

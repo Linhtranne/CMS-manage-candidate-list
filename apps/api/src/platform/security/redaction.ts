@@ -1,4 +1,4 @@
-const SENSITIVE_KEY = /password|passphrase|secret|token|authorization|cookie|passport|credential|privatekey|email|phone|address|body|filename/i;
+const SENSITIVE_KEY = /password|passphrase|secret|token|authorization|cookie|passport|credential|privatekey|email|phone|address|body|filename|objectkey|signedurl/i;
 
 export function redactStructuredValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => redactStructuredValue(item));

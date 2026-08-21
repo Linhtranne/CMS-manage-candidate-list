@@ -644,6 +644,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mailbox/conversations/{id}/attachments/{attachmentId}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createMailboxAttachmentDownload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/mailbox/conversations/{id}/send": {
         parameters: {
             query?: never;
@@ -900,6 +916,70 @@ export interface paths {
         patch: operations["updateAdminMailboxSettings"];
         trace?: never;
     };
+    "/mailboxes/{id}/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMailboxHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mailboxes/{id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["pauseMailbox"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mailboxes/{id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resumeMailbox"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mailboxes/{id}/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["requestMailboxSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/audit": {
         parameters: {
             query?: never;
@@ -1054,22 +1134,6 @@ export interface paths {
         get: operations["getMetrics"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/webhooks/mail/{provider}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["receiveMailWebhook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1668,6 +1732,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/emails/previews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createCanonicalEmailPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["enqueueCanonicalEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/mail/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["receiveMailWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/emails/{id}/match-resolution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resolveEmailMatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/email-drafts": {
         parameters: {
             query?: never;
@@ -1693,7 +1821,7 @@ export interface paths {
         };
         get: operations["listConversationMessages"];
         put?: never;
-        post?: never;
+        post: operations["sendConversationMessage"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2412,7 +2540,7 @@ export interface components {
             fileName: string;
             sizeBytes: number;
             /** @enum {string} */
-            scanStatus: "PENDING" | "SAFE" | "QUARANTINED" | "REJECTED";
+            scanStatus: "DISCOVERED" | "DOWNLOADING" | "SCANNING" | "SAFE" | "QUARANTINED" | "REJECTED" | "FAILED";
             /** Format: uri */
             downloadUrl?: string | null;
         };
@@ -2457,6 +2585,72 @@ export interface components {
         };
         ConversationsResponse: {
             items: components["schemas"]["Conversation"][];
+        };
+        EmailRecipientInput: {
+            /** @enum {string} */
+            kind: "TO" | "CC" | "BCC";
+            /** Format: email */
+            address: string;
+        };
+        CreateEmailPreviewRequest: {
+            mailboxId: string;
+            /** Format: email */
+            from: string;
+            recipients: components["schemas"]["EmailRecipientInput"][];
+            subject: string;
+            bodyText: string;
+            sanitizedHtml?: string | null;
+            templateId?: string | null;
+            templateChecksum?: string | null;
+            candidateId?: string | null;
+            conversationId?: string | null;
+            applicationId?: string | null;
+            journeyId?: string | null;
+        };
+        EnqueueEmailRequest: components["schemas"]["CreateEmailPreviewRequest"] & {
+            previewToken: string;
+            idempotencyKey: string;
+        };
+        CreateEmailDraftRequest: {
+            mailboxId: string;
+            conversationId?: string | null;
+            to: string[];
+            cc?: string[];
+            subject: string;
+            body: string;
+            candidateId?: string | null;
+            applicationId?: string | null;
+            journeyId?: string | null;
+            idempotencyKey?: string;
+            version?: number;
+        };
+        MailWebhookRequest: {
+            mailboxId: string;
+            notificationId: string;
+            providerMessageId: string;
+        };
+        ResolveEmailMatchRequest: {
+            candidateId: string;
+            applicationId?: string | null;
+            journeyId?: string | null;
+            reason: string;
+        };
+        EmailPreview: {
+            previewId: string;
+            token: string;
+            /** Format: date-time */
+            expiresAt: string;
+            requestHash: string;
+            mailboxId: string;
+            /** Format: email */
+            from: string;
+            recipients: components["schemas"]["EmailRecipientInput"][];
+            subject: string;
+            bodyText: string;
+            sanitizedHtml?: string | null;
+            templateChecksum?: string | null;
+            /** @enum {string} */
+            sensitivityWarning?: "MANUAL_CONFIRM_REQUIRED";
         };
         SendEmailRequest: {
             to: string[];
@@ -2672,7 +2866,7 @@ export interface components {
             address: string;
             senderName: string;
             /** @enum {string} */
-            adapter: "MICROSOFT_365" | "GOOGLE_WORKSPACE" | "SMTP_IMAP";
+            adapter: "MICROSOFT_GRAPH" | "GMAIL_API" | "SMTP_IMAP";
             maxAttachmentBytes: number;
             /** @enum {string} */
             health: "HEALTHY" | "DEGRADED" | "DISCONNECTED";
@@ -2689,7 +2883,7 @@ export interface components {
         MailboxSettingsUpdate: {
             senderName: string;
             /** @enum {string} */
-            adapter: "MICROSOFT_365" | "GOOGLE_WORKSPACE" | "SMTP_IMAP";
+            adapter: "MICROSOFT_GRAPH" | "GMAIL_API" | "SMTP_IMAP";
             maxAttachmentBytes: number;
             signature?: string;
             receiveFolder?: string;
@@ -2697,6 +2891,18 @@ export interface components {
             retryLimit?: number;
             /** Format: email */
             alertAddress?: string;
+        };
+        MailboxHealth: {
+            id: string;
+            address: string;
+            provider: string;
+            status: string;
+            providerHealth: {
+                status: string;
+                /** Format: date-time */
+                checkedAt: string;
+                detail?: string;
+            };
         };
         AdminAuditEvent: {
             id: string;
@@ -2887,6 +3093,20 @@ export interface components {
             data: components["schemas"]["EmailSendResult"];
             requestId: string;
         };
+        ApiEmailPreviewEnvelope: {
+            data: components["schemas"]["EmailPreview"];
+            requestId: string;
+        };
+        ApiAttachmentDownloadEnvelope: {
+            data: {
+                attachmentId: string;
+                /** Format: uri */
+                url: string;
+                /** Format: date-time */
+                expiresAt: string;
+            };
+            requestId: string;
+        };
         ApiConversationEnvelope: {
             data: components["schemas"]["Conversation"];
             requestId: string;
@@ -2943,6 +3163,10 @@ export interface components {
             data: components["schemas"]["MailboxSettingsView"];
             requestId: string;
         };
+        ApiMailboxHealthEnvelope: {
+            data: components["schemas"]["MailboxHealth"];
+            requestId: string;
+        };
         ApiAdminAuditResponseEnvelope: {
             data: components["schemas"]["AdminAuditResponse"];
             page: components["schemas"]["ApiPage"];
@@ -2950,6 +3174,9 @@ export interface components {
         };
         GenericCommand: {
             [key: string]: unknown;
+        };
+        EmailActionRequest: {
+            reason?: string;
         };
         ApiOidcRedirectEnvelope: {
             data: components["schemas"]["OidcRedirect"];
@@ -3011,6 +3238,15 @@ export interface components {
         };
         /** @description Permission required */
         Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiProblem"];
+            };
+        };
+        /** @description External provider or queue is unavailable */
+        ServiceUnavailable: {
             headers: {
                 [name: string]: unknown;
             };
@@ -4271,6 +4507,8 @@ export interface operations {
                 query?: string;
                 view?: "all" | "needs-action" | "unmatched" | "sent" | "received" | "waiting-candidate" | "waiting-internal" | "completed" | "failed";
                 journeyId?: string;
+                cursor?: string;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -4312,6 +4550,32 @@ export interface operations {
                 };
             };
             403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createMailboxAttachmentDownload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Short-lived authorized attachment download */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiAttachmentDownloadEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -4853,6 +5117,105 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    getMailboxHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Masked mailbox/provider health */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiMailboxHealthEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    pauseMailbox: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mailbox paused */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    resumeMailbox: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mailbox resumed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    requestMailboxSync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mailbox sync queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            503: components["responses"]["ServiceUnavailable"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     listAdminAuditEvents: {
         parameters: {
             query?: {
@@ -5062,32 +5425,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
-                };
-            };
-        };
-    };
-    receiveMailWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                provider: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GenericCommand"];
-            };
-        };
-        responses: {
-            /** @description Webhook accepted */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiWebhookAcceptedEnvelope"];
                 };
             };
         };
@@ -5906,12 +6243,99 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["CreateEmailPreviewRequest"];
             };
         };
         responses: {
-            /** @description createEmailPreview */
+            /** @description Signed email preview */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailPreviewEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createCanonicalEmailPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEmailPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Signed email preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailPreviewEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    enqueueCanonicalEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnqueueEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Email queued for sending */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailSendResultEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    receiveMailWebhook: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Mail-Signature": string;
+            };
+            path: {
+                provider: "MICROSOFT_GRAPH" | "GMAIL_API" | "SMTP_IMAP";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MailWebhookRequest"];
+            };
+        };
+        responses: {
+            /** @description Webhook accepted for fetch */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5919,6 +6343,37 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    resolveEmailMatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveEmailMatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Match decision appended */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
         };
     };
     createEmailDraft: {
@@ -5930,31 +6385,37 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["CreateEmailDraftRequest"];
             };
         };
         responses: {
-            /** @description createEmailDraft */
+            /** @description Immutable draft message */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
+                    "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
                 };
             };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
         };
     };
     listConversationMessages: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description listConversationMessages */
+            /** @description Immutable conversation messages */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -5963,6 +6424,38 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericListEnvelope"];
                 };
             };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    sendConversationMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Email queued for sending */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEmailSendResultEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
         };
     };
     cancelEmailMessage: {
@@ -5974,7 +6467,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["EmailActionRequest"];
             };
         };
         responses: {
@@ -5998,7 +6491,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["EmailActionRequest"];
             };
         };
         responses: {
@@ -6017,12 +6510,14 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["ResolveEmailMatchRequest"];
             };
         };
         responses: {
@@ -6035,6 +6530,10 @@ export interface operations {
                     "application/json": components["schemas"]["ApiEmailMessageEnvelope"];
                 };
             };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
         };
     };
     createReportExportJob: {

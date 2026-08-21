@@ -1416,6 +1416,18 @@ paths:
           required: false
           schema:
             type: string
+        - in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
         '200':
           description: Shared mailbox conversations
@@ -1427,6 +1439,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
   /mailbox/conversations/{id}:
     get:
       operationId: getMailboxConversation
@@ -1447,6 +1461,38 @@ paths:
           $ref: '#/components/responses/Forbidden'
         default:
           $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+  /mailbox/conversations/{id}/attachments/{attachmentId}/download:
+    post:
+      operationId: createMailboxAttachmentDownload
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: attachmentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Short-lived authorized attachment download
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiAttachmentDownloadEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
   /mailbox/conversations/{id}/send:
     post:
       operationId: sendMailboxEmail
@@ -2013,6 +2059,101 @@ paths:
       security:
         - sessionCookie: []
           csrfHeader: []
+  /mailboxes/{id}/health:
+    get:
+      operationId: getMailboxHealth
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Masked mailbox/provider health
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiMailboxHealthEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /mailboxes/{id}/pause:
+    post:
+      operationId: pauseMailbox
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mailbox paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /mailboxes/{id}/resume:
+    post:
+      operationId: resumeMailbox
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mailbox resumed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /mailboxes/{id}/sync:
+    post:
+      operationId: requestMailboxSync
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Mailbox sync queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
   /admin/audit:
     get:
       operationId: listAdminAuditEvents
@@ -2170,29 +2311,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
-  /webhooks/mail/{provider}:
-    post:
-      operationId: receiveMailWebhook
-      security: []
-      parameters:
-        - in: path
-          name: provider
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericCommand'
-      responses:
-        '202':
-          description: Webhook accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiWebhookAcceptedEnvelope'
   /industry-sectors:
     get:
       operationId: listIndustrySectors
@@ -2342,9 +2460,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericCommand'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericCommand'
       responses:
         '200':
           description: transitionJobOrder
@@ -2401,9 +2519,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericCommand'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericCommand'
       responses:
         '200':
           description: createCandidateImport
@@ -2723,14 +2841,140 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/CreateEmailPreviewRequest'
       responses:
         '200':
-          description: createEmailPreview
+          description: Signed email preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailPreviewEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /emails/previews:
+    post:
+      operationId: createCanonicalEmailPreview
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmailPreviewRequest'
+      responses:
+        '200':
+          description: Signed email preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailPreviewEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /emails:
+    post:
+      operationId: enqueueCanonicalEmail
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnqueueEmailRequest'
+      responses:
+        '202':
+          description: Email queued for sending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailSendResultEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /webhooks/mail/{provider}:
+    post:
+      operationId: receiveMailWebhook
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum:
+              - MICROSOFT_GRAPH
+              - GMAIL_API
+              - SMTP_IMAP
+        - in: header
+          name: X-Mail-Signature
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailWebhookRequest'
+      responses:
+        '202':
+          description: Webhook accepted for fetch
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /emails/{id}/match-resolution:
+    post:
+      operationId: resolveEmailMatch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveEmailMatchRequest'
+      responses:
+        '200':
+          description: Match decision appended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailMessageEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /email-drafts:
     post:
       operationId: createEmailDraft
@@ -2742,24 +2986,76 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/CreateEmailDraftRequest'
       responses:
         '200':
-          description: createEmailDraft
+          description: Immutable draft message
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+                $ref: '#/components/schemas/ApiEmailMessageEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /conversations/{id}/messages:
     get:
       operationId: listConversationMessages
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: listConversationMessages
+          description: Immutable conversation messages
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiGenericListEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+    post:
+      operationId: sendConversationMessage
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+      responses:
+        '202':
+          description: Email queued for sending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailSendResultEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
   /email-messages/{id}/cancellations:
     post:
       operationId: cancelEmailMessage
@@ -2771,7 +3067,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/EmailActionRequest'
       responses:
         '200':
           description: cancelEmailMessage
@@ -2790,7 +3086,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/EmailActionRequest'
       responses:
         '200':
           description: retryEmailMessage
@@ -2801,6 +3097,12 @@ paths:
   /inbox/messages/{id}/match-decisions:
     post:
       operationId: resolveInboxMessageMatch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
       security:
         - sessionCookie: []
           csrfHeader: []
@@ -2809,7 +3111,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/ResolveEmailMatchRequest'
       responses:
         '200':
           description: resolveInboxMessageMatch
@@ -2817,6 +3119,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiEmailMessageEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /report-exports:
     post:
       operationId: createReportExportJob
@@ -2868,6 +3178,12 @@ components:
             $ref: '#/components/schemas/ApiProblem'
     Forbidden:
       description: Permission required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiProblem'
+    ServiceUnavailable:
+      description: External provider or queue is unavailable
       content:
         application/json:
           schema:
@@ -4778,10 +5094,13 @@ components:
         scanStatus:
           type: string
           enum:
-            - PENDING
+            - DISCOVERED
+            - DOWNLOADING
+            - SCANNING
             - SAFE
             - QUARANTINED
             - REJECTED
+            - FAILED
         downloadUrl:
           type: string
           format: uri
@@ -4931,6 +5250,205 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Conversation'
+    EmailRecipientInput:
+      type: object
+      required:
+        - kind
+        - address
+      properties:
+        kind:
+          type: string
+          enum:
+            - TO
+            - CC
+            - BCC
+        address:
+          type: string
+          format: email
+    CreateEmailPreviewRequest:
+      type: object
+      required:
+        - mailboxId
+        - from
+        - recipients
+        - subject
+        - bodyText
+      properties:
+        mailboxId:
+          type: string
+        from:
+          type: string
+          format: email
+        recipients:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/EmailRecipientInput'
+        subject:
+          type: string
+          minLength: 1
+        bodyText:
+          type: string
+          minLength: 1
+        sanitizedHtml:
+          type: string
+          nullable: true
+        templateId:
+          type: string
+          nullable: true
+        templateChecksum:
+          type: string
+          nullable: true
+        candidateId:
+          type: string
+          nullable: true
+        conversationId:
+          type: string
+          nullable: true
+        applicationId:
+          type: string
+          nullable: true
+        journeyId:
+          type: string
+          nullable: true
+    EnqueueEmailRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateEmailPreviewRequest'
+        - type: object
+          required:
+            - previewToken
+            - idempotencyKey
+          properties:
+            previewToken:
+              type: string
+              minLength: 1
+            idempotencyKey:
+              type: string
+              minLength: 8
+              maxLength: 240
+    CreateEmailDraftRequest:
+      type: object
+      required:
+        - mailboxId
+        - to
+        - subject
+        - body
+      additionalProperties: false
+      properties:
+        mailboxId:
+          type: string
+        conversationId:
+          type: string
+          nullable: true
+        to:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: email
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+        subject:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+        candidateId:
+          type: string
+          nullable: true
+        applicationId:
+          type: string
+          nullable: true
+        journeyId:
+          type: string
+          nullable: true
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 240
+        version:
+          type: integer
+          minimum: 1
+    MailWebhookRequest:
+      type: object
+      required:
+        - mailboxId
+        - notificationId
+        - providerMessageId
+      properties:
+        mailboxId:
+          type: string
+        notificationId:
+          type: string
+        providerMessageId:
+          type: string
+    ResolveEmailMatchRequest:
+      type: object
+      required:
+        - candidateId
+        - reason
+      properties:
+        candidateId:
+          type: string
+        applicationId:
+          type: string
+          nullable: true
+        journeyId:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    EmailPreview:
+      type: object
+      required:
+        - previewId
+        - token
+        - expiresAt
+        - requestHash
+        - mailboxId
+        - from
+        - recipients
+        - subject
+        - bodyText
+      properties:
+        previewId:
+          type: string
+        token:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        requestHash:
+          type: string
+        mailboxId:
+          type: string
+        from:
+          type: string
+          format: email
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailRecipientInput'
+        subject:
+          type: string
+        bodyText:
+          type: string
+        sanitizedHtml:
+          type: string
+          nullable: true
+        templateChecksum:
+          type: string
+          nullable: true
+        sensitivityWarning:
+          type: string
+          enum:
+            - MANUAL_CONFIRM_REQUIRED
     SendEmailRequest:
       type: object
       required:
@@ -5618,8 +6136,8 @@ components:
         adapter:
           type: string
           enum:
-            - MICROSOFT_365
-            - GOOGLE_WORKSPACE
+            - MICROSOFT_GRAPH
+            - GMAIL_API
             - SMTP_IMAP
         maxAttachmentBytes:
           type: integer
@@ -5661,8 +6179,8 @@ components:
         adapter:
           type: string
           enum:
-            - MICROSOFT_365
-            - GOOGLE_WORKSPACE
+            - MICROSOFT_GRAPH
+            - GMAIL_API
             - SMTP_IMAP
         maxAttachmentBytes:
           type: integer
@@ -5681,6 +6199,36 @@ components:
         alertAddress:
           type: string
           format: email
+    MailboxHealth:
+      type: object
+      required:
+        - id
+        - address
+        - provider
+        - status
+        - providerHealth
+      properties:
+        id:
+          type: string
+        address:
+          type: string
+        provider:
+          type: string
+        status:
+          type: string
+        providerHealth:
+          type: object
+          required:
+            - status
+            - checkedAt
+          properties:
+            status:
+              type: string
+            checkedAt:
+              type: string
+              format: date-time
+            detail:
+              type: string
     AdminAuditEvent:
       type: object
       required:
@@ -6182,6 +6730,41 @@ components:
         requestId:
           type: string
           minLength: 1
+    ApiEmailPreviewEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/EmailPreview'
+        requestId:
+          type: string
+          minLength: 1
+    ApiAttachmentDownloadEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          type: object
+          required:
+            - attachmentId
+            - url
+            - expiresAt
+          properties:
+            attachmentId:
+              type: string
+            url:
+              type: string
+              format: uri
+            expiresAt:
+              type: string
+              format: date-time
+        requestId:
+          type: string
+          minLength: 1
     ApiConversationEnvelope:
       type: object
       required:
@@ -6337,6 +6920,17 @@ components:
         requestId:
           type: string
           minLength: 1
+    ApiMailboxHealthEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/MailboxHealth'
+        requestId:
+          type: string
+          minLength: 1
     ApiAdminAuditResponseEnvelope:
       type: object
       required:
@@ -6354,6 +6948,13 @@ components:
     GenericCommand:
       type: object
       additionalProperties: true
+    EmailActionRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        reason:
+          type: string
+          maxLength: 1000
     ApiOidcRedirectEnvelope:
       type: object
       required:

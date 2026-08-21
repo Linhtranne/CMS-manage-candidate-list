@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 export type NodeEnvironment = 'development' | 'test' | 'staging' | 'production';
-export type MailProvider = 'DISABLED' | 'MICROSOFT_365' | 'GOOGLE_WORKSPACE' | 'SMTP_IMAP';
+export type MailProvider = 'DISABLED' | 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
 
 export interface ConfigIssue {
   field: string;
@@ -64,6 +64,8 @@ export interface RuntimeConfig {
   mail: {
     provider: MailProvider;
     enabled: boolean;
+    approvalFile: string | null;
+    approved: boolean;
   };
 }
 
@@ -223,6 +225,41 @@ function readOidcApprovalRecord(
   return valid;
 }
 
+function readMailApprovalRecord(path: string | undefined, nodeEnv: NodeEnvironment, provider: MailProvider, issues: ConfigIssue[]): boolean {
+  if (!path) {
+    issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'is required when MAIL_PROVIDER is enabled');
+    return false;
+  }
+  let record: unknown;
+  try {
+    record = JSON.parse(readFileSync(path, 'utf8')) as unknown;
+  } catch {
+    issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'must be a readable JSON approval record');
+    return false;
+  }
+  if (!isRecord(record)) {
+    issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'must contain an approval object');
+    return false;
+  }
+  let valid = true;
+  if (record.id !== 'DEC-003') { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'id must be DEC-003'); valid = false; }
+  if (record.status !== 'approved') { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'status must be approved'); valid = false; }
+  if (typeof record.version !== 'string' || !record.version.trim()) { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'version is required'); valid = false; }
+  if (typeof record.artifact_checksum !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(record.artifact_checksum)) { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', 'artifact_checksum must use sha256:<64-hex-digest>'); valid = false; }
+  if (!approvalScopeAllows(record.scope, nodeEnv)) { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', `scope must include ${nodeEnv}`); valid = false; }
+  const approvedProvider = typeof record.provider === 'string' ? record.provider : typeof record.selected_provider === 'string' ? record.selected_provider : undefined;
+  if (!approvedProvider || approvedProvider !== provider) { issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', `provider must match ${provider}`); valid = false; }
+  const approvals = Array.isArray(record.approvals) ? record.approvals.filter(isRecord) : [];
+  for (const role of ['Security Owner', 'Business Owner']) {
+    const approval = approvals.find((candidate) => candidate.role === role);
+    if (!approval || typeof approval.identity !== 'string' || !approval.identity.trim() || approval.identity.includes('<') || typeof approval.at !== 'string' || Number.isNaN(Date.parse(approval.at))) {
+      issue(issues, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE', `${role} approval identity and timestamp are required`);
+      valid = false;
+    }
+  }
+  return valid;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig {
   const issues: ConfigIssue[] = [];
   const nodeEnv = parseEnvironment(value(env, 'NODE_ENV'), issues);
@@ -265,9 +302,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
   const encryptionKey = requiredSecret(env, 'ENCRYPTION_KEY', strictSecrets, issues, DEFAULTS.encryptionKey);
   const sessionSecret = requiredSecret(env, 'SESSION_SECRET', strictSecrets, issues, DEFAULTS.sessionSecret);
   const rawMailProvider = value(env, 'MAIL_PROVIDER') ?? 'DISABLED';
-  const mailProviders: readonly MailProvider[] = ['DISABLED', 'MICROSOFT_365', 'GOOGLE_WORKSPACE', 'SMTP_IMAP'];
+  const mailProviders: readonly MailProvider[] = ['DISABLED', 'MICROSOFT_GRAPH', 'GMAIL_API', 'SMTP_IMAP'];
   if (!mailProviders.includes(rawMailProvider as MailProvider)) issue(issues, 'MAIL_PROVIDER', 'is not supported');
   const mailProvider = mailProviders.includes(rawMailProvider as MailProvider) ? rawMailProvider as MailProvider : 'DISABLED';
+  const mailApprovalFile = value(env, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE');
+  const mailApproved = mailProvider === 'DISABLED' || readMailApprovalRecord(mailApprovalFile, nodeEnv, mailProvider, issues);
   const secureCookies = value(env, 'COOKIE_SECURE') ? value(env, 'COOKIE_SECURE') === 'true' : strictSecrets;
   if (strictSecrets && !secureCookies) issue(issues, 'COOKIE_SECURE', 'must be true in staging/production');
   const corsFallback = isUrl(appOrigin, ['http', 'https']) ? appOrigin : DEFAULTS.appOrigin;
@@ -275,7 +314,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
   const queueEnabled = parseBoolean(value(env, 'QUEUE_ENABLED'), 'QUEUE_ENABLED', false, issues);
   if (strictSecrets && queueEnabled) issue(issues, 'QUEUE_ENABLED', 'cannot be enabled until a production consumer handler is registered');
   const telemetryEnabled = parseBoolean(value(env, 'OTEL_ENABLED'), 'OTEL_ENABLED', strictSecrets, issues);
-  const queueNames = (value(env, 'QUEUE_NAMES') ?? 'outbox').split(',').map((name) => name.trim()).filter(Boolean);
+  const queueNames = (value(env, 'QUEUE_NAMES') ?? 'outbox,reconcile,mail-ingest,mail-sync,file-scan').split(',').map((name) => name.trim()).filter(Boolean);
   if (!queueNames.length) issue(issues, 'QUEUE_NAMES', 'must contain at least one queue name');
   const queuePrefix = value(env, 'QUEUE_PREFIX') ?? 'cms';
   const queueConcurrency = parseBoundedInteger(value(env, 'QUEUE_CONCURRENCY'), 'QUEUE_CONCURRENCY', 5, 1, 100, issues);
@@ -327,6 +366,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
       approvalRecordFile: value(env, 'CATALOG_APPROVAL_RECORD_FILE') ?? null,
     },
     security: { encryptionKey, sessionSecret, secureCookies },
-    mail: { provider: mailProvider, enabled: mailProvider !== 'DISABLED' },
+    mail: { provider: mailProvider, enabled: mailProvider !== 'DISABLED' && mailApproved, approvalFile: mailApprovalFile ?? null, approved: mailApproved },
   };
 }

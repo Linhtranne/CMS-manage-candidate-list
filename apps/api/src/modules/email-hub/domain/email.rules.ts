@@ -14,6 +14,29 @@ const TRANSITIONS: Record<EmailMessageStatus, readonly EmailMessageStatus[]> = {
   CANCELLED: [],
 };
 
+const SAFE_HTML_TAGS = new Set(['p', 'br', 'div', 'span', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code']);
+const BLOCKED_HTML_TAGS = /<(?:script|style|iframe|object|embed|form|input|button|textarea|select|option|template|svg|math)(?:\s|>)[\s\S]*?<\/(?:script|style|iframe|object|embed|form|input|button|textarea|select|option|template|svg|math)\s*>/gi;
+
+/**
+ * Conservative email HTML policy: preserve formatting-only tags, discard every
+ * attribute (therefore handlers, URLs and remote content), and remove active
+ * content blocks before the message becomes a persisted/renderable snapshot.
+ */
+export function sanitizeEmailHtml(value: string, maxLength = 1_000_000): string {
+  const source = value.slice(0, maxLength).replace(/<!--[\s\S]*?-->/g, '').replace(BLOCKED_HTML_TAGS, '');
+  return source
+    .replace(/<\s*([a-z][a-z0-9-]*)\b[^>]*>/gi, (full, rawTag: string) => {
+      const tag = rawTag.toLowerCase();
+      return SAFE_HTML_TAGS.has(tag) ? `<${tag}>` : '';
+    })
+    .replace(/<\s*\/\s*([a-z][a-z0-9-]*)\s*>/gi, (full, rawTag: string) => {
+      const tag = rawTag.toLowerCase();
+      return SAFE_HTML_TAGS.has(tag) ? `</${tag}>` : '';
+    })
+    .replace(/(?:javascript|vbscript|data)\s*:/gi, '')
+    .trim();
+}
+
 export function assertEmailMessageTransition(from: EmailMessageStatus, to: EmailMessageStatus): void {
   if (!TRANSITIONS[from]?.includes(to)) {
     throw new EmailDomainError('INVALID_EMAIL_STATUS_TRANSITION', 'errors.invalidEmailStatusTransition');

@@ -41,7 +41,9 @@ export type EmailMessageMinAggregateOutputType = {
   direction: string | null
   status: string | null
   providerMessageId: string | null
+  providerThreadId: string | null
   internetMessageId: string | null
+  inReplyTo: string | null
   idempotencyKey: string | null
   fromAddress: string | null
   subject: string | null
@@ -61,7 +63,9 @@ export type EmailMessageMaxAggregateOutputType = {
   direction: string | null
   status: string | null
   providerMessageId: string | null
+  providerThreadId: string | null
   internetMessageId: string | null
+  inReplyTo: string | null
   idempotencyKey: string | null
   fromAddress: string | null
   subject: string | null
@@ -81,7 +85,10 @@ export type EmailMessageCountAggregateOutputType = {
   direction: number
   status: number
   providerMessageId: number
+  providerThreadId: number
   internetMessageId: number
+  inReplyTo: number
+  referencesJson: number
   idempotencyKey: number
   fromAddress: number
   subject: number
@@ -111,7 +118,9 @@ export type EmailMessageMinAggregateInputType = {
   direction?: true
   status?: true
   providerMessageId?: true
+  providerThreadId?: true
   internetMessageId?: true
+  inReplyTo?: true
   idempotencyKey?: true
   fromAddress?: true
   subject?: true
@@ -131,7 +140,9 @@ export type EmailMessageMaxAggregateInputType = {
   direction?: true
   status?: true
   providerMessageId?: true
+  providerThreadId?: true
   internetMessageId?: true
+  inReplyTo?: true
   idempotencyKey?: true
   fromAddress?: true
   subject?: true
@@ -151,7 +162,10 @@ export type EmailMessageCountAggregateInputType = {
   direction?: true
   status?: true
   providerMessageId?: true
+  providerThreadId?: true
   internetMessageId?: true
+  inReplyTo?: true
+  referencesJson?: true
   idempotencyKey?: true
   fromAddress?: true
   subject?: true
@@ -258,7 +272,10 @@ export type EmailMessageGroupByOutputType = {
   direction: string
   status: string
   providerMessageId: string | null
+  providerThreadId: string | null
   internetMessageId: string | null
+  inReplyTo: string | null
+  referencesJson: runtime.JsonValue | null
   idempotencyKey: string | null
   fromAddress: string
   subject: string
@@ -301,7 +318,10 @@ export type EmailMessageWhereInput = {
   direction?: Prisma.StringFilter<"EmailMessage"> | string
   status?: Prisma.StringFilter<"EmailMessage"> | string
   providerMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  providerThreadId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   internetMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  inReplyTo?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  referencesJson?: Prisma.JsonNullableFilter<"EmailMessage">
   idempotencyKey?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   fromAddress?: Prisma.StringFilter<"EmailMessage"> | string
   subject?: Prisma.StringFilter<"EmailMessage"> | string
@@ -326,7 +346,10 @@ export type EmailMessageOrderByWithRelationInput = {
   direction?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerThreadId?: Prisma.SortOrderInput | Prisma.SortOrder
   internetMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  inReplyTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  referencesJson?: Prisma.SortOrderInput | Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   fromAddress?: Prisma.SortOrder
   subject?: Prisma.SortOrder
@@ -356,7 +379,10 @@ export type EmailMessageWhereUniqueInput = Prisma.AtLeast<{
   direction?: Prisma.StringFilter<"EmailMessage"> | string
   status?: Prisma.StringFilter<"EmailMessage"> | string
   providerMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  providerThreadId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   internetMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  inReplyTo?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  referencesJson?: Prisma.JsonNullableFilter<"EmailMessage">
   idempotencyKey?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   fromAddress?: Prisma.StringFilter<"EmailMessage"> | string
   subject?: Prisma.StringFilter<"EmailMessage"> | string
@@ -381,7 +407,10 @@ export type EmailMessageOrderByWithAggregationInput = {
   direction?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerThreadId?: Prisma.SortOrderInput | Prisma.SortOrder
   internetMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  inReplyTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  referencesJson?: Prisma.SortOrderInput | Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   fromAddress?: Prisma.SortOrder
   subject?: Prisma.SortOrder
@@ -409,7 +438,10 @@ export type EmailMessageScalarWhereWithAggregatesInput = {
   direction?: Prisma.StringWithAggregatesFilter<"EmailMessage"> | string
   status?: Prisma.StringWithAggregatesFilter<"EmailMessage"> | string
   providerMessageId?: Prisma.StringNullableWithAggregatesFilter<"EmailMessage"> | string | null
+  providerThreadId?: Prisma.StringNullableWithAggregatesFilter<"EmailMessage"> | string | null
   internetMessageId?: Prisma.StringNullableWithAggregatesFilter<"EmailMessage"> | string | null
+  inReplyTo?: Prisma.StringNullableWithAggregatesFilter<"EmailMessage"> | string | null
+  referencesJson?: Prisma.JsonNullableWithAggregatesFilter<"EmailMessage">
   idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"EmailMessage"> | string | null
   fromAddress?: Prisma.StringWithAggregatesFilter<"EmailMessage"> | string
   subject?: Prisma.StringWithAggregatesFilter<"EmailMessage"> | string
@@ -427,7 +459,10 @@ export type EmailMessageCreateInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -452,7 +487,10 @@ export type EmailMessageUncheckedCreateInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -473,7 +511,10 @@ export type EmailMessageUpdateInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -498,7 +539,10 @@ export type EmailMessageUncheckedUpdateInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -521,7 +565,10 @@ export type EmailMessageCreateManyInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -539,7 +586,10 @@ export type EmailMessageUpdateManyMutationInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -559,7 +609,10 @@ export type EmailMessageUncheckedUpdateManyInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -599,7 +652,10 @@ export type EmailMessageCountOrderByAggregateInput = {
   direction?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerMessageId?: Prisma.SortOrder
+  providerThreadId?: Prisma.SortOrder
   internetMessageId?: Prisma.SortOrder
+  inReplyTo?: Prisma.SortOrder
+  referencesJson?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   fromAddress?: Prisma.SortOrder
   subject?: Prisma.SortOrder
@@ -623,7 +679,9 @@ export type EmailMessageMaxOrderByAggregateInput = {
   direction?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerMessageId?: Prisma.SortOrder
+  providerThreadId?: Prisma.SortOrder
   internetMessageId?: Prisma.SortOrder
+  inReplyTo?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   fromAddress?: Prisma.SortOrder
   subject?: Prisma.SortOrder
@@ -643,7 +701,9 @@ export type EmailMessageMinOrderByAggregateInput = {
   direction?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerMessageId?: Prisma.SortOrder
+  providerThreadId?: Prisma.SortOrder
   internetMessageId?: Prisma.SortOrder
+  inReplyTo?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   fromAddress?: Prisma.SortOrder
   subject?: Prisma.SortOrder
@@ -796,7 +856,10 @@ export type EmailMessageCreateWithoutMailboxInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -819,7 +882,10 @@ export type EmailMessageUncheckedCreateWithoutMailboxInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -871,7 +937,10 @@ export type EmailMessageScalarWhereInput = {
   direction?: Prisma.StringFilter<"EmailMessage"> | string
   status?: Prisma.StringFilter<"EmailMessage"> | string
   providerMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  providerThreadId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   internetMessageId?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  inReplyTo?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
+  referencesJson?: Prisma.JsonNullableFilter<"EmailMessage">
   idempotencyKey?: Prisma.StringNullableFilter<"EmailMessage"> | string | null
   fromAddress?: Prisma.StringFilter<"EmailMessage"> | string
   subject?: Prisma.StringFilter<"EmailMessage"> | string
@@ -889,7 +958,10 @@ export type EmailMessageCreateWithoutConversationInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -912,7 +984,10 @@ export type EmailMessageUncheckedCreateWithoutConversationInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -959,7 +1034,10 @@ export type EmailMessageCreateWithoutRecipientsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -983,7 +1061,10 @@ export type EmailMessageUncheckedCreateWithoutRecipientsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1019,7 +1100,10 @@ export type EmailMessageUpdateWithoutRecipientsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1043,7 +1127,10 @@ export type EmailMessageUncheckedUpdateWithoutRecipientsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1063,7 +1150,10 @@ export type EmailMessageCreateWithoutAttachmentsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1087,7 +1177,10 @@ export type EmailMessageUncheckedCreateWithoutAttachmentsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1123,7 +1216,10 @@ export type EmailMessageUpdateWithoutAttachmentsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1147,7 +1243,10 @@ export type EmailMessageUncheckedUpdateWithoutAttachmentsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1167,7 +1266,10 @@ export type EmailMessageCreateWithoutMatchDecisionsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1191,7 +1293,10 @@ export type EmailMessageUncheckedCreateWithoutMatchDecisionsInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1227,7 +1332,10 @@ export type EmailMessageUpdateWithoutMatchDecisionsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1251,7 +1359,10 @@ export type EmailMessageUncheckedUpdateWithoutMatchDecisionsInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1272,7 +1383,10 @@ export type EmailMessageCreateManyMailboxInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1290,7 +1404,10 @@ export type EmailMessageUpdateWithoutMailboxInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1313,7 +1430,10 @@ export type EmailMessageUncheckedUpdateWithoutMailboxInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1335,7 +1455,10 @@ export type EmailMessageUncheckedUpdateManyWithoutMailboxInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1354,7 +1477,10 @@ export type EmailMessageCreateManyConversationInput = {
   direction: string
   status?: string
   providerMessageId?: string | null
+  providerThreadId?: string | null
   internetMessageId?: string | null
+  inReplyTo?: string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: string | null
   fromAddress: string
   subject: string
@@ -1372,7 +1498,10 @@ export type EmailMessageUpdateWithoutConversationInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1395,7 +1524,10 @@ export type EmailMessageUncheckedUpdateWithoutConversationInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1417,7 +1549,10 @@ export type EmailMessageUncheckedUpdateManyWithoutConversationInput = {
   direction?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerThreadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   internetMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inReplyTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referencesJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromAddress?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1486,7 +1621,10 @@ export type EmailMessageSelect<ExtArgs extends runtime.Types.Extensions.Internal
   direction?: boolean
   status?: boolean
   providerMessageId?: boolean
+  providerThreadId?: boolean
   internetMessageId?: boolean
+  inReplyTo?: boolean
+  referencesJson?: boolean
   idempotencyKey?: boolean
   fromAddress?: boolean
   subject?: boolean
@@ -1512,7 +1650,10 @@ export type EmailMessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   direction?: boolean
   status?: boolean
   providerMessageId?: boolean
+  providerThreadId?: boolean
   internetMessageId?: boolean
+  inReplyTo?: boolean
+  referencesJson?: boolean
   idempotencyKey?: boolean
   fromAddress?: boolean
   subject?: boolean
@@ -1534,7 +1675,10 @@ export type EmailMessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   direction?: boolean
   status?: boolean
   providerMessageId?: boolean
+  providerThreadId?: boolean
   internetMessageId?: boolean
+  inReplyTo?: boolean
+  referencesJson?: boolean
   idempotencyKey?: boolean
   fromAddress?: boolean
   subject?: boolean
@@ -1556,7 +1700,10 @@ export type EmailMessageSelectScalar = {
   direction?: boolean
   status?: boolean
   providerMessageId?: boolean
+  providerThreadId?: boolean
   internetMessageId?: boolean
+  inReplyTo?: boolean
+  referencesJson?: boolean
   idempotencyKey?: boolean
   fromAddress?: boolean
   subject?: boolean
@@ -1569,7 +1716,7 @@ export type EmailMessageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EmailMessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mailboxId" | "conversationId" | "direction" | "status" | "providerMessageId" | "internetMessageId" | "idempotencyKey" | "fromAddress" | "subject" | "bodyText" | "sanitizedHtml" | "sentOrReceivedAt" | "immutable" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["emailMessage"]>
+export type EmailMessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mailboxId" | "conversationId" | "direction" | "status" | "providerMessageId" | "providerThreadId" | "internetMessageId" | "inReplyTo" | "referencesJson" | "idempotencyKey" | "fromAddress" | "subject" | "bodyText" | "sanitizedHtml" | "sentOrReceivedAt" | "immutable" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["emailMessage"]>
 export type EmailMessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   mailbox?: boolean | Prisma.MailboxDefaultArgs<ExtArgs>
   conversation?: boolean | Prisma.EmailConversationDefaultArgs<ExtArgs>
@@ -1603,7 +1750,10 @@ export type $EmailMessagePayload<ExtArgs extends runtime.Types.Extensions.Intern
     direction: string
     status: string
     providerMessageId: string | null
+    providerThreadId: string | null
     internetMessageId: string | null
+    inReplyTo: string | null
+    referencesJson: runtime.JsonValue | null
     idempotencyKey: string | null
     fromAddress: string
     subject: string
@@ -2048,7 +2198,10 @@ export interface EmailMessageFieldRefs {
   readonly direction: Prisma.FieldRef<"EmailMessage", 'String'>
   readonly status: Prisma.FieldRef<"EmailMessage", 'String'>
   readonly providerMessageId: Prisma.FieldRef<"EmailMessage", 'String'>
+  readonly providerThreadId: Prisma.FieldRef<"EmailMessage", 'String'>
   readonly internetMessageId: Prisma.FieldRef<"EmailMessage", 'String'>
+  readonly inReplyTo: Prisma.FieldRef<"EmailMessage", 'String'>
+  readonly referencesJson: Prisma.FieldRef<"EmailMessage", 'Json'>
   readonly idempotencyKey: Prisma.FieldRef<"EmailMessage", 'String'>
   readonly fromAddress: Prisma.FieldRef<"EmailMessage", 'String'>
   readonly subject: Prisma.FieldRef<"EmailMessage", 'String'>

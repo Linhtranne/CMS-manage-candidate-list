@@ -33,6 +33,11 @@ Phase 1A và phần adapter-fake của 1B có thể phát triển song song sau 
 - Phase 1A Task 6 technical implementation and regression evidence: **complete**; see [Task 6 evidence](../phase-1a-task-6-evidence.md).
 - Phase 1A technical checkpoint: **ready for human approval**; see [checkpoint evidence](../phase-1a-checkpoint-evidence.md). External production promotion is not claimed until named deployment, secrets, approvals and UAT evidence exist.
 - Phase 1B Task 1 technical implementation: **complete**; email schema/domain foundation, immutable message trigger, disabled/fake adapters and PostgreSQL migration evidence are in [Task 1 evidence](../phase-1b-task-1-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
+- Phase 1B Task 2 technical implementation: **complete**; signed preview, idempotent enqueue/outbox, CAS outbound worker and reconciliation evidence are in [Task 2 evidence](../phase-1b-task-2-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
+- Phase 1B Task 3 technical implementation: **complete**; verified webhook replay protection, ID-only fetch queue, transactional inbound ingest/cursor, deterministic matcher and manual match resolution evidence are in [Task 3 evidence](../phase-1b-task-3-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
+- Phase 1B Task 4 technical implementation: **complete**; streaming attachment quarantine, checksum/MIME/scan state machine, ID-only document handoff and authorized signed-download evidence are in [Task 4 evidence](../phase-1b-task-4-evidence.md). Real object storage/scanner remain disabled until their production approvals exist.
+- Phase 1B Task 5 technical preparation: **blocked by DEC-003**; approval-gated provider wrapper, mailbox operations, runbooks and smoke gate are in [Task 5 evidence](../phase-1b-task-5-evidence.md). No concrete provider or real staging mail is claimed.
+- Phase 1B checkpoint: **blocked by DEC-003/DEC-005 and unavailable Docker runtime**; see [checkpoint evidence](../phase-1b-checkpoint-evidence.md). Local technical regressions are green, but no real provider, DB/Redis/object-storage smoke or production promotion is claimed.
 
 ## Global execution rules
 

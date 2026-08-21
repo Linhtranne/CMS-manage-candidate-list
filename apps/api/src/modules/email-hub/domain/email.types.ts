@@ -46,6 +46,12 @@ export interface ProviderSendResult {
   acceptedAt: Date;
 }
 
+export interface ProviderSendLookup {
+  providerMessageId: string;
+  internetMessageId?: string;
+  acceptedAt: Date;
+}
+
 export interface ProviderHealth {
   status: 'not_configured' | 'healthy' | 'degraded' | 'paused_auth' | 'paused_operator' | 'failed';
   provider: MailboxProvider;
@@ -63,6 +69,13 @@ export interface ProviderChange {
   receivedAt: Date;
 }
 
+export interface ProviderAttachment {
+  providerAttachmentId: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+}
+
 export interface ProviderChangePage {
   changes: readonly ProviderChange[];
   nextCursor: MailCursor | null;
@@ -74,7 +87,14 @@ export interface ProviderMessage {
   to: readonly string[];
   subject: string;
   bodyText: string;
+  bodyHtml?: string;
   receivedAt: Date;
+  attachments?: readonly ProviderAttachment[];
+  providerThreadId?: string;
+  internetMessageId?: string;
+  inReplyTo?: string;
+  references?: readonly string[];
+  headers?: Readonly<Record<string, string>>;
 }
 
 export class EmailDomainError extends Error {

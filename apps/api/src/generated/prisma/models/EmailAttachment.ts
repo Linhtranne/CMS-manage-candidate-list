@@ -37,12 +37,17 @@ export type EmailAttachmentSumAggregateOutputType = {
 export type EmailAttachmentMinAggregateOutputType = {
   id: string | null
   messageId: string | null
+  providerAttachmentId: string | null
   fileName: string | null
   contentType: string | null
+  detectedContentType: string | null
   sizeBytes: bigint | null
   checksum: string | null
   objectKey: string | null
   status: string | null
+  scanReason: string | null
+  quarantinedAt: Date | null
+  scannedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,12 +55,17 @@ export type EmailAttachmentMinAggregateOutputType = {
 export type EmailAttachmentMaxAggregateOutputType = {
   id: string | null
   messageId: string | null
+  providerAttachmentId: string | null
   fileName: string | null
   contentType: string | null
+  detectedContentType: string | null
   sizeBytes: bigint | null
   checksum: string | null
   objectKey: string | null
   status: string | null
+  scanReason: string | null
+  quarantinedAt: Date | null
+  scannedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,12 +73,17 @@ export type EmailAttachmentMaxAggregateOutputType = {
 export type EmailAttachmentCountAggregateOutputType = {
   id: number
   messageId: number
+  providerAttachmentId: number
   fileName: number
   contentType: number
+  detectedContentType: number
   sizeBytes: number
   checksum: number
   objectKey: number
   status: number
+  scanReason: number
+  quarantinedAt: number
+  scannedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -86,12 +101,17 @@ export type EmailAttachmentSumAggregateInputType = {
 export type EmailAttachmentMinAggregateInputType = {
   id?: true
   messageId?: true
+  providerAttachmentId?: true
   fileName?: true
   contentType?: true
+  detectedContentType?: true
   sizeBytes?: true
   checksum?: true
   objectKey?: true
   status?: true
+  scanReason?: true
+  quarantinedAt?: true
+  scannedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -99,12 +119,17 @@ export type EmailAttachmentMinAggregateInputType = {
 export type EmailAttachmentMaxAggregateInputType = {
   id?: true
   messageId?: true
+  providerAttachmentId?: true
   fileName?: true
   contentType?: true
+  detectedContentType?: true
   sizeBytes?: true
   checksum?: true
   objectKey?: true
   status?: true
+  scanReason?: true
+  quarantinedAt?: true
+  scannedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,12 +137,17 @@ export type EmailAttachmentMaxAggregateInputType = {
 export type EmailAttachmentCountAggregateInputType = {
   id?: true
   messageId?: true
+  providerAttachmentId?: true
   fileName?: true
   contentType?: true
+  detectedContentType?: true
   sizeBytes?: true
   checksum?: true
   objectKey?: true
   status?: true
+  scanReason?: true
+  quarantinedAt?: true
+  scannedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -212,12 +242,17 @@ export type EmailAttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type EmailAttachmentGroupByOutputType = {
   id: string
   messageId: string
+  providerAttachmentId: string | null
   fileName: string
   contentType: string
+  detectedContentType: string | null
   sizeBytes: bigint
   checksum: string | null
   objectKey: string
   status: string
+  scanReason: string | null
+  quarantinedAt: Date | null
+  scannedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: EmailAttachmentCountAggregateOutputType | null
@@ -248,12 +283,17 @@ export type EmailAttachmentWhereInput = {
   NOT?: Prisma.EmailAttachmentWhereInput | Prisma.EmailAttachmentWhereInput[]
   id?: Prisma.UuidFilter<"EmailAttachment"> | string
   messageId?: Prisma.UuidFilter<"EmailAttachment"> | string
+  providerAttachmentId?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   fileName?: Prisma.StringFilter<"EmailAttachment"> | string
   contentType?: Prisma.StringFilter<"EmailAttachment"> | string
+  detectedContentType?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   sizeBytes?: Prisma.BigIntFilter<"EmailAttachment"> | bigint | number
   checksum?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   objectKey?: Prisma.StringFilter<"EmailAttachment"> | string
   status?: Prisma.StringFilter<"EmailAttachment"> | string
+  scanReason?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
+  quarantinedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
+  scannedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
   message?: Prisma.XOR<Prisma.EmailMessageScalarRelationFilter, Prisma.EmailMessageWhereInput>
@@ -262,12 +302,17 @@ export type EmailAttachmentWhereInput = {
 export type EmailAttachmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  providerAttachmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   fileName?: Prisma.SortOrder
   contentType?: Prisma.SortOrder
+  detectedContentType?: Prisma.SortOrderInput | Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   objectKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  scanReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  quarantinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  scannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   message?: Prisma.EmailMessageOrderByWithRelationInput
@@ -279,12 +324,17 @@ export type EmailAttachmentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EmailAttachmentWhereInput[]
   NOT?: Prisma.EmailAttachmentWhereInput | Prisma.EmailAttachmentWhereInput[]
   messageId?: Prisma.UuidFilter<"EmailAttachment"> | string
+  providerAttachmentId?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   fileName?: Prisma.StringFilter<"EmailAttachment"> | string
   contentType?: Prisma.StringFilter<"EmailAttachment"> | string
+  detectedContentType?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   sizeBytes?: Prisma.BigIntFilter<"EmailAttachment"> | bigint | number
   checksum?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   objectKey?: Prisma.StringFilter<"EmailAttachment"> | string
   status?: Prisma.StringFilter<"EmailAttachment"> | string
+  scanReason?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
+  quarantinedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
+  scannedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
   message?: Prisma.XOR<Prisma.EmailMessageScalarRelationFilter, Prisma.EmailMessageWhereInput>
@@ -293,12 +343,17 @@ export type EmailAttachmentWhereUniqueInput = Prisma.AtLeast<{
 export type EmailAttachmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  providerAttachmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   fileName?: Prisma.SortOrder
   contentType?: Prisma.SortOrder
+  detectedContentType?: Prisma.SortOrderInput | Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   objectKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  scanReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  quarantinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  scannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.EmailAttachmentCountOrderByAggregateInput
@@ -314,24 +369,34 @@ export type EmailAttachmentScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EmailAttachmentScalarWhereWithAggregatesInput | Prisma.EmailAttachmentScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"EmailAttachment"> | string
   messageId?: Prisma.UuidWithAggregatesFilter<"EmailAttachment"> | string
+  providerAttachmentId?: Prisma.StringNullableWithAggregatesFilter<"EmailAttachment"> | string | null
   fileName?: Prisma.StringWithAggregatesFilter<"EmailAttachment"> | string
   contentType?: Prisma.StringWithAggregatesFilter<"EmailAttachment"> | string
+  detectedContentType?: Prisma.StringNullableWithAggregatesFilter<"EmailAttachment"> | string | null
   sizeBytes?: Prisma.BigIntWithAggregatesFilter<"EmailAttachment"> | bigint | number
   checksum?: Prisma.StringNullableWithAggregatesFilter<"EmailAttachment"> | string | null
   objectKey?: Prisma.StringWithAggregatesFilter<"EmailAttachment"> | string
   status?: Prisma.StringWithAggregatesFilter<"EmailAttachment"> | string
+  scanReason?: Prisma.StringNullableWithAggregatesFilter<"EmailAttachment"> | string | null
+  quarantinedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"EmailAttachment"> | Date | string | null
+  scannedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"EmailAttachment"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"EmailAttachment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"EmailAttachment"> | Date | string
 }
 
 export type EmailAttachmentCreateInput = {
   id?: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   message: Prisma.EmailMessageCreateNestedOneWithoutAttachmentsInput
@@ -340,24 +405,34 @@ export type EmailAttachmentCreateInput = {
 export type EmailAttachmentUncheckedCreateInput = {
   id?: string
   messageId: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type EmailAttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.EmailMessageUpdateOneRequiredWithoutAttachmentsNestedInput
@@ -366,12 +441,17 @@ export type EmailAttachmentUpdateInput = {
 export type EmailAttachmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -379,24 +459,34 @@ export type EmailAttachmentUncheckedUpdateInput = {
 export type EmailAttachmentCreateManyInput = {
   id?: string
   messageId: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type EmailAttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -404,12 +494,17 @@ export type EmailAttachmentUpdateManyMutationInput = {
 export type EmailAttachmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -427,12 +522,17 @@ export type EmailAttachmentOrderByRelationAggregateInput = {
 export type EmailAttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  providerAttachmentId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   contentType?: Prisma.SortOrder
+  detectedContentType?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   objectKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  scanReason?: Prisma.SortOrder
+  quarantinedAt?: Prisma.SortOrder
+  scannedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -444,12 +544,17 @@ export type EmailAttachmentAvgOrderByAggregateInput = {
 export type EmailAttachmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  providerAttachmentId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   contentType?: Prisma.SortOrder
+  detectedContentType?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   objectKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  scanReason?: Prisma.SortOrder
+  quarantinedAt?: Prisma.SortOrder
+  scannedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -457,12 +562,17 @@ export type EmailAttachmentMaxOrderByAggregateInput = {
 export type EmailAttachmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  providerAttachmentId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   contentType?: Prisma.SortOrder
+  detectedContentType?: Prisma.SortOrder
   sizeBytes?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   objectKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  scanReason?: Prisma.SortOrder
+  quarantinedAt?: Prisma.SortOrder
+  scannedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -523,24 +633,34 @@ export type BigIntFieldUpdateOperationsInput = {
 
 export type EmailAttachmentCreateWithoutMessageInput = {
   id?: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type EmailAttachmentUncheckedCreateWithoutMessageInput = {
   id?: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -577,60 +697,85 @@ export type EmailAttachmentScalarWhereInput = {
   NOT?: Prisma.EmailAttachmentScalarWhereInput | Prisma.EmailAttachmentScalarWhereInput[]
   id?: Prisma.UuidFilter<"EmailAttachment"> | string
   messageId?: Prisma.UuidFilter<"EmailAttachment"> | string
+  providerAttachmentId?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   fileName?: Prisma.StringFilter<"EmailAttachment"> | string
   contentType?: Prisma.StringFilter<"EmailAttachment"> | string
+  detectedContentType?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   sizeBytes?: Prisma.BigIntFilter<"EmailAttachment"> | bigint | number
   checksum?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
   objectKey?: Prisma.StringFilter<"EmailAttachment"> | string
   status?: Prisma.StringFilter<"EmailAttachment"> | string
+  scanReason?: Prisma.StringNullableFilter<"EmailAttachment"> | string | null
+  quarantinedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
+  scannedAt?: Prisma.DateTimeNullableFilter<"EmailAttachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EmailAttachment"> | Date | string
 }
 
 export type EmailAttachmentCreateManyMessageInput = {
   id?: string
+  providerAttachmentId?: string | null
   fileName: string
   contentType: string
+  detectedContentType?: string | null
   sizeBytes: bigint | number
   checksum?: string | null
   objectKey: string
   status?: string
+  scanReason?: string | null
+  quarantinedAt?: Date | string | null
+  scannedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type EmailAttachmentUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EmailAttachmentUncheckedUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EmailAttachmentUncheckedUpdateManyWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerAttachmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedContentType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sizeBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   objectKey?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  scanReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quarantinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  scannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -640,12 +785,17 @@ export type EmailAttachmentUncheckedUpdateManyWithoutMessageInput = {
 export type EmailAttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   messageId?: boolean
+  providerAttachmentId?: boolean
   fileName?: boolean
   contentType?: boolean
+  detectedContentType?: boolean
   sizeBytes?: boolean
   checksum?: boolean
   objectKey?: boolean
   status?: boolean
+  scanReason?: boolean
+  quarantinedAt?: boolean
+  scannedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.EmailMessageDefaultArgs<ExtArgs>
@@ -654,12 +804,17 @@ export type EmailAttachmentSelect<ExtArgs extends runtime.Types.Extensions.Inter
 export type EmailAttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   messageId?: boolean
+  providerAttachmentId?: boolean
   fileName?: boolean
   contentType?: boolean
+  detectedContentType?: boolean
   sizeBytes?: boolean
   checksum?: boolean
   objectKey?: boolean
   status?: boolean
+  scanReason?: boolean
+  quarantinedAt?: boolean
+  scannedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.EmailMessageDefaultArgs<ExtArgs>
@@ -668,12 +823,17 @@ export type EmailAttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
 export type EmailAttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   messageId?: boolean
+  providerAttachmentId?: boolean
   fileName?: boolean
   contentType?: boolean
+  detectedContentType?: boolean
   sizeBytes?: boolean
   checksum?: boolean
   objectKey?: boolean
   status?: boolean
+  scanReason?: boolean
+  quarantinedAt?: boolean
+  scannedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   message?: boolean | Prisma.EmailMessageDefaultArgs<ExtArgs>
@@ -682,17 +842,22 @@ export type EmailAttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
 export type EmailAttachmentSelectScalar = {
   id?: boolean
   messageId?: boolean
+  providerAttachmentId?: boolean
   fileName?: boolean
   contentType?: boolean
+  detectedContentType?: boolean
   sizeBytes?: boolean
   checksum?: boolean
   objectKey?: boolean
   status?: boolean
+  scanReason?: boolean
+  quarantinedAt?: boolean
+  scannedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type EmailAttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageId" | "fileName" | "contentType" | "sizeBytes" | "checksum" | "objectKey" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAttachment"]>
+export type EmailAttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageId" | "providerAttachmentId" | "fileName" | "contentType" | "detectedContentType" | "sizeBytes" | "checksum" | "objectKey" | "status" | "scanReason" | "quarantinedAt" | "scannedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAttachment"]>
 export type EmailAttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   message?: boolean | Prisma.EmailMessageDefaultArgs<ExtArgs>
 }
@@ -711,12 +876,17 @@ export type $EmailAttachmentPayload<ExtArgs extends runtime.Types.Extensions.Int
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     messageId: string
+    providerAttachmentId: string | null
     fileName: string
     contentType: string
+    detectedContentType: string | null
     sizeBytes: bigint
     checksum: string | null
     objectKey: string
     status: string
+    scanReason: string | null
+    quarantinedAt: Date | null
+    scannedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["emailAttachment"]>
@@ -1145,12 +1315,17 @@ export interface Prisma__EmailAttachmentClient<T, Null = never, ExtArgs extends 
 export interface EmailAttachmentFieldRefs {
   readonly id: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly messageId: Prisma.FieldRef<"EmailAttachment", 'String'>
+  readonly providerAttachmentId: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly fileName: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly contentType: Prisma.FieldRef<"EmailAttachment", 'String'>
+  readonly detectedContentType: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly sizeBytes: Prisma.FieldRef<"EmailAttachment", 'BigInt'>
   readonly checksum: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly objectKey: Prisma.FieldRef<"EmailAttachment", 'String'>
   readonly status: Prisma.FieldRef<"EmailAttachment", 'String'>
+  readonly scanReason: Prisma.FieldRef<"EmailAttachment", 'String'>
+  readonly quarantinedAt: Prisma.FieldRef<"EmailAttachment", 'DateTime'>
+  readonly scannedAt: Prisma.FieldRef<"EmailAttachment", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"EmailAttachment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"EmailAttachment", 'DateTime'>
 }

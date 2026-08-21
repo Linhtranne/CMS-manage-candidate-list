@@ -87,6 +87,7 @@ export const ModelName = {
   Mailbox: 'Mailbox',
   EmailConversation: 'EmailConversation',
   EmailMessage: 'EmailMessage',
+  EmailWebhookNotification: 'EmailWebhookNotification',
   EmailRecipient: 'EmailRecipient',
   EmailAttachment: 'EmailAttachment',
   EmailMatchDecision: 'EmailMatchDecision'
@@ -672,7 +673,10 @@ export const EmailMessageScalarFieldEnum = {
   direction: 'direction',
   status: 'status',
   providerMessageId: 'providerMessageId',
+  providerThreadId: 'providerThreadId',
   internetMessageId: 'internetMessageId',
+  inReplyTo: 'inReplyTo',
+  referencesJson: 'referencesJson',
   idempotencyKey: 'idempotencyKey',
   fromAddress: 'fromAddress',
   subject: 'subject',
@@ -686,6 +690,19 @@ export const EmailMessageScalarFieldEnum = {
 } as const
 
 export type EmailMessageScalarFieldEnum = (typeof EmailMessageScalarFieldEnum)[keyof typeof EmailMessageScalarFieldEnum]
+
+
+export const EmailWebhookNotificationScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  mailboxId: 'mailboxId',
+  notificationId: 'notificationId',
+  providerMessageId: 'providerMessageId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailWebhookNotificationScalarFieldEnum = (typeof EmailWebhookNotificationScalarFieldEnum)[keyof typeof EmailWebhookNotificationScalarFieldEnum]
 
 
 export const EmailRecipientScalarFieldEnum = {
@@ -703,12 +720,17 @@ export type EmailRecipientScalarFieldEnum = (typeof EmailRecipientScalarFieldEnu
 export const EmailAttachmentScalarFieldEnum = {
   id: 'id',
   messageId: 'messageId',
+  providerAttachmentId: 'providerAttachmentId',
   fileName: 'fileName',
   contentType: 'contentType',
+  detectedContentType: 'detectedContentType',
   sizeBytes: 'sizeBytes',
   checksum: 'checksum',
   objectKey: 'objectKey',
   status: 'status',
+  scanReason: 'scanReason',
+  quarantinedAt: 'quarantinedAt',
+  scannedAt: 'scannedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
