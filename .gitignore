@@ -21,6 +21,7 @@ uploads/
 exports/
 backups/
 storage/
+!apps/api/src/platform/storage/
 *.sqlite
 *.sqlite3
 
