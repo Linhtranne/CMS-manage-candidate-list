@@ -29,6 +29,20 @@ test('health endpoint exposes production security baseline', async ({ request })
   expect(headers['content-security-policy']).toContain("default-src 'self'");
 });
 
+test('home redirect and standalone access states remain actionable', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/work$/);
+  await expect(page.getByRole('heading', { name: 'Việc của tôi' })).toBeVisible();
+
+  await page.goto('/forbidden');
+  await expect(page.getByRole('heading', { name: 'Bạn không có quyền truy cập' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Về việc của tôi' })).toHaveAttribute('href', '/work');
+
+  await page.goto('/session-expired');
+  await expect(page.getByRole('heading', { name: 'Phiên làm việc đã hết hạn' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Đăng nhập lại' })).toHaveAttribute('href', '/login');
+});
+
 test('mobile navigation fits the viewport and closes with Escape', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/work');
