@@ -17,7 +17,7 @@ describe('CandidateListPage', () => {
     expect(row).toBeInTheDocument();
     await userEvent.click(row);
     expect(await screen.findByRole('dialog', { name: 'Hồ sơ ứng viên' })).toBeInTheDocument();
-    expect(screen.queryByText('Mở hồ sơ đầy đủ')).not.toBeInTheDocument();
+    expect(screen.getByText('Mở hồ sơ đầy đủ')).toBeVisible();
   });
 
   it('switches saved views through the URL state and filters the list', async () => {

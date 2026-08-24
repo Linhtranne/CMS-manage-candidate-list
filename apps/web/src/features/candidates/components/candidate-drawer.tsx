@@ -37,6 +37,7 @@ export function CandidateDrawer({ candidateId, open, onClose, onAddToOrder }: { 
             <div className="text-right text-sm text-text-muted"><p>{t('candidates.drawer.owner')}</p><p className="mt-1 font-semibold text-text">{candidate.owner.name}</p></div>
           </header>
           <section className="flex flex-wrap gap-2" aria-label={t('candidates.drawer.actionsLabel')}>
+            <ButtonLink variant="secondary" href={`/candidates/${candidate.id}`}>{t('candidates.drawer.fullProfile')}</ButtonLink>
             <ButtonLink variant="secondary" href={`/mailbox?query=${encodeURIComponent(candidate.name)}`}>{t('candidates.drawer.email')}</ButtonLink>
             <Button variant="secondary" onClick={() => onAddToOrder?.(candidate.id)}>{t('candidates.drawer.addToOrder')}</Button>
             <Button variant="secondary" onClick={() => setCreateWorkOpen(true)}>{t('candidates.drawer.createWork')}</Button>

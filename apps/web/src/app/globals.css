@@ -64,6 +64,14 @@ body {
   }
 }
 
+@media (min-width: 640px) {
+  .cms-saved-view-bar:not(.cms-candidate-filter-bar) > label:first-child > input,
+  .cms-saved-view-bar:not(.cms-candidate-filter-bar) > div:first-child > input {
+    width: auto;
+    flex: 1 1 0%;
+  }
+}
+
 .cms-candidate-filter-bar {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

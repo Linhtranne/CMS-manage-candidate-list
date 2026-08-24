@@ -3,7 +3,7 @@ import { assertNoSeriousA11yIssues } from './helpers/axe';
 
 test('app shell works on desktop and tablet', async ({ page }) => {
   await page.goto('/work');
-  await expect(page.getByRole('link', { name: 'Ứng viên' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Ứng viên', exact: true })).toBeVisible();
 
   await page.setViewportSize({ width: 768, height: 1024 });
   await expect(page.getByRole('button', { name: 'Mở điều hướng' })).toBeVisible();

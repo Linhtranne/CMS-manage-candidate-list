@@ -76,22 +76,22 @@ describe('canonical OpenAPI rules', () => {
     });
   });
 
-  it('uses OIDC session endpoints and has no password login operation', () => {
-    expect(document.paths).not.toHaveProperty('/auth/login');
+  it('declares local password login and optional OIDC session endpoints', () => {
     expect(document.paths).toEqual(expect.objectContaining({
       '/auth/oidc/start': expect.anything(),
       '/auth/oidc/callback': expect.anything(),
+      '/auth/login': expect.anything(),
       '/auth/session': expect.anything(),
       '/auth/csrf': expect.anything(),
       '/auth/logout': expect.anything(),
     }));
     const loginRequest = document.components.schemas.LoginRequest;
-    expect(loginRequest).toBeUndefined();
+    expect(loginRequest?.required).toEqual(['email', 'password']);
   });
 
   it('declares the canonical endpoint inventory and CSRF on mutations', () => {
     const requiredPaths = [
-      '/health/live', '/health/ready', '/metrics', '/auth/oidc/start', '/auth/oidc/callback', '/auth/session', '/auth/csrf',
+      '/health/live', '/health/ready', '/metrics', '/auth/oidc/start', '/auth/oidc/callback', '/auth/login', '/auth/session', '/auth/csrf',
       '/industry-sectors', '/occupations', '/visa-routes', '/admin/industry-field-definitions',
       '/admin/interview-question-templates', '/admin/supply-journey-templates', '/admin/email-templates',
       '/clients/{id}/contacts', '/job-orders', '/job-orders/{id}', '/job-orders/{id}/status-transitions',
@@ -110,7 +110,7 @@ describe('canonical OpenAPI rules', () => {
     for (const path of requiredPaths) expect(document.paths).toHaveProperty(path);
 
     const publicPaths = new Set([
-      '/health/live', '/health/ready', '/metrics', '/auth/oidc/start', '/auth/oidc/callback', '/webhooks/mail/{provider}',
+      '/health/live', '/health/ready', '/metrics', '/auth/oidc/start', '/auth/oidc/callback', '/auth/login', '/webhooks/mail/{provider}',
     ]);
     for (const { path, method, operation } of operations) {
       if (!['post', 'patch', 'put', 'delete'].includes(method) || publicPaths.has(path)) continue;

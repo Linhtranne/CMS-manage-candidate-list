@@ -27,13 +27,14 @@ describe('mail subscription lifecycle', () => {
   });
 
   it('renews a subscription and emits an id-only success event', async () => {
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
     const repository = {
       findMailbox: vi.fn().mockResolvedValue({ id: 'mailbox-1', status: 'HEALTHY', providerSubscriptionId: 'provider-secret-id' }),
       withTransaction: vi.fn(async (work: (repo: unknown, tx: unknown) => unknown) => work(repository, {})),
       markSubscriptionRenewed: vi.fn().mockResolvedValue({ count: 1 }),
       markSubscriptionRenewalFailure: vi.fn(),
     };
-    const provider = { renewSubscription: vi.fn().mockResolvedValue({ subscriptionId: 'provider-secret-id-2', expiresAt: new Date('2026-08-24T12:00:00.000Z') }) };
+    const provider = { renewSubscription: vi.fn().mockResolvedValue({ subscriptionId: 'provider-secret-id-2', expiresAt }) };
     const outbox = { append: vi.fn().mockResolvedValue(undefined) };
     const processor = new RenewMailSubscriptionProcessor(repository as never, provider as never, outbox as never);
 
@@ -42,7 +43,7 @@ describe('mail subscription lifecycle', () => {
     expect(repository.markSubscriptionRenewed).toHaveBeenCalledWith('mailbox-1', expect.objectContaining({ expiresAt: expect.any(Date) }));
     expect(outbox.append).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
       eventType: 'mail.subscription.renewed',
-      payload: { mailboxId: 'mailbox-1', expiresAt: '2026-08-24T12:00:00.000Z' },
+      payload: { mailboxId: 'mailbox-1', expiresAt: expiresAt.toISOString() },
     }));
   });
 
@@ -66,4 +67,3 @@ describe('mail subscription lifecycle', () => {
     expect(JSON.stringify(outbox.append.mock.calls[0])).not.toContain('do-not-leak');
   });
 });
-

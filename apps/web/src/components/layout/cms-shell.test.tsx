@@ -43,7 +43,7 @@ describe('CmsShell', () => {
     expect(document.activeElement).toBe(navigation);
     const sidebars = screen.getAllByRole('complementary', { name: 'Điều hướng CMS' });
     expect(sidebars[sidebars.length - 1]).toHaveClass('cms-sidebar-mobile');
-    expect(sidebars[sidebars.length - 1]?.querySelector('button[aria-label="Đóng điều hướng"]')).toBeNull();
+    expect(sidebars[sidebars.length - 1]?.querySelector('button[aria-label="Đóng điều hướng"]')).not.toBeNull();
     expect(document.body.style.overflow).toBe('hidden');
 
     await user.keyboard('{Escape}');
