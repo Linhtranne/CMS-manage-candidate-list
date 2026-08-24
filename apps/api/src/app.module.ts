@@ -14,9 +14,14 @@ import { ClientsOrdersModule } from './modules/clients-orders/clients-orders.mod
 import { CandidatesModule } from './modules/candidates/candidates.module.js';
 import { ApplicationsInterviewsModule } from './modules/applications-interviews/applications-interviews.module.js';
 import { EmailHubModule } from './modules/email-hub/email-hub.module.js';
+import { SupplyJourneysModule } from './modules/supply-journeys/supply-journeys.module.js';
+import { TasksReportingModule } from './modules/tasks-reporting/tasks-reporting.module.js';
+import { DocumentsModule } from './modules/documents/documents.module.js';
+import { AuditModule } from './modules/audit/audit.module.js';
+import { RetentionModule } from './modules/retention/retention.module.js';
 
 @Module({
-  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule, EmailHubModule],
+  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule, EmailHubModule, SupplyJourneysModule, TasksReportingModule, DocumentsModule, AuditModule, RetentionModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: EnvelopeInterceptor },

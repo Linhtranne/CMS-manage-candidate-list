@@ -83,3 +83,15 @@ export function normalizeRecipients(input: readonly EmailRecipientInput[]): Emai
     return { kind: recipient.kind, address };
   });
 }
+
+export function assertCanaryRecipients(
+  recipients: readonly { address: string }[],
+  canaryOnly: boolean,
+  canaryRecipients: readonly string[],
+): void {
+  if (!canaryOnly) return;
+  const allowed = new Set(canaryRecipients.map((address) => normalizeEmailAddress(address)));
+  if (recipients.some((recipient) => !allowed.has(normalizeEmailAddress(recipient.address)))) {
+    throw new EmailDomainError('EMAIL_CANARY_RECIPIENT_NOT_ALLOWED', 'errors.emailCanaryRecipientNotAllowed', 422);
+  }
+}

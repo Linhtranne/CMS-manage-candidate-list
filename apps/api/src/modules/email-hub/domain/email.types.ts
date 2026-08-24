@@ -9,6 +9,10 @@ export type EmailMessageDirection = (typeof EMAIL_MESSAGE_DIRECTIONS)[number];
 export const MAILBOX_PROVIDERS = ['DISABLED', 'FAKE', 'MICROSOFT_GRAPH', 'GMAIL_API', 'SMTP_IMAP'] as const;
 export type MailboxProvider = (typeof MAILBOX_PROVIDERS)[number];
 
+/** Providers that may cross the public webhook boundary. FAKE is synthetic-only and never accepted here. */
+export const EXTERNAL_MAILBOX_PROVIDERS = ['MICROSOFT_GRAPH', 'GMAIL_API', 'SMTP_IMAP'] as const;
+export type ExternalMailboxProvider = (typeof EXTERNAL_MAILBOX_PROVIDERS)[number];
+
 export const MAILBOX_HEALTH_STATUSES = ['NOT_CONFIGURED', 'HEALTHY', 'DEGRADED', 'PAUSED_AUTH', 'PAUSED_OPERATOR', 'FAILED'] as const;
 export type MailboxHealthStatus = (typeof MAILBOX_HEALTH_STATUSES)[number];
 
@@ -57,6 +61,7 @@ export interface ProviderHealth {
   provider: MailboxProvider;
   checkedAt: Date;
   detail?: string;
+  authExpiresAt?: Date | null;
 }
 
 export interface MailCursor {

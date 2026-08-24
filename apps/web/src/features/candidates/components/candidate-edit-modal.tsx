@@ -10,6 +10,13 @@ import { useUpdateCandidate, type CandidateDetail } from '../services/candidate-
 
 const inputClass = 'mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 text-sm text-text focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20';
 
+function normalizePhoneInput(value: string): string {
+  const normalized = value.trim().replace(/[\s().-]/g, '');
+  if (normalized.startsWith('0')) return `+84${normalized.slice(1)}`;
+  if (normalized.startsWith('84')) return `+${normalized}`;
+  return normalized;
+}
+
 export function CandidateEditModal({ candidate, open, onClose, onSaved }: { candidate: CandidateDetail; open: boolean; onClose: () => void; onSaved: () => void }) {
   const { t } = useI18n();
   const updateCandidate = useUpdateCandidate();
@@ -24,7 +31,7 @@ export function CandidateEditModal({ candidate, open, onClose, onSaved }: { cand
   const submit = () => {
     if (!name.trim() || !industry || !occupation.trim()) return setError(t('candidates.form.missingRequired'));
     setError('');
-    updateCandidate.mutate({ id: candidate.id, body: { name, industryLabels: [industry], occupation, japaneseLevel, email: email || null, phone: phone || null, address: candidate.address ?? null, source: candidate.source ?? candidateSourceOptions[0].value, readinessStatus: candidate.readinessStatus, contactabilityStatus: candidate.contactabilityStatus, version: candidate.version } }, { onSuccess: onSaved, onError: (mutationError) => setError(localizedError(t, mutationError, t('common.errors.loadFailed'))) });
+    updateCandidate.mutate({ id: candidate.id, body: { name, industryLabels: [industry], occupation, japaneseLevel, email: email || null, phone: phone.trim() ? normalizePhoneInput(phone) : null, address: candidate.address ?? null, source: candidate.source ?? candidateSourceOptions[0].value, readinessStatus: candidate.readinessStatus, contactabilityStatus: candidate.contactabilityStatus, version: candidate.version } }, { onSuccess: onSaved, onError: (mutationError) => setError(localizedError(t, mutationError, t('common.errors.loadFailed'))) });
   };
 
   return <Modal open={open} onClose={onClose} title={t('candidates.form.editTitle')} description={t('candidates.form.editDescription', { code: candidate.code })} size="lg" footer={<><Button onClick={onClose}>{t('candidates.form.cancel')}</Button><Button variant="primary" onClick={submit} disabled={updateCandidate.isPending}>{updateCandidate.isPending ? t('candidates.form.saving') : t('candidates.form.saveChanges')}</Button></>}>

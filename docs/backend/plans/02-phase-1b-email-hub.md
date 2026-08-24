@@ -10,7 +10,7 @@
 
 **Spec:** [Email Hub](../07-email-hub-workers-and-storage.md), [Security](../09-security-privacy-threat-model.md), [Operations](../10-observability-operations-dr.md).
 
-**Global Constraints:** Mặc định `MAIL_PROVIDER=DISABLED`. Fake adapter được dùng cho CI; provider thật chỉ cấu hình sau DEC-003 và privacy scope DEC-005. Không gửi tới recipient ngoài staging canary allowlist trước gate.
+**Global Constraints:** Mặc định `MAIL_PROVIDER=DISABLED`. `MAIL_PROVIDER=FAKE` chỉ được phép ở development/test để chạy synthetic end-to-end; provider thật chỉ cấu hình sau DEC-003 và privacy scope DEC-005. Không gửi tới recipient ngoài staging canary allowlist trước gate.
 
 ### Task 1: Add email schema, domain model and disabled adapter
 
@@ -96,7 +96,7 @@
 
 ### Task 5: Implement selected provider and production operations
 
-> Technical preparation is complete; concrete provider binding and staging smoke are blocked until DEC-003 selects and approves the provider/mailbox/credential/DNS scope. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
+> Technical preparation, including subscription renewal lifecycle and canary enforcement, is complete; concrete provider binding and staging smoke are blocked until DEC-003 selects and approves the provider/mailbox/credential/DNS scope. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
 
 **Files:**
 
@@ -111,7 +111,7 @@
 - [ ] After DEC-003 approval, bind `ApprovedMailProviderAdapter` to the selected provider SDK and add sandbox contract tests from approved cursor/send behavior.
 - [ ] Run provider contract tests against fake and sandbox; verify concrete adapter initially fails.
 - [ ] Implement least-privilege OAuth/credential reference, send/fetch/attachment/subscription methods and rate/quota handling.
-- [ ] Add health/alerts/runbooks, webhook endpoint config, cursor/subscription renewal and canary recipient enforcement.
+- [x] Add health/alerts/runbooks, webhook endpoint config, cursor/subscription renewal scheduling and canary recipient enforcement. Concrete provider health/sandbox evidence remains gated by DEC-003.
 - [ ] Execute SPF/DKIM/DMARC, send/reply/bounce, auth expiry, duplicate and uncertain-send staging drills; attach evidence IDs.
 - [ ] Commit: `feat(email): integrate approved shared mailbox provider`.
 

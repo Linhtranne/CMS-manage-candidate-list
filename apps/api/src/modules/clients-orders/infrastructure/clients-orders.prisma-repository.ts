@@ -141,6 +141,15 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
     return row?.status ?? null;
   }
 
+  async findActiveOccupationCatalogVersion(occupation: string): Promise<string | null> {
+    const row = await this.prisma.catalogVersion.findFirst({
+      where: { status: 'ACTIVE', item: { type: 'OCCUPATION' }, labelVi: { equals: occupation.trim(), mode: 'insensitive' } },
+      orderBy: [{ version: 'desc' }, { updatedAt: 'desc' }],
+      select: { id: true },
+    });
+    return row?.id ?? null;
+  }
+
   async findCatalogStatus(catalogVersionId: string): Promise<string | null> {
     const row = await this.prisma.catalogVersion.findUnique({ where: { id: catalogVersionId }, select: { status: true } });
     return row?.status ?? null;

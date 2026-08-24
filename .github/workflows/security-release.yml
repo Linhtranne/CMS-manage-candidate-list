@@ -1,0 +1,44 @@
+name: security-release
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-secret-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level=high
+      - run: pnpm --filter @cms/api typecheck
+      - run: pnpm --filter @cms/api lint
+      - run: pnpm --filter @cms/api test:security -- --pool=threads --maxWorkers=1
+      - run: pnpm --filter @cms/contracts test
+      - run: git diff --check
+      - run: npx @cyclonedx/cyclonedx-npm --output-file sbom.cdx.json --output-format json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cms-sbom
+          path: sbom.cdx.json
+  codeql:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3

@@ -1,7 +1,7 @@
 import { Inject, Injectable, Optional } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { EmailDomainError } from '../domain/email.types.js';
-import { normalizeRecipients, sanitizeEmailHtml } from '../domain/email.rules.js';
+import { assertCanaryRecipients, normalizeRecipients, sanitizeEmailHtml } from '../domain/email.rules.js';
 import { EmailPreviewService, emailPreviewRequestHash, type EmailPreviewRequest } from './email-preview.service.js';
 import { EmailPrismaRepository } from '../infrastructure/email.prisma-repository.js';
 import { IdempotencyService } from '../../../platform/idempotency/idempotency.service.js';
@@ -84,6 +84,7 @@ export class EmailCommandService {
     const mailbox = await this.repository.findMailbox(input.mailboxId);
     if (!mailbox) throw new EmailDomainError('MAILBOX_NOT_FOUND', 'errors.mailboxNotFound', 404);
     const serverOwnedInput = { ...input, from: mailbox.address };
+    this.assertCanaryRecipients(serverOwnedInput.recipients);
     if (serverOwnedInput.candidateId) {
       const candidate = await this.prisma?.candidate.findUnique({ where: { id: serverOwnedInput.candidateId }, select: { id: true, contactabilityStatus: true, emailBlindIndex: true, ownerId: true, teamId: true } });
       if (!candidate) throw new EmailDomainError('CANDIDATE_NOT_FOUND', 'errors.candidateNotFound', 404);
@@ -105,6 +106,7 @@ export class EmailCommandService {
     await this.assertCandidateContactable(input.candidateId);
     await this.assertCandidateRecipientsFromStore(input);
     const recipients = normalizeRecipients(input.recipients);
+    this.assertCanaryRecipients(recipients);
     const requestHash = createHash('sha256').update(JSON.stringify({
       previewRequestHash: emailPreviewRequestHash(input),
       conversationId: input.conversationId ?? null,
@@ -150,7 +152,10 @@ export class EmailCommandService {
         direction: 'OUTBOUND',
         status: 'QUEUED',
         idempotencyKey: input.idempotencyKey,
-        fromAddress: input.from.trim().toLowerCase(),
+        // Preview signatures are an authorization boundary, but keep the
+        // mailbox identity server-owned even if this service is called
+        // outside the HTTP controller.
+        fromAddress: mailbox.address,
         subject: input.subject,
         bodyText: input.bodyText,
         ...(input.sanitizedHtml ? { sanitizedHtml: sanitizeEmailHtml(input.sanitizedHtml) } : {}),
@@ -475,5 +480,11 @@ export class EmailCommandService {
     if (!candidateId) return;
     if (candidate.contactabilityStatus === 'DO_NOT_CONTACT') throw new EmailDomainError('DO_NOT_CONTACT', 'errors.doNotContact', 422);
     if (candidate.contactabilityStatus === 'TEMPORARILY_UNREACHABLE') throw new EmailDomainError('CANDIDATE_NOT_CONTACTABLE', 'errors.candidateNotContactable', 422);
+  }
+
+  private assertCanaryRecipients(recipients: readonly { address: string }[]): void {
+    const mail = this.config?.mail;
+    if (!mail) return;
+    assertCanaryRecipients(recipients, mail.canaryOnly, mail.canaryRecipients);
   }
 }

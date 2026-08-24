@@ -62,6 +62,7 @@ export interface CandidateListQuery {
   readinessStatus?: CandidateReadinessStatus;
   contactabilityStatus?: CandidateContactabilityStatus;
   occupationId?: string;
+  japaneseLevel?: string;
   skill?: string;
   desiredLocation?: string;
   source?: string;
@@ -77,4 +78,19 @@ export interface CandidateListQuery {
 export interface CandidatePage {
   items: CandidateEntity[];
   page: { nextCursor: string | null; hasMore: boolean };
+}
+
+export interface CandidateMatchEntity {
+  id: string;
+  code: string;
+  name: string;
+  industryLabel: string;
+  occupation: string;
+  japaneseLevel: string;
+  readinessStatus: CandidateReadinessStatus;
+  recordStatus: CandidateRecordStatus;
+  hasActiveApplicationInOrder: boolean;
+  hasActiveJourney: boolean;
+  skills: string[];
+  yearsExperience: number;
 }

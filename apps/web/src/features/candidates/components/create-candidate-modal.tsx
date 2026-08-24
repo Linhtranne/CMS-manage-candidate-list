@@ -11,6 +11,13 @@ import { useCreateCandidate, type Candidate } from '../services/candidate-querie
 const inputClass = 'mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 text-sm text-text focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20';
 const errorId = 'create-candidate-error';
 
+function normalizePhoneInput(value: string): string {
+  const normalized = value.trim().replace(/[\s().-]/g, '');
+  if (normalized.startsWith('0')) return `+84${normalized.slice(1)}`;
+  if (normalized.startsWith('84')) return `+${normalized}`;
+  return normalized;
+}
+
 export function CreateCandidateModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated?: (candidate: Candidate) => void }) {
   const { t } = useI18n();
   const createCandidate = useCreateCandidate();
@@ -39,7 +46,7 @@ export function CreateCandidateModal({ open, onClose, onCreated }: { open: boole
     if (!industry) { setError(t('candidates.form.missingIndustry')); setErrorField('industry'); return requestAnimationFrame(() => industryRef.current?.focus()); }
     if (!occupation.trim()) { setError(t('candidates.form.missingOccupation')); setErrorField('occupation'); return requestAnimationFrame(() => occupationRef.current?.focus()); }
     setError(''); setErrorField(null);
-    createCandidate.mutate({ name, industryLabels: [industry], occupation, japaneseLevel, email: email || null, phone: phone || null, source, version: 0 }, {
+    createCandidate.mutate({ name, industryLabels: [industry], occupation, japaneseLevel, email: email || null, phone: phone.trim() ? normalizePhoneInput(phone) : null, source, version: 0 }, {
       onSuccess: (candidate) => { setSaved(candidate); onCreated?.(candidate); },
       onError: (mutationError) => setError(localizedError(t, mutationError, t('common.errors.loadFailed')))
     });

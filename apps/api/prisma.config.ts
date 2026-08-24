@@ -7,6 +7,7 @@ export default defineConfig({
   },
   datasource: {
     // `db:migrate:deploy` validates DATABASE_URL before invoking Prisma.
-    url: process.env.DATABASE_URL ?? 'postgresql://localhost:5432/cms_candidate_supply',
+    // Local Compose defaults only; CI/staging/production must inject DATABASE_URL.
+    url: process.env.DATABASE_URL ?? 'postgresql://cms_owner:cms_owner_dev@localhost:5432/cms_candidate_supply',
   },
 });

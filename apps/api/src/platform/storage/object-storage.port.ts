@@ -11,6 +11,7 @@ export interface StoredObjectMetadata {
 }
 
 export interface ObjectStoragePort {
+  createSignedUpload?(objectKey: string, ttlSeconds: number, contentType: string, sizeBytes: number, checksum: string): Promise<{ url: string; expiresAt: Date }>;
   putQuarantine(input: {
     objectKey: string;
     source: Readable;
@@ -26,6 +27,7 @@ export interface ObjectStoragePort {
 @Injectable()
 export class DisabledObjectStorageAdapter implements ObjectStoragePort {
   private unavailable(): never { throw new Error('OBJECT_STORAGE_DISABLED'); }
+  createSignedUpload(): Promise<{ url: string; expiresAt: Date }> { return Promise.reject(this.unavailable()); }
   putQuarantine(): Promise<StoredObjectMetadata> { return Promise.reject(this.unavailable()); }
   head(): Promise<StoredObjectMetadata> { return Promise.reject(this.unavailable()); }
   createSignedDownload(): Promise<{ url: string; expiresAt: Date }> { return Promise.reject(this.unavailable()); }

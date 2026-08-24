@@ -125,6 +125,15 @@ approvals:
   - role: Business Owner
     identity: <corporate-identity>
     at: <iso-8601>
+sandbox_endpoint: https://<approved-provider-sandbox>
+canary_recipients:
+  - <approved-canary-address>
+operational_policy:
+  rate_per_minute: <approved-positive-integer>
+  burst: <approved-positive-integer>
+  max_concurrency: <approved-positive-integer>
+  max_attempts: 8
+  retry_window_seconds: 86400
 ```
 
 Giá trị trong angle brackets là schema; approval thật không được để placeholder. Thay đổi materially khác cần version mới và impact review; không sửa âm thầm record đã approved.

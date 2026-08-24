@@ -692,6 +692,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTasks"];
+        put?: never;
+        post: operations["createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTask"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/assignment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assignTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["startTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/completion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports/summary": {
         parameters: {
             query?: never;
@@ -1006,6 +1102,22 @@ export interface paths {
         get: operations["startOidcLogin"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["loginWithPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2675,6 +2787,62 @@ export interface components {
             journeyId?: string | null;
             version: number;
         };
+        Task: {
+            id: string;
+            title: string;
+            description?: string | null;
+            /** @enum {string} */
+            status: "NEW" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+            assigneeUserId: string;
+            teamId: string | null;
+            /** @enum {string|null} */
+            waitingOn: "CANDIDATE" | "CLIENT_PARTNER" | "INTERNAL" | "OTHER" | null;
+            /** Format: date-time */
+            dueAt: string | null;
+            noDueDateReason: string | null;
+            ruleCode: string | null;
+            sourceEventId: string | null;
+            dedupeKey: string | null;
+            referenceEntityType: string;
+            referenceEntityId: string;
+            version: number;
+        };
+        CreateTaskRequest: {
+            title: string;
+            description?: string | null;
+            assigneeUserId: string;
+            teamId?: string | null;
+            /** @enum {string|null} */
+            waitingOn?: "CANDIDATE" | "CLIENT_PARTNER" | "INTERNAL" | "OTHER" | null;
+            /** Format: date-time */
+            dueAt?: string | null;
+            noDueDateReason?: string | null;
+            ruleCode?: string | null;
+            sourceEventId?: string | null;
+            dedupeKey?: string | null;
+            referenceEntityType: string;
+            referenceEntityId: string;
+        };
+        VersionedTaskActionRequest: {
+            version: number;
+            reason?: string | null;
+        };
+        AssignTaskRequest: {
+            version: number;
+            assigneeUserId: string;
+            teamId?: string | null;
+        };
+        TasksResponse: {
+            items: components["schemas"]["Task"][];
+        };
+        ApiTaskEnvelope: {
+            data: components["schemas"]["Task"];
+            requestId: string;
+        };
+        ApiTasksResponseEnvelope: {
+            data: components["schemas"]["TasksResponse"];
+            requestId: string;
+        };
         ReportMetric: {
             key: string;
             label: string;
@@ -2897,12 +3065,30 @@ export interface components {
             address: string;
             provider: string;
             status: string;
+            /** Format: date-time */
+            lastSyncAt: string | null;
+            /** Format: date-time */
+            lastSendAt: string | null;
+            /** Format: date-time */
+            subscriptionExpiresAt: string | null;
+            cursorAgeSeconds: number | null;
+            queue: components["schemas"]["MailboxQueueHealth"];
             providerHealth: {
                 status: string;
                 /** Format: date-time */
                 checkedAt: string;
+                /** Format: date-time */
+                authExpiresAt: string | null;
                 detail?: string;
             };
+        };
+        MailboxQueueHealth: {
+            enabled: boolean;
+            available: boolean;
+            waiting: number;
+            active: number;
+            delayed: number;
+            failed: number;
         };
         AdminAuditEvent: {
             id: string;
@@ -2958,6 +3144,11 @@ export interface components {
         OidcRedirect: {
             /** Format: uri */
             redirectUrl: string;
+        };
+        LoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
         };
         WebhookAccepted: {
             /** @constant */
@@ -3174,6 +3365,19 @@ export interface components {
         };
         GenericCommand: {
             [key: string]: unknown;
+        };
+        CreateDocumentUploadRequest: {
+            candidateId: string;
+            title: string;
+            category: string;
+            claimedMime: string;
+            sizeBytes: number;
+            checksum: string;
+        };
+        LinkDocumentRequest: {
+            candidateId: string;
+            journeyId?: string;
+            milestoneId?: string;
         };
         EmailActionRequest: {
             reason?: string;
@@ -4639,6 +4843,199 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    listTasks: {
+        parameters: {
+            query?: {
+                status?: "NEW" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+                assigneeUserId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped task list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTasksResponseEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description Task created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    getTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped task */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    assignTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description Task assigned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    startTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedTaskActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Task started */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    completeTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedTaskActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Task completed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    cancelTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedTaskActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Task cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiTaskEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     getReportSummary: {
         parameters: {
             query?: {
@@ -5266,6 +5663,31 @@ export interface operations {
             };
         };
     };
+    loginWithPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Password login completed and session cookies were set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSessionEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     completeOidcLogin: {
         parameters: {
             query: {
@@ -5278,14 +5700,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OIDC callback completed */
-            200: {
+            /** @description OIDC callback completed and browser redirected to the CMS app */
+            303: {
                 headers: {
+                    Location: string;
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ApiSessionEnvelope"];
-                };
+                content?: never;
             };
         };
     };
@@ -6131,7 +6552,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["CreateDocumentUploadRequest"];
             };
         };
         responses: {
@@ -6195,7 +6616,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericCommand"];
+                "application/json": components["schemas"]["LinkDocumentRequest"];
             };
         };
         responses: {

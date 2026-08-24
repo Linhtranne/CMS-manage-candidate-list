@@ -4,6 +4,8 @@ import { CommandPlatformModule } from '../../platform/command-platform.module.js
 import { PolicyService } from './application/policy.service.js';
 import { SessionService } from './application/session.service.js';
 import { AuthController } from './http/auth.controller.js';
+import { CurrentUserController } from './http/current-user.controller.js';
+import { AdminCompatibilityController } from './http/admin-compatibility.controller.js';
 import { PolicyController } from './http/policy.controller.js';
 import { CsrfGuard } from './http/guards/csrf.guard.js';
 import { PolicyGuard } from './http/guards/policy.guard.js';
@@ -12,7 +14,7 @@ import { OIDC_FETCH, OidcAdapter } from './infrastructure/oidc.adapter.js';
 
 @Module({
   imports: [DatabaseModule, CommandPlatformModule],
-  controllers: [AuthController, PolicyController],
+  controllers: [AuthController, CurrentUserController, PolicyController, AdminCompatibilityController],
   providers: [
     PolicyService,
     SessionService,

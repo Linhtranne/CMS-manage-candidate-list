@@ -5,8 +5,23 @@ import { MAIL_PROVIDER_ADAPTER, type MailProviderAdapter } from '../infrastructu
 import type { EmailMessageStatus } from '../domain/email.types.js';
 import { OutboxRepository } from '../../../platform/outbox/outbox.repository.js';
 import { TelemetryService } from '../../../platform/telemetry/telemetry.service.js';
+import { RUNTIME_CONFIG, type RuntimeConfig } from '../../../platform/config/config.module.js';
+import type { MailOperationalPolicy } from '../../../platform/config/config.schema.js';
 
 export type SendFailureDisposition = Extract<EmailMessageStatus, 'RETRY_WAIT' | 'RECONCILING' | 'FAILED'>;
+
+const DEFAULT_MAX_RETRY_DELAY_MS = 24 * 60 * 60 * 1000;
+
+export function computeRetryDelayMs(error: unknown, attempt: number, random: () => number = Math.random, now = Date.now(), policy?: Pick<MailOperationalPolicy, 'maxAttempts' | 'retryWindowSeconds'> | null): number {
+  const maxAttempts = policy?.maxAttempts ?? 8;
+  const maxRetryDelayMs = policy ? policy.retryWindowSeconds * 1000 : DEFAULT_MAX_RETRY_DELAY_MS;
+  const boundedAttempt = Math.max(1, Math.min(maxAttempts, Math.floor(Number.isFinite(attempt) ? attempt : 1)));
+  const exponential = Math.min(maxRetryDelayMs, 30_000 * (2 ** Math.min(boundedAttempt - 1, 7)));
+  const jitterRatio = Math.min(0.2, Math.max(0, Number(random()) || 0));
+  const jittered = exponential + Math.floor(exponential * jitterRatio);
+  const retryAfter = retryAfterMs(error, now);
+  return Math.min(maxRetryDelayMs, Math.max(jittered, retryAfter ?? 0));
+}
 
 export function classifySendFailure(error: unknown): SendFailureDisposition {
   const candidate = error as { code?: unknown; message?: unknown };
@@ -33,6 +48,7 @@ export class SendEmailProcessor {
     @Inject(MAIL_PROVIDER_ADAPTER) private readonly provider: MailProviderAdapter,
     @Inject(OutboxRepository) private readonly deliveryEvents: Pick<OutboxRepository, 'append'>,
     @Optional() private readonly telemetry?: TelemetryService,
+    @Optional() @Inject(RUNTIME_CONFIG) private readonly config?: RuntimeConfig,
   ) {}
 
   async handle(payload: OutboundQueuePayload): Promise<void> {
@@ -81,7 +97,9 @@ export class SendEmailProcessor {
       const disposition = classifySendFailure(error);
       const previousAttempt = typeof payload.attempt === 'number' && Number.isFinite(payload.attempt) ? payload.attempt : 0;
       const attempt = previousAttempt + 1;
-      const effectiveDisposition: SendFailureDisposition = disposition === 'RETRY_WAIT' && attempt >= 8 ? 'FAILED' : disposition;
+      const policy = this.config?.mail.operationalPolicy;
+      const maxAttempts = policy?.maxAttempts ?? 8;
+      const effectiveDisposition: SendFailureDisposition = disposition === 'RETRY_WAIT' && attempt >= maxAttempts ? 'FAILED' : disposition;
       if (isAuthFailure(error)) {
         await this.repository.pauseMailboxAuth(message.mailboxId);
         this.telemetry?.increment('email.mailbox.auth_pause');
@@ -95,7 +113,7 @@ export class SendEmailProcessor {
           aggregateId: message.id,
           idempotencyKey: `email.${effectiveDisposition.toLowerCase()}:${message.id}:${payload.eventId}`,
           correlationId: payload.correlationId,
-          ...(effectiveDisposition === 'RETRY_WAIT' ? { availableAt: new Date(Date.now() + Math.min(24 * 60 * 60 * 1000, 30_000 * (2 ** Math.min(attempt - 1, 7)))) } : {}),
+          ...(effectiveDisposition === 'RETRY_WAIT' ? { availableAt: new Date(Date.now() + computeRetryDelayMs(error, attempt, Math.random, Date.now(), policy)) } : {}),
           payload: { messageId: message.id, mailboxId: message.mailboxId, conversationId: message.conversationId, disposition: effectiveDisposition, attempt },
         });
       });
@@ -112,4 +130,15 @@ export class SendEmailProcessor {
 function isAuthFailure(error: unknown): boolean {
   const candidate = error as { code?: unknown; message?: unknown };
   return /AUTH|CREDENTIAL|UNAUTHORIZED|FORBIDDEN/.test(`${String(candidate?.code ?? '')} ${String(candidate?.message ?? '')}`.toUpperCase());
+}
+
+function retryAfterMs(error: unknown, now: number): number | undefined {
+  const candidate = error as { retryAfterMs?: unknown; retryAfterSeconds?: unknown; retryAfter?: unknown };
+  if (typeof candidate.retryAfterMs === 'number' && Number.isFinite(candidate.retryAfterMs) && candidate.retryAfterMs >= 0) return candidate.retryAfterMs;
+  if (typeof candidate.retryAfterSeconds === 'number' && Number.isFinite(candidate.retryAfterSeconds) && candidate.retryAfterSeconds >= 0) return candidate.retryAfterSeconds * 1000;
+  if (typeof candidate.retryAfter !== 'string') return undefined;
+  const seconds = Number(candidate.retryAfter);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const date = Date.parse(candidate.retryAfter);
+  return Number.isNaN(date) ? undefined : Math.max(0, date - now);
 }

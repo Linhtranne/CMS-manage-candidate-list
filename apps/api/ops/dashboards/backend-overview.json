@@ -1,0 +1,1 @@
+{"title":"CMS backend overview","panels":[{"title":"API error rate","metric":"http_server_errors_total","threshold":"<1%"},{"title":"Command p95","metric":"http_server_duration_p95_ms","threshold":"<800"},{"title":"Outbox lag","metric":"outbox_pending_age_seconds","threshold":"<300"},{"title":"Provider disabled calls","metric":"provider_disabled_total","threshold":"alert"}]}

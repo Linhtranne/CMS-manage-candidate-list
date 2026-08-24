@@ -52,6 +52,25 @@ const approvals = Array.isArray(approvalRecord) ? approvalRecord : approvalRecor
 const defaultApprovals = requiredApprovalRoles.map((role) => ({ role, status: 'pending' }));
 const releaseApprovals = approvals ?? defaultApprovals;
 const approvalArtifactChecksum = approvalFile ? digest(approvalFile) : undefined;
+const securityArtifactFiles = {
+  sast: process.env.SAST_ARTIFACT?.trim(),
+  dependency: process.env.DEPENDENCY_SCAN_ARTIFACT?.trim(),
+  secret: process.env.SECRET_SCAN_ARTIFACT?.trim(),
+  container: process.env.CONTAINER_SCAN_ARTIFACT?.trim(),
+  sbom: process.env.SBOM_ARTIFACT?.trim(),
+  dast: process.env.DAST_ARTIFACT?.trim(),
+};
+const securityArtifacts = {};
+for (const [name, file] of Object.entries(securityArtifactFiles)) {
+  if (status === 'production' && !file) throw new Error(`production release manifest requires ${name} security artifact`);
+  if (!file) continue;
+  try {
+    if (!readFileSync(resolve(root, file), 'utf8').trim()) throw new Error('empty');
+  } catch {
+    throw new Error(`${name} security artifact must be a readable non-empty file`);
+  }
+  securityArtifacts[name] = { checksum: digest(file) };
+}
 
 const commit = command('git', ['rev-parse', 'HEAD']);
 const dirty = Boolean(command('git', ['status', '--porcelain']));
@@ -97,6 +116,14 @@ const manifest = {
     { suite: 'production-smoke', command: 'health/live + health/ready + protected-route deny', result: 'passed' },
   ],
   approvals: releaseApprovals,
+  security_artifacts: securityArtifacts,
+  activation_flags: {
+    production_seed: process.env.PRODUCTION_SEED_ACTIVATION === 'true',
+    documents: process.env.DOCUMENTS_ENABLED === 'true',
+    bulk_export: process.env.BULK_EXPORT_ENABLED === 'true',
+    purge: process.env.PURGE_ENABLED === 'true',
+    break_glass: process.env.BREAK_GLASS_ENABLED === 'true',
+  },
 };
 if (migrationImageDigest) manifest.migration_image_digest = migrationImageDigest;
 if (webImageDigest) manifest.web_image_digest = webImageDigest;

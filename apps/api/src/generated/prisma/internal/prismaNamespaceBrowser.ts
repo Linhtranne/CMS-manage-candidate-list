@@ -90,7 +90,25 @@ export const ModelName = {
   EmailWebhookNotification: 'EmailWebhookNotification',
   EmailRecipient: 'EmailRecipient',
   EmailAttachment: 'EmailAttachment',
-  EmailMatchDecision: 'EmailMatchDecision'
+  EmailMatchDecision: 'EmailMatchDecision',
+  SupplyJourneyTemplate: 'SupplyJourneyTemplate',
+  SupplyJourneyTemplateVersion: 'SupplyJourneyTemplateVersion',
+  JourneyMilestoneTemplate: 'JourneyMilestoneTemplate',
+  TaskRuleVersion: 'TaskRuleVersion',
+  Task: 'Task',
+  ReportProjectionWatermark: 'ReportProjectionWatermark',
+  ReportProjectionRow: 'ReportProjectionRow',
+  ReportExportJob: 'ReportExportJob',
+  SupplyJourney: 'SupplyJourney',
+  JourneyMilestone: 'JourneyMilestone',
+  JourneyMilestoneHistory: 'JourneyMilestoneHistory',
+  JourneyMilestoneAttempt: 'JourneyMilestoneAttempt',
+  Document: 'Document',
+  DocumentVersion: 'DocumentVersion',
+  DocumentLink: 'DocumentLink',
+  DocumentAccessAudit: 'DocumentAccessAudit',
+  RetentionPolicy: 'RetentionPolicy',
+  LegalHold: 'LegalHold'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -126,6 +144,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   displayName: 'displayName',
   email: 'email',
+  passwordHash: 'passwordHash',
   status: 'status',
   teamId: 'teamId',
   createdAt: 'createdAt',
@@ -634,6 +653,9 @@ export const MailboxScalarFieldEnum = {
   provider: 'provider',
   status: 'status',
   providerAccountRef: 'providerAccountRef',
+  providerSubscriptionId: 'providerSubscriptionId',
+  providerSubscriptionExpiresAt: 'providerSubscriptionExpiresAt',
+  lastSubscriptionRenewedAt: 'lastSubscriptionRenewedAt',
   syncCursor: 'syncCursor',
   syncCursorIssuedAt: 'syncCursorIssuedAt',
   lastSyncAt: 'lastSyncAt',
@@ -749,6 +771,318 @@ export const EmailMatchDecisionScalarFieldEnum = {
 } as const
 
 export type EmailMatchDecisionScalarFieldEnum = (typeof EmailMatchDecisionScalarFieldEnum)[keyof typeof EmailMatchDecisionScalarFieldEnum]
+
+
+export const SupplyJourneyTemplateScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplyJourneyTemplateScalarFieldEnum = (typeof SupplyJourneyTemplateScalarFieldEnum)[keyof typeof SupplyJourneyTemplateScalarFieldEnum]
+
+
+export const SupplyJourneyTemplateVersionScalarFieldEnum = {
+  id: 'id',
+  templateId: 'templateId',
+  version: 'version',
+  status: 'status',
+  residenceContext: 'residenceContext',
+  visaRouteVersionId: 'visaRouteVersionId',
+  caseType: 'caseType',
+  sectorVersionId: 'sectorVersionId',
+  occupationVersionId: 'occupationVersionId',
+  applicability: 'applicability',
+  checksum: 'checksum',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplyJourneyTemplateVersionScalarFieldEnum = (typeof SupplyJourneyTemplateVersionScalarFieldEnum)[keyof typeof SupplyJourneyTemplateVersionScalarFieldEnum]
+
+
+export const JourneyMilestoneTemplateScalarFieldEnum = {
+  id: 'id',
+  templateVersionId: 'templateVersionId',
+  code: 'code',
+  name: 'name',
+  sequence: 'sequence',
+  parallel: 'parallel',
+  dependencyCodes: 'dependencyCodes',
+  applicability: 'applicability',
+  dueSlaDays: 'dueSlaDays',
+  ownerRule: 'ownerRule',
+  checklistSchema: 'checklistSchema',
+  evidenceRequirements: 'evidenceRequirements',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JourneyMilestoneTemplateScalarFieldEnum = (typeof JourneyMilestoneTemplateScalarFieldEnum)[keyof typeof JourneyMilestoneTemplateScalarFieldEnum]
+
+
+export const TaskRuleVersionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  version: 'version',
+  status: 'status',
+  eventType: 'eventType',
+  action: 'action',
+  titleTemplate: 'titleTemplate',
+  dueAfterHours: 'dueAfterHours',
+  referenceEntityType: 'referenceEntityType',
+  businessSlot: 'businessSlot',
+  conditions: 'conditions',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskRuleVersionScalarFieldEnum = (typeof TaskRuleVersionScalarFieldEnum)[keyof typeof TaskRuleVersionScalarFieldEnum]
+
+
+export const TaskScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  status: 'status',
+  assigneeUserId: 'assigneeUserId',
+  teamId: 'teamId',
+  waitingOn: 'waitingOn',
+  dueAt: 'dueAt',
+  noDueDateReason: 'noDueDateReason',
+  ruleCode: 'ruleCode',
+  sourceEventId: 'sourceEventId',
+  dedupeKey: 'dedupeKey',
+  referenceEntityType: 'referenceEntityType',
+  referenceEntityId: 'referenceEntityId',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const ReportProjectionWatermarkScalarFieldEnum = {
+  id: 'id',
+  projectionKey: 'projectionKey',
+  watermarkAt: 'watermarkAt',
+  refreshedAt: 'refreshedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportProjectionWatermarkScalarFieldEnum = (typeof ReportProjectionWatermarkScalarFieldEnum)[keyof typeof ReportProjectionWatermarkScalarFieldEnum]
+
+
+export const ReportProjectionRowScalarFieldEnum = {
+  id: 'id',
+  reportCode: 'reportCode',
+  scopeKey: 'scopeKey',
+  dimensionKey: 'dimensionKey',
+  asOf: 'asOf',
+  payload: 'payload',
+  sourceWatermark: 'sourceWatermark',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportProjectionRowScalarFieldEnum = (typeof ReportProjectionRowScalarFieldEnum)[keyof typeof ReportProjectionRowScalarFieldEnum]
+
+
+export const ReportExportJobScalarFieldEnum = {
+  id: 'id',
+  reportCode: 'reportCode',
+  format: 'format',
+  requesterId: 'requesterId',
+  purpose: 'purpose',
+  scopeSnapshot: 'scopeSnapshot',
+  includedFields: 'includedFields',
+  status: 'status',
+  objectKey: 'objectKey',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportExportJobScalarFieldEnum = (typeof ReportExportJobScalarFieldEnum)[keyof typeof ReportExportJobScalarFieldEnum]
+
+
+export const SupplyJourneyScalarFieldEnum = {
+  id: 'id',
+  candidateId: 'candidateId',
+  applicationId: 'applicationId',
+  templateVersionId: 'templateVersionId',
+  templateChecksum: 'templateChecksum',
+  ownerUserId: 'ownerUserId',
+  teamId: 'teamId',
+  status: 'status',
+  contextSnapshot: 'contextSnapshot',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  cancelReason: 'cancelReason',
+  idempotencyKey: 'idempotencyKey',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplyJourneyScalarFieldEnum = (typeof SupplyJourneyScalarFieldEnum)[keyof typeof SupplyJourneyScalarFieldEnum]
+
+
+export const JourneyMilestoneScalarFieldEnum = {
+  id: 'id',
+  journeyId: 'journeyId',
+  templateMilestoneId: 'templateMilestoneId',
+  code: 'code',
+  name: 'name',
+  sequence: 'sequence',
+  status: 'status',
+  dependencyCodes: 'dependencyCodes',
+  ownerUserId: 'ownerUserId',
+  dueAt: 'dueAt',
+  completedAt: 'completedAt',
+  blockerParty: 'blockerParty',
+  blockerReason: 'blockerReason',
+  expectedResolution: 'expectedResolution',
+  waivedBy: 'waivedBy',
+  waiveReason: 'waiveReason',
+  waivedAt: 'waivedAt',
+  notApplicableReason: 'notApplicableReason',
+  checklistData: 'checklistData',
+  evidenceRequirement: 'evidenceRequirement',
+  attemptNo: 'attemptNo',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JourneyMilestoneScalarFieldEnum = (typeof JourneyMilestoneScalarFieldEnum)[keyof typeof JourneyMilestoneScalarFieldEnum]
+
+
+export const JourneyMilestoneHistoryScalarFieldEnum = {
+  id: 'id',
+  journeyId: 'journeyId',
+  milestoneId: 'milestoneId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  actorUserId: 'actorUserId',
+  reason: 'reason',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type JourneyMilestoneHistoryScalarFieldEnum = (typeof JourneyMilestoneHistoryScalarFieldEnum)[keyof typeof JourneyMilestoneHistoryScalarFieldEnum]
+
+
+export const JourneyMilestoneAttemptScalarFieldEnum = {
+  id: 'id',
+  milestoneId: 'milestoneId',
+  attemptNo: 'attemptNo',
+  status: 'status',
+  reason: 'reason',
+  openedBy: 'openedBy',
+  openedAt: 'openedAt',
+  closedAt: 'closedAt',
+  result: 'result'
+} as const
+
+export type JourneyMilestoneAttemptScalarFieldEnum = (typeof JourneyMilestoneAttemptScalarFieldEnum)[keyof typeof JourneyMilestoneAttemptScalarFieldEnum]
+
+
+export const DocumentScalarFieldEnum = {
+  id: 'id',
+  candidateId: 'candidateId',
+  ownerUserId: 'ownerUserId',
+  teamId: 'teamId',
+  title: 'title',
+  category: 'category',
+  status: 'status',
+  latestVersionNo: 'latestVersionNo',
+  legalHold: 'legalHold',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+
+
+export const DocumentVersionScalarFieldEnum = {
+  id: 'id',
+  documentId: 'documentId',
+  versionNo: 'versionNo',
+  objectKey: 'objectKey',
+  sizeBytes: 'sizeBytes',
+  checksum: 'checksum',
+  claimedMime: 'claimedMime',
+  detectedMime: 'detectedMime',
+  status: 'status',
+  rejectionReason: 'rejectionReason',
+  createdAt: 'createdAt'
+} as const
+
+export type DocumentVersionScalarFieldEnum = (typeof DocumentVersionScalarFieldEnum)[keyof typeof DocumentVersionScalarFieldEnum]
+
+
+export const DocumentLinkScalarFieldEnum = {
+  id: 'id',
+  documentId: 'documentId',
+  candidateId: 'candidateId',
+  journeyId: 'journeyId',
+  milestoneId: 'milestoneId',
+  linkedBy: 'linkedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type DocumentLinkScalarFieldEnum = (typeof DocumentLinkScalarFieldEnum)[keyof typeof DocumentLinkScalarFieldEnum]
+
+
+export const DocumentAccessAuditScalarFieldEnum = {
+  id: 'id',
+  documentId: 'documentId',
+  versionNo: 'versionNo',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  requestId: 'requestId',
+  createdAt: 'createdAt'
+} as const
+
+export type DocumentAccessAuditScalarFieldEnum = (typeof DocumentAccessAuditScalarFieldEnum)[keyof typeof DocumentAccessAuditScalarFieldEnum]
+
+
+export const RetentionPolicyScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  version: 'version',
+  status: 'status',
+  retentionDays: 'retentionDays',
+  appliesTo: 'appliesTo',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RetentionPolicyScalarFieldEnum = (typeof RetentionPolicyScalarFieldEnum)[keyof typeof RetentionPolicyScalarFieldEnum]
+
+
+export const LegalHoldScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  reason: 'reason',
+  status: 'status',
+  placedBy: 'placedBy',
+  releasedBy: 'releasedBy',
+  releasedAt: 'releasedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type LegalHoldScalarFieldEnum = (typeof LegalHoldScalarFieldEnum)[keyof typeof LegalHoldScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -44,10 +44,19 @@ const appVersion = env('APP_VERSION');
 const appOrigin = env('APP_ORIGIN');
 const corsOrigins = env('CORS_ORIGINS');
 const databaseUrl = env('DATABASE_URL');
+const databaseRuntimeRole = env('DATABASE_RUNTIME_ROLE');
 const redisUrl = env('REDIS_URL');
 const encryptionKey = env('ENCRYPTION_KEY');
 const sessionSecret = env('SESSION_SECRET');
 const approvalFile = env('RELEASE_APPROVALS_FILE');
+const securityArtifactFiles = {
+  sast: env('SAST_ARTIFACT'),
+  dependency: env('DEPENDENCY_SCAN_ARTIFACT'),
+  secret: env('SECRET_SCAN_ARTIFACT'),
+  container: env('CONTAINER_SCAN_ARTIFACT'),
+  sbom: env('SBOM_ARTIFACT'),
+  dast: env('DAST_ARTIFACT'),
+};
 const apiDigest = env('IMAGE_DIGEST');
 const migrationDigest = env('MIGRATION_IMAGE_DIGEST');
 const webDigest = env('WEB_IMAGE_DIGEST');
@@ -72,7 +81,22 @@ for (const [name, image, digest] of [
   check(`${name}-digest-match`, Boolean(digest && digestFromImageRef(image) === digest.toLowerCase()), 'image reference digest must match the corresponding *_IMAGE_DIGEST');
 }
 check('production-env', process.env.NODE_ENV === 'production', 'NODE_ENV must be production');
-check('required-runtime-inputs', [appVersion, appOrigin, corsOrigins, databaseUrl, redisUrl, encryptionKey, sessionSecret].every(Boolean));
+check('required-runtime-inputs', [appVersion, appOrigin, corsOrigins, databaseUrl, databaseRuntimeRole, redisUrl, encryptionKey, sessionSecret].every(Boolean));
+let databaseUrlRole = null;
+try {
+  databaseUrlRole = databaseUrl ? decodeURIComponent(new URL(databaseUrl).username) : null;
+} catch {
+  databaseUrlRole = null;
+}
+check('database-runtime-role-not-cms-api', databaseRuntimeRole !== 'cms_api', 'cms_api is the NOLOGIN schema owner role and cannot be used by the runtime');
+check('database-runtime-role-match', Boolean(databaseRuntimeRole && databaseUrlRole && databaseRuntimeRole === databaseUrlRole), 'DATABASE_RUNTIME_ROLE must match the username in DATABASE_URL');
+for (const [name, file] of Object.entries(securityArtifactFiles)) {
+  let readable = false;
+  if (file) {
+    try { readable = readFileSync(resolve(root, file), 'utf8').trim().length > 0; } catch { readable = false; }
+  }
+  check(`${name}-artifact-readable`, readable, `${name} scan artifact must be a readable non-empty file`);
+}
 
 let approvalRecord = null;
 if (approvalFile) {
@@ -88,6 +112,18 @@ check('approval-artifact-shape', approvalArtifactIssues.length === 0, approvalAr
 check('approved-decisions', Boolean(approvalRecord) && requiredDecisions.every((id) => approvedDecisions.has(id)), `required=${requiredDecisions.join(',')}`);
 const approvals = Array.isArray(approvalRecord?.approvals) ? approvalRecord.approvals : [];
 check('approved-roles', requiredRoles.every((role) => approvals.some((item) => item?.role === role && item?.status === 'approved' && item?.identity && item?.at)), `required=${requiredRoles.join(',')}`);
+
+const activationFlags = [
+  ['PRODUCTION_SEED_ACTIVATION', 'DEC-004'],
+  ['DOCUMENTS_ENABLED', 'DEC-005'],
+  ['BULK_EXPORT_ENABLED', 'DEC-005'],
+  ['PURGE_ENABLED', 'DEC-005'],
+  ['BREAK_GLASS_ENABLED', 'DEC-001'],
+];
+for (const [flag, decisionId] of activationFlags) {
+  const requested = process.env[flag] === 'true';
+  check(`${flag}-approval`, !requested || approvedDecisions.has(decisionId), `${flag}=true requires approved ${decisionId}`);
+}
 
 const gitStatus = command('git', ['status', '--porcelain']);
 check('clean-worktree', gitStatus === '');

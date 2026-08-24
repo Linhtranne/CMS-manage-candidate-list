@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
-import { OidcAdapter } from '../infrastructure/oidc.adapter.js';
-import { CsrfViolationError, SessionService } from '../application/session.service.js';
+import { OidcAdapter, OidcValidationError } from '../infrastructure/oidc.adapter.js';
+import { CsrfViolationError, SessionAuthenticationError, SessionService } from '../application/session.service.js';
 import { CsrfGuard } from './guards/csrf.guard.js';
 import { readCookie, SessionGuard, type AuthenticatedRequest } from './guards/session.guard.js';
 import { RUNTIME_CONFIG, type RuntimeConfig } from '../../../platform/config/config.module.js';
 import { Inject } from '@nestjs/common';
+import { LoginDto } from './login.dto.js';
 
 function sessionCookieOptions(config: RuntimeConfig) {
   return { httpOnly: true, secure: config.security.secureCookies, sameSite: 'lax' as const, path: '/api/v1', maxAge: 8 * 60 * 60 * 1000 };
@@ -19,6 +20,15 @@ export class AuthController {
     @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
   ) {}
 
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() body: LoginDto, @Res({ passthrough: true }) response: Response) {
+    const created = await this.sessions.authenticateWithPassword(body.email, body.password);
+    response.cookie('cms_sid', created.sessionToken, sessionCookieOptions(this.config));
+    response.cookie('cms_csrf', created.csrfToken, { ...sessionCookieOptions(this.config), httpOnly: false });
+    return { user: created.user, expiresAt: created.expiresAt };
+  }
+
   @Get('oidc/start')
   startOidc(@Query('returnTo') returnTo?: string) {
     return this.oidc.start(returnTo);
@@ -28,13 +38,23 @@ export class AuthController {
   async completeOidc(
     @Query('code') code: string,
     @Query('state') state: string,
-    @Res({ passthrough: true }) response: Response,
+    @Res() response: Response,
   ) {
-    const completion = await this.oidc.complete(code, state);
-    const created = await this.sessions.establishFromOidc(completion.claims);
-    response.cookie('cms_sid', created.sessionToken, sessionCookieOptions(this.config));
-    response.cookie('cms_csrf', created.csrfToken, { ...sessionCookieOptions(this.config), httpOnly: false });
-    return { user: created.user, expiresAt: created.expiresAt };
+    try {
+      const completion = await this.oidc.complete(code, state);
+      const created = await this.sessions.establishFromOidc(completion.claims);
+      response.cookie('cms_sid', created.sessionToken, sessionCookieOptions(this.config));
+      response.cookie('cms_csrf', created.csrfToken, { ...sessionCookieOptions(this.config), httpOnly: false });
+      const target = new URL(completion.returnTo, this.config.http.appOrigin).toString();
+      return response.redirect(303, target);
+    } catch (error) {
+      if (!(error instanceof OidcValidationError) && !(error instanceof SessionAuthenticationError)) throw error;
+      const candidate = typeof error === 'object' && error !== null && 'code' in error ? (error as { code?: unknown }).code : undefined;
+      const errorCode = typeof candidate === 'string' && /^[A-Z0-9_]+$/.test(candidate) ? candidate : 'OIDC_CALLBACK_FAILED';
+      const login = new URL('/login', this.config.http.appOrigin);
+      login.searchParams.set('oidc_error', errorCode);
+      return response.redirect(303, login.toString());
+    }
   }
 
   @Get('session')
@@ -53,6 +73,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(SessionGuard, CsrfGuard)
   async logout(@Req() request: AuthenticatedRequest, @Res({ passthrough: true }) response: Response) {
     await this.sessions.revokeSession(readCookie(request, 'cms_sid'));

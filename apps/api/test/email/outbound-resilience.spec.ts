@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { EmailPreviewService } from '../../src/modules/email-hub/application/email-preview.service.js';
-import { classifySendFailure, SendEmailProcessor } from '../../src/modules/email-hub/workers/send-email.processor.js';
+import { classifySendFailure, computeRetryDelayMs, SendEmailProcessor } from '../../src/modules/email-hub/workers/send-email.processor.js';
 import { EmailCommandService } from '../../src/modules/email-hub/application/email-command.service.js';
 import { ReconcileSendProcessor } from '../../src/modules/email-hub/workers/reconcile-send.processor.js';
 
@@ -64,6 +64,14 @@ describe('email outbound resilience', () => {
     expect(classifySendFailure(Object.assign(new Error('invalid credential'), { code: 'AUTH_INVALID' }))).toEqual('FAILED');
     const previews = new EmailPreviewService('test-preview-secret');
     expect(() => previews.create({ ...request, headers: { 'Auto-Submitted': 'auto-replied' } })).toThrowError(/EMAIL_AUTO_REPLY_LOOP/);
+  });
+
+  it('uses jittered exponential retry and honors provider Retry-After', () => {
+    expect(computeRetryDelayMs({}, 2, () => 0)).toBe(60_000);
+    expect(computeRetryDelayMs({}, 2, () => 0.2)).toBe(72_000);
+    expect(computeRetryDelayMs({ retryAfterSeconds: 90 }, 1, () => 0)).toBe(90_000);
+    expect(computeRetryDelayMs({ retryAfter: 'Wed, 21 Aug 2026 00:02:00 GMT' }, 1, () => 0, Date.parse('2026-08-21T00:00:00.000Z'))).toBe(120_000);
+    expect(computeRetryDelayMs({}, 8, () => 0, Date.now(), { maxAttempts: 2, retryWindowSeconds: 60 })).toBe(60_000);
   });
 
   it('does not call the provider twice when the DB claim is lost', async () => {
@@ -140,6 +148,26 @@ describe('email outbound resilience', () => {
     expect(outbox.append).toHaveBeenCalledWith(tx, expect.objectContaining({ eventType: 'email.send.requested', payload: { messageId: 'message-1', mailboxId: request.mailboxId, conversationId: 'conversation-1' } }));
     expect(JSON.stringify(outbox.append.mock.calls[0][1])).not.toContain('candidate@example.test');
     expect(audit.append).toHaveBeenCalled();
+  });
+
+  it('uses the persisted mailbox From even when the signed input carries a different address', async () => {
+    const previews = new EmailPreviewService('test-preview-secret');
+    const preview = previews.create(request);
+    const createMessage = vi.fn().mockResolvedValue({ id: 'message-owned-from', status: 'QUEUED', sentOrReceivedAt: new Date('2026-08-20T00:00:00.000Z') });
+    const repository = {
+      withTransaction: vi.fn(async (work: (repo: unknown, transaction: unknown) => Promise<unknown>) => work({
+        findMailbox: vi.fn().mockResolvedValue({ id: request.mailboxId, address: 'shared@example.test', provider: 'FAKE', status: 'HEALTHY' }),
+        createConversation: vi.fn().mockResolvedValue({ id: 'conversation-owned-from', mailboxId: request.mailboxId }),
+        createMessage,
+        touchConversationOutbound: vi.fn().mockResolvedValue({}),
+      }, {})),
+    };
+    const idempotency = { runIdempotent: vi.fn(async (_key: string, _hash: string, work: () => Promise<unknown>) => work()) };
+    const command = new EmailCommandService(previews, repository as never, idempotency as never, { append: vi.fn() } as never, { append: vi.fn() } as never);
+
+    await command.enqueue({ ...request, previewToken: preview.token, idempotencyKey: 'owned-from-key' }, { actorId: 'user-1', correlationId: 'corr-owned-from' });
+    expect(createMessage).toHaveBeenCalledWith(expect.objectContaining({ fromAddress: 'shared@example.test' }));
+    expect(createMessage).not.toHaveBeenCalledWith(expect.objectContaining({ fromAddress: 'ops@example.test' }));
   });
 
   it('cancels only pre-send work and records an ID-only cancellation event', async () => {

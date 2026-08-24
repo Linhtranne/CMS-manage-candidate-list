@@ -7,6 +7,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-cms_candidate_supply}
     volumes:
       - cms-postgres:/var/lib/postgresql/data
+    # Local development only; production compose keeps the database private.
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -42,12 +45,34 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-development-only-encryption-key-32}
       SESSION_SECRET: ${SESSION_SECRET:-development-only-session-secret-32}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      OIDC_ISSUER: ${OIDC_ISSUER:-}
-      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
-      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
-      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
-      OIDC_AUDIENCE: ${OIDC_AUDIENCE:-}
-      OIDC_APPROVAL_RECORD_FILE: ${OIDC_APPROVAL_RECORD_FILE:-}
+      # Local authentication is email/password only. Provider OIDC is configured through staging/production compose.
+      OIDC_ISSUER: ""
+      OIDC_CLIENT_ID: ""
+      OIDC_CLIENT_SECRET: ""
+      OIDC_REDIRECT_URI: ""
+      OIDC_AUDIENCE: ""
+      OIDC_APPROVAL_RECORD_FILE: ""
+      PRODUCTION_SEED_ACTIVATION: ${PRODUCTION_SEED_ACTIVATION:-false}
+      CATALOG_APPROVAL_RECORD_FILE: ${CATALOG_APPROVAL_RECORD_FILE:-}
+      DOCUMENTS_ENABLED: ${DOCUMENTS_ENABLED:-false}
+      DOCUMENT_APPROVAL_RECORD_FILE: ${DOCUMENT_APPROVAL_RECORD_FILE:-}
+      BULK_EXPORT_ENABLED: ${BULK_EXPORT_ENABLED:-false}
+      EXPORT_APPROVAL_RECORD_FILE: ${EXPORT_APPROVAL_RECORD_FILE:-}
+      PURGE_ENABLED: ${PURGE_ENABLED:-false}
+      RETENTION_APPROVAL_RECORD_FILE: ${RETENTION_APPROVAL_RECORD_FILE:-}
+      BREAK_GLASS_ENABLED: ${BREAK_GLASS_ENABLED:-false}
+      BREAK_GLASS_APPROVAL_RECORD_FILE: ${BREAK_GLASS_APPROVAL_RECORD_FILE:-}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-}
+      STORAGE_REGION: ${STORAGE_REGION:-}
+      STORAGE_KMS_KEY_ID: ${STORAGE_KMS_KEY_ID:-}
+      STORAGE_UPLOAD_TTL_SECONDS: ${STORAGE_UPLOAD_TTL_SECONDS:-300}
+      STORAGE_DOWNLOAD_TTL_SECONDS: ${STORAGE_DOWNLOAD_TTL_SECONDS:-60}
+      MALWARE_SCANNER_ENDPOINT: ${MALWARE_SCANNER_ENDPOINT:-}
+      MALWARE_SCANNER_TIMEOUT_MS: ${MALWARE_SCANNER_TIMEOUT_MS:-5000}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-DISABLED}
+      MAIL_PROVIDER_APPROVAL_RECORD_FILE: ${MAIL_PROVIDER_APPROVAL_RECORD_FILE:-}
+      MAIL_CANARY_RECIPIENTS: ${MAIL_CANARY_RECIPIENTS:-}
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }

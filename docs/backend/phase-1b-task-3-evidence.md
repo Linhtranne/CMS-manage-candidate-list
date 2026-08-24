@@ -4,7 +4,7 @@ status: ready_for_human_approval
 technical_review: complete
 external_approvals: pending
 version: 1.0.0
-updated_at: 2026-08-21
+updated_at: 2026-08-24
 owner: Backend Tech Lead
 risk: critical
 ---
@@ -14,6 +14,7 @@ risk: critical
 ## Delivered
 
 - Added signed `POST /api/v1/webhooks/mail/{provider}` handling with provider/mailbox/notification/message binding, replay claim storage and fail-closed rejection while the provider/queue is disabled.
+- Hardened the public webhook boundary: only approved external providers are accepted (`FAKE` is synthetic-only), mailbox UUID/provider binding is checked before replay claim, and notification/message identifiers are validated with bounded DTO fields.
 - Webhook queue payloads contain only schema, event, correlation, provider, mailbox, notification and provider-message identifiers. Message body, addresses and attachments are fetched by a worker and are not placed in queue payloads.
 - Added `mail-ingest` fetch worker and sequential mailbox sync worker. A sync cursor advances only after every message in the fetched page commits successfully; a failed page item leaves the cursor unchanged for safe replay.
 - Added transactional inbound ingest with provider-message dedupe, normalized sender/recipient addresses, immutable `RECEIVED` message persistence, provider thread/reply headers, append-only match decisions and conversation activity updates.
@@ -25,9 +26,9 @@ risk: critical
 ## Verification
 
 ```text
-vitest run test/email --pool=threads --maxWorkers=1                    # 5 files, 21 tests passed
+vitest run test/email --pool=threads --maxWorkers=1                    # 7 files, 40 tests passed
 vitest run test/e2e/api.e2e-spec.ts --pool=threads --maxWorkers=1       # 1 file, 3 tests passed
-vitest run (API) --pool=threads --maxWorkers=1                         # 39 files passed, 4 skipped; 109 passed, 15 skipped
+vitest run (API) --pool=threads --maxWorkers=1                         # 48 files passed, 4 skipped; 172 passed, 15 skipped
 pnpm --filter @cms/api typecheck                                        # passed
 pnpm --filter @cms/api lint                                             # passed; MODULE_BOUNDARY_VIOLATIONS=0
 pnpm --filter @cms/api build                                            # passed

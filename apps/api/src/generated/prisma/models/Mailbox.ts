@@ -41,6 +41,9 @@ export type MailboxMinAggregateOutputType = {
   provider: string | null
   status: string | null
   providerAccountRef: string | null
+  providerSubscriptionId: string | null
+  providerSubscriptionExpiresAt: Date | null
+  lastSubscriptionRenewedAt: Date | null
   syncCursor: string | null
   syncCursorIssuedAt: Date | null
   lastSyncAt: Date | null
@@ -57,6 +60,9 @@ export type MailboxMaxAggregateOutputType = {
   provider: string | null
   status: string | null
   providerAccountRef: string | null
+  providerSubscriptionId: string | null
+  providerSubscriptionExpiresAt: Date | null
+  lastSubscriptionRenewedAt: Date | null
   syncCursor: string | null
   syncCursorIssuedAt: Date | null
   lastSyncAt: Date | null
@@ -73,6 +79,9 @@ export type MailboxCountAggregateOutputType = {
   provider: number
   status: number
   providerAccountRef: number
+  providerSubscriptionId: number
+  providerSubscriptionExpiresAt: number
+  lastSubscriptionRenewedAt: number
   syncCursor: number
   syncCursorIssuedAt: number
   lastSyncAt: number
@@ -99,6 +108,9 @@ export type MailboxMinAggregateInputType = {
   provider?: true
   status?: true
   providerAccountRef?: true
+  providerSubscriptionId?: true
+  providerSubscriptionExpiresAt?: true
+  lastSubscriptionRenewedAt?: true
   syncCursor?: true
   syncCursorIssuedAt?: true
   lastSyncAt?: true
@@ -115,6 +127,9 @@ export type MailboxMaxAggregateInputType = {
   provider?: true
   status?: true
   providerAccountRef?: true
+  providerSubscriptionId?: true
+  providerSubscriptionExpiresAt?: true
+  lastSubscriptionRenewedAt?: true
   syncCursor?: true
   syncCursorIssuedAt?: true
   lastSyncAt?: true
@@ -131,6 +146,9 @@ export type MailboxCountAggregateInputType = {
   provider?: true
   status?: true
   providerAccountRef?: true
+  providerSubscriptionId?: true
+  providerSubscriptionExpiresAt?: true
+  lastSubscriptionRenewedAt?: true
   syncCursor?: true
   syncCursorIssuedAt?: true
   lastSyncAt?: true
@@ -234,6 +252,9 @@ export type MailboxGroupByOutputType = {
   provider: string
   status: string
   providerAccountRef: string | null
+  providerSubscriptionId: string | null
+  providerSubscriptionExpiresAt: Date | null
+  lastSubscriptionRenewedAt: Date | null
   syncCursor: string | null
   syncCursorIssuedAt: Date | null
   lastSyncAt: Date | null
@@ -273,6 +294,9 @@ export type MailboxWhereInput = {
   provider?: Prisma.StringFilter<"Mailbox"> | string
   status?: Prisma.StringFilter<"Mailbox"> | string
   providerAccountRef?: Prisma.StringNullableFilter<"Mailbox"> | string | null
+  providerSubscriptionId?: Prisma.StringNullableFilter<"Mailbox"> | string | null
+  providerSubscriptionExpiresAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
   syncCursor?: Prisma.StringNullableFilter<"Mailbox"> | string | null
   syncCursorIssuedAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
   lastSyncAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
@@ -292,6 +316,9 @@ export type MailboxOrderByWithRelationInput = {
   provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerAccountRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerSubscriptionExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastSubscriptionRenewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   syncCursor?: Prisma.SortOrderInput | Prisma.SortOrder
   syncCursorIssuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastSyncAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -314,6 +341,9 @@ export type MailboxWhereUniqueInput = Prisma.AtLeast<{
   provider?: Prisma.StringFilter<"Mailbox"> | string
   status?: Prisma.StringFilter<"Mailbox"> | string
   providerAccountRef?: Prisma.StringNullableFilter<"Mailbox"> | string | null
+  providerSubscriptionId?: Prisma.StringNullableFilter<"Mailbox"> | string | null
+  providerSubscriptionExpiresAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
   syncCursor?: Prisma.StringNullableFilter<"Mailbox"> | string | null
   syncCursorIssuedAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
   lastSyncAt?: Prisma.DateTimeNullableFilter<"Mailbox"> | Date | string | null
@@ -333,6 +363,9 @@ export type MailboxOrderByWithAggregationInput = {
   provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerAccountRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerSubscriptionExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastSubscriptionRenewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   syncCursor?: Prisma.SortOrderInput | Prisma.SortOrder
   syncCursorIssuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastSyncAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -357,6 +390,9 @@ export type MailboxScalarWhereWithAggregatesInput = {
   provider?: Prisma.StringWithAggregatesFilter<"Mailbox"> | string
   status?: Prisma.StringWithAggregatesFilter<"Mailbox"> | string
   providerAccountRef?: Prisma.StringNullableWithAggregatesFilter<"Mailbox"> | string | null
+  providerSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Mailbox"> | string | null
+  providerSubscriptionExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Mailbox"> | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Mailbox"> | Date | string | null
   syncCursor?: Prisma.StringNullableWithAggregatesFilter<"Mailbox"> | string | null
   syncCursorIssuedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Mailbox"> | Date | string | null
   lastSyncAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Mailbox"> | Date | string | null
@@ -373,6 +409,9 @@ export type MailboxCreateInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -392,6 +431,9 @@ export type MailboxUncheckedCreateInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -411,6 +453,9 @@ export type MailboxUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -430,6 +475,9 @@ export type MailboxUncheckedUpdateInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -449,6 +497,9 @@ export type MailboxCreateManyInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -465,6 +516,9 @@ export type MailboxUpdateManyMutationInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -481,6 +535,9 @@ export type MailboxUncheckedUpdateManyInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -497,6 +554,9 @@ export type MailboxCountOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerAccountRef?: Prisma.SortOrder
+  providerSubscriptionId?: Prisma.SortOrder
+  providerSubscriptionExpiresAt?: Prisma.SortOrder
+  lastSubscriptionRenewedAt?: Prisma.SortOrder
   syncCursor?: Prisma.SortOrder
   syncCursorIssuedAt?: Prisma.SortOrder
   lastSyncAt?: Prisma.SortOrder
@@ -517,6 +577,9 @@ export type MailboxMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerAccountRef?: Prisma.SortOrder
+  providerSubscriptionId?: Prisma.SortOrder
+  providerSubscriptionExpiresAt?: Prisma.SortOrder
+  lastSubscriptionRenewedAt?: Prisma.SortOrder
   syncCursor?: Prisma.SortOrder
   syncCursorIssuedAt?: Prisma.SortOrder
   lastSyncAt?: Prisma.SortOrder
@@ -533,6 +596,9 @@ export type MailboxMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
   providerAccountRef?: Prisma.SortOrder
+  providerSubscriptionId?: Prisma.SortOrder
+  providerSubscriptionExpiresAt?: Prisma.SortOrder
+  lastSubscriptionRenewedAt?: Prisma.SortOrder
   syncCursor?: Prisma.SortOrder
   syncCursorIssuedAt?: Prisma.SortOrder
   lastSyncAt?: Prisma.SortOrder
@@ -600,6 +666,9 @@ export type MailboxCreateWithoutConversationsInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -618,6 +687,9 @@ export type MailboxUncheckedCreateWithoutConversationsInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -652,6 +724,9 @@ export type MailboxUpdateWithoutConversationsInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -670,6 +745,9 @@ export type MailboxUncheckedUpdateWithoutConversationsInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -688,6 +766,9 @@ export type MailboxCreateWithoutMessagesInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -706,6 +787,9 @@ export type MailboxUncheckedCreateWithoutMessagesInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -740,6 +824,9 @@ export type MailboxUpdateWithoutMessagesInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -758,6 +845,9 @@ export type MailboxUncheckedUpdateWithoutMessagesInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -776,6 +866,9 @@ export type MailboxCreateWithoutWebhookNotificationsInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -794,6 +887,9 @@ export type MailboxUncheckedCreateWithoutWebhookNotificationsInput = {
   provider?: string
   status?: string
   providerAccountRef?: string | null
+  providerSubscriptionId?: string | null
+  providerSubscriptionExpiresAt?: Date | string | null
+  lastSubscriptionRenewedAt?: Date | string | null
   syncCursor?: string | null
   syncCursorIssuedAt?: Date | string | null
   lastSyncAt?: Date | string | null
@@ -828,6 +924,9 @@ export type MailboxUpdateWithoutWebhookNotificationsInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -846,6 +945,9 @@ export type MailboxUncheckedUpdateWithoutWebhookNotificationsInput = {
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerSubscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSubscriptionRenewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   syncCursor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   syncCursorIssuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastSyncAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -913,6 +1015,9 @@ export type MailboxSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   provider?: boolean
   status?: boolean
   providerAccountRef?: boolean
+  providerSubscriptionId?: boolean
+  providerSubscriptionExpiresAt?: boolean
+  lastSubscriptionRenewedAt?: boolean
   syncCursor?: boolean
   syncCursorIssuedAt?: boolean
   lastSyncAt?: boolean
@@ -933,6 +1038,9 @@ export type MailboxSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   provider?: boolean
   status?: boolean
   providerAccountRef?: boolean
+  providerSubscriptionId?: boolean
+  providerSubscriptionExpiresAt?: boolean
+  lastSubscriptionRenewedAt?: boolean
   syncCursor?: boolean
   syncCursorIssuedAt?: boolean
   lastSyncAt?: boolean
@@ -949,6 +1057,9 @@ export type MailboxSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   provider?: boolean
   status?: boolean
   providerAccountRef?: boolean
+  providerSubscriptionId?: boolean
+  providerSubscriptionExpiresAt?: boolean
+  lastSubscriptionRenewedAt?: boolean
   syncCursor?: boolean
   syncCursorIssuedAt?: boolean
   lastSyncAt?: boolean
@@ -965,6 +1076,9 @@ export type MailboxSelectScalar = {
   provider?: boolean
   status?: boolean
   providerAccountRef?: boolean
+  providerSubscriptionId?: boolean
+  providerSubscriptionExpiresAt?: boolean
+  lastSubscriptionRenewedAt?: boolean
   syncCursor?: boolean
   syncCursorIssuedAt?: boolean
   lastSyncAt?: boolean
@@ -974,7 +1088,7 @@ export type MailboxSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MailboxOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "address" | "displayName" | "provider" | "status" | "providerAccountRef" | "syncCursor" | "syncCursorIssuedAt" | "lastSyncAt" | "lastSendAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["mailbox"]>
+export type MailboxOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "address" | "displayName" | "provider" | "status" | "providerAccountRef" | "providerSubscriptionId" | "providerSubscriptionExpiresAt" | "lastSubscriptionRenewedAt" | "syncCursor" | "syncCursorIssuedAt" | "lastSyncAt" | "lastSendAt" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["mailbox"]>
 export type MailboxInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | Prisma.Mailbox$conversationsArgs<ExtArgs>
   messages?: boolean | Prisma.Mailbox$messagesArgs<ExtArgs>
@@ -998,6 +1112,9 @@ export type $MailboxPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     provider: string
     status: string
     providerAccountRef: string | null
+    providerSubscriptionId: string | null
+    providerSubscriptionExpiresAt: Date | null
+    lastSubscriptionRenewedAt: Date | null
     syncCursor: string | null
     syncCursorIssuedAt: Date | null
     lastSyncAt: Date | null
@@ -1437,6 +1554,9 @@ export interface MailboxFieldRefs {
   readonly provider: Prisma.FieldRef<"Mailbox", 'String'>
   readonly status: Prisma.FieldRef<"Mailbox", 'String'>
   readonly providerAccountRef: Prisma.FieldRef<"Mailbox", 'String'>
+  readonly providerSubscriptionId: Prisma.FieldRef<"Mailbox", 'String'>
+  readonly providerSubscriptionExpiresAt: Prisma.FieldRef<"Mailbox", 'DateTime'>
+  readonly lastSubscriptionRenewedAt: Prisma.FieldRef<"Mailbox", 'DateTime'>
   readonly syncCursor: Prisma.FieldRef<"Mailbox", 'String'>
   readonly syncCursorIssuedAt: Prisma.FieldRef<"Mailbox", 'DateTime'>
   readonly lastSyncAt: Prisma.FieldRef<"Mailbox", 'DateTime'>

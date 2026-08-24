@@ -11,6 +11,15 @@ export interface QueuePayload {
   [key: string]: unknown;
 }
 
+export interface QueueHealthCounts {
+  enabled: boolean;
+  available: boolean;
+  waiting: number;
+  active: number;
+  delayed: number;
+  failed: number;
+}
+
 const SENSITIVE_KEYS = /(token|secret|password|authorization|cookie|email|phone|address|object[_-]?key|signed[_-]?url|access[_-]?key)/i;
 
 function connectionFromUrl(raw: string): ConnectionOptions {
@@ -51,6 +60,8 @@ export class QueueService implements OnModuleDestroy {
 
   get enabled(): boolean { return this.config.queue.enabled; }
 
+  get configuredQueueNames(): readonly string[] { return this.config.queue.names; }
+
   private queue(name: string): Queue<QueuePayload> {
     if (!this.config.queue.names.includes(name)) throw new Error(`QUEUE_NOT_ALLOWED:${name}`);
     const existing = this.queues.get(name);
@@ -76,6 +87,29 @@ export class QueueService implements OnModuleDestroy {
     await queue.getJobCounts();
   }
 
+  async healthCounts(): Promise<QueueHealthCounts> {
+    // The configured list is the allowlist for this deployment, so count every
+    // configured queue (including provider-specific names such as
+    // `mail-outbound` and `notifications`) instead of silently omitting one.
+    const queueNames = this.config.queue.names;
+    const empty: QueueHealthCounts = { enabled: this.enabled, available: !this.enabled, waiting: 0, active: 0, delayed: 0, failed: 0 };
+    if (!this.enabled || !queueNames.length) return empty;
+
+    try {
+      const counts = await Promise.all(queueNames.map((name) => this.queue(name).getJobCounts('waiting', 'active', 'delayed', 'failed')));
+      return counts.reduce<QueueHealthCounts>((total, count) => ({
+        ...total,
+        available: true,
+        waiting: total.waiting + (count.waiting ?? 0),
+        active: total.active + (count.active ?? 0),
+        delayed: total.delayed + (count.delayed ?? 0),
+        failed: total.failed + (count.failed ?? 0),
+      }), { ...empty, available: true });
+    } catch {
+      return { ...empty, available: false };
+    }
+  }
+
   startWorker(name: string, handler: (payload: QueuePayload) => Promise<void>): void {
     if (!this.enabled || this.workers.has(name)) return;
     const worker = new Worker<QueuePayload>(name, async (job) => handler(job.data), {
@@ -86,7 +120,7 @@ export class QueueService implements OnModuleDestroy {
     this.telemetry?.increment(`queue.${name}.worker_started`);
     worker.on('failed', (job, error) => {
       this.telemetry?.increment(`queue.${name}.failed`);
-      console.error(JSON.stringify({ event: 'queue_job_failed', queue: name, jobId: job?.id, error: error.message }));
+      console.error(JSON.stringify({ event: 'queue_job_failed', queue: name, jobId: job?.id, error: sanitizeQueueError(error) }));
     });
     this.workers.set(name, worker);
   }
@@ -95,4 +129,12 @@ export class QueueService implements OnModuleDestroy {
     await Promise.all([...this.workers.values()].map((worker) => worker.close()));
     await Promise.all([...this.queues.values()].map((queue) => queue.close()));
   }
+}
+
+function sanitizeQueueError(error: Error): string {
+  // Provider SDKs may echo recipient/body data in exception messages. Keep
+  // operational classification while preventing accidental PII telemetry.
+  const candidate = error as unknown as { code?: unknown };
+  const code = typeof candidate.code === 'string' ? candidate.code : 'QUEUE_JOB_FAILED';
+  return code.replace(/[^A-Z0-9_.-]/gi, '_').slice(0, 120);
 }

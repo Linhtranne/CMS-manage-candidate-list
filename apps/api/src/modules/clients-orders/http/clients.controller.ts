@@ -28,7 +28,7 @@ export class ClientsController {
   @RequirePermission('client.create')
   create(@Body() body: CreateClientDto, @Req() request: AuthenticatedRequest) {
     return this.clients.create({
-      name: body.name, organizationType: body.organizationType, industryLabels: body.industryLabels, region: body.region, ownerId: body.ownerId, teamId: body.teamId,
+      name: body.name, organizationType: body.organizationType, industryLabels: body.industryLabels, region: body.region, ownerId: request.auth!.userId, teamId: request.auth!.teamId,
       contact: body.contactName ? { name: body.contactName, ...(body.contactEmail ? { email: body.contactEmail } : {}), ...(body.contactPhone ? { phone: body.contactPhone } : {}) } : null,
       notes: body.notes,
     }, this.context(request)).then(serializeClient);

@@ -25,6 +25,13 @@ export class InterviewService {
       const participantCount = await tx.user.count({ where: { id: { in: input.participants }, status: 'ACTIVE' } });
       if (participantCount !== input.participants.length) throw new InterviewDomainError('INTERVIEW_PARTICIPANT_NOT_FOUND', 'errors.interviewParticipantNotFound', 422);
       await this.assertParticipantConflict(tx, input.participants, input.scheduledAt, input.scheduledEndAt);
+      if (application.status === 'MATCHED') {
+        const statusUpdate = await tx.application.update({ where: { id: applicationId }, data: { status: 'IN_INTERVIEW_PROCESS', lastActivityAt: new Date(), version: { increment: 1 } } });
+        const applicationVersion = statusUpdate.version;
+        await tx.applicationStatusHistory.create({ data: { applicationId, fromStatus: 'MATCHED', toStatus: 'IN_INTERVIEW_PROCESS', actorUserId: context.actorId, metadata: { reason: 'INTERVIEW_SCHEDULED' } } });
+        await this.audit.append(tx, { action: 'APPLICATION_STATUS_CHANGED', entityType: 'Application', entityId: applicationId, actorUserId: context.actorId, correlationId: context.correlationId, metadataJson: { fromStatus: 'MATCHED', toStatus: 'IN_INTERVIEW_PROCESS', reason: 'INTERVIEW_SCHEDULED' } });
+        await this.outbox.append(tx, { eventType: 'application.status_changed', aggregateType: 'Application', aggregateId: applicationId, idempotencyKey: `application.status:${applicationId}:${applicationVersion}`, correlationId: context.correlationId, payload: { fromStatus: 'MATCHED', toStatus: 'IN_INTERVIEW_PROCESS', reason: 'INTERVIEW_SCHEDULED' } });
+      }
       try {
         const interview = await tx.interview.create({ data: {
           applicationId, ownerId: context.actorId, roundNo: round + 1, scheduledAt: input.scheduledAt, scheduledEndAt: input.scheduledEndAt, timeZone: input.timeZone.trim(), mode: input.mode,

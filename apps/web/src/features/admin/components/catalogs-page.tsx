@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
-import { useAdminCatalogs, useCreateAdminCatalog, useRetireAdminCatalog } from '../services/admin-queries';
+import {
+  useAdminCatalogs,
+  useCreateAdminCatalog,
+  useRetireAdminCatalog,
+} from '../services/admin-queries';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { StatusLabel } from '@/components/ui/status-label';
@@ -21,10 +25,205 @@ export function CatalogsPage() {
   const [code, setCode] = useState('');
   const [label, setLabel] = useState('');
   const [error, setError] = useState('');
-  const [retireTarget, setRetireTarget] = useState<{ id: string; label: string; version: number }>();
-  const submit = () => { if (!code.trim() || !label.trim()) { setError(t('admin.catalogs.required')); return; } setError(''); create.mutate({ type, code: code.trim().toUpperCase(), label: label.trim() }, { onSuccess: () => { setOpen(false); setCode(''); setLabel(''); }, onError: (cause) => setError(localizedError(t, cause, t('admin.catalogs.loadError'))) }); };
+  const [retireTarget, setRetireTarget] = useState<{
+    id: string;
+    label: string;
+    version: number;
+  }>();
+  const submit = () => {
+    if (!code.trim() || !label.trim()) {
+      setError(t('admin.catalogs.required'));
+      return;
+    }
+    setError('');
+    create.mutate(
+      { type, code: code.trim().toUpperCase(), label: label.trim() },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setCode('');
+          setLabel('');
+        },
+        onError: (cause) => setError(localizedError(t, cause, t('admin.catalogs.loadError'))),
+      },
+    );
+  };
   if (query.isPending) return <LoadingState label={t('admin.catalogs.loading')} />;
-  if (query.error) return <ErrorState message={t('admin.catalogs.loadError')} onRetry={() => void query.refetch()} />;
-  const typeLabels = { INDUSTRY: t('admin.catalogs.industry'), OCCUPATION: t('admin.catalogs.occupation'), VISA_ROUTE: t('admin.catalogs.visaRoute'), SOURCE: t('admin.catalogs.source') };
-  return <div className="space-y-6"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-medium text-accent">{t('admin.catalogs.eyebrow')}</p><h1 className="mt-1 text-2xl font-bold text-text">{t('admin.catalogs.title')}</h1><p className="mt-2 text-sm text-text-muted">{t('admin.catalogs.description')}</p></div><Button variant="primary" onClick={() => setOpen(true)}>{t('admin.catalogs.add')}</Button></div><section className="overflow-x-auto rounded-lg border border-border bg-panel p-5"><table className="w-full min-w-[44rem] text-left text-sm"><thead><tr className="border-b border-border text-xs uppercase tracking-wide text-text-muted"><th className="px-3 py-3">{t('admin.catalogs.type')}</th><th className="px-3 py-3">{t('admin.catalogs.code')}</th><th className="px-3 py-3">{t('admin.catalogs.label')}</th><th className="px-3 py-3">{t('admin.catalogs.usage')}</th><th className="px-3 py-3">{t('admin.catalogs.status')}</th><th className="px-3 py-3">{t('admin.catalogs.actions')}</th></tr></thead><tbody>{query.data?.items.length ? query.data.items.map((item) => <tr key={item.id} className="border-b border-border last:border-0"><td className="px-3 py-3 text-text-muted">{typeLabels[item.type]}</td><td className="px-3 py-3 font-semibold text-text">{item.code}</td><td className="px-3 py-3 text-text">{item.label}</td><td className="px-3 py-3 text-text-muted">{item.usageCount}</td><td className="px-3 py-3"><StatusLabel tone={item.status === 'ACTIVE' ? 'success' : 'neutral'}>{item.status === 'ACTIVE' ? t('admin.catalogs.active') : t('admin.catalogs.retired')}</StatusLabel></td><td className="px-3 py-3">{item.status === 'ACTIVE' ? <button type="button" className="text-sm font-semibold text-danger underline" aria-label={t('admin.catalogs.retire')} disabled={retire.isPending} onClick={() => setRetireTarget({ id: item.id, label: item.label, version: item.version })}>{t('admin.catalogs.retire')}</button> : <span className="text-sm text-text-muted">{t('admin.catalogs.noAction')}</span>}</td></tr>) : <tr><td colSpan={6} className="p-4"><EmptyState title={t('admin.catalogs.empty')} description={t('admin.catalogs.emptyDescription')} action={<Button variant="primary" onClick={() => setOpen(true)}>{t('admin.catalogs.add')}</Button>} /></td></tr>}</tbody></table></section><Modal open={open} title={t('admin.catalogs.addTitle')} description={t('admin.catalogs.addDescription')} onClose={() => setOpen(false)} size="sm" footer={<><Button onClick={() => setOpen(false)}>{t('admin.catalogs.cancel')}</Button><Button variant="primary" disabled={create.isPending} onClick={submit}>{t('admin.catalogs.save')}</Button></>}><div className="space-y-4">{error ? <p role="alert" className="text-sm font-semibold text-danger">{error}</p> : null}<label className="block text-sm font-semibold text-text">{t('admin.catalogs.type')}<select aria-label={t('admin.catalogs.typeAria')} name="loai-danh-muc" value={type} onChange={(event) => setType(event.target.value as typeof type)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"><option value="INDUSTRY">{t('admin.catalogs.industry')}</option><option value="OCCUPATION">{t('admin.catalogs.occupation')}</option><option value="VISA_ROUTE">{t('admin.catalogs.visaRoute')}</option><option value="SOURCE">{t('admin.catalogs.source')}</option></select></label><label className="block text-sm font-semibold text-text">{t('admin.catalogs.code')}<input aria-label={t('admin.catalogs.codeAria')} name="ma-danh-muc" value={code} onChange={(event) => setCode(event.target.value)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal" /></label><label className="block text-sm font-semibold text-text">{t('admin.catalogs.label')}<input aria-label={t('admin.catalogs.labelAria')} name="nhan-danh-muc" value={label} onChange={(event) => setLabel(event.target.value)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal" /></label></div></Modal><Modal open={Boolean(retireTarget)} title={t('admin.catalogs.retireTitle')} description={t('admin.catalogs.retireDescription')} onClose={() => setRetireTarget(undefined)} size="sm" footer={<><Button onClick={() => setRetireTarget(undefined)}>{t('admin.catalogs.cancel')}</Button><Button variant="primary" disabled={retire.isPending} onClick={() => { if (!retireTarget) return; retire.mutate({ id: retireTarget.id, body: { version: retireTarget.version } }, { onSuccess: () => setRetireTarget(undefined) }); }}>{t('admin.catalogs.confirmRetire')}</Button></>}><p className="text-sm text-text">{retireTarget?.label}</p></Modal></div>;
+  if (query.error)
+    return (
+      <ErrorState message={t('admin.catalogs.loadError')} onRetry={() => void query.refetch()} />
+    );
+  const typeLabels = {
+    INDUSTRY: t('admin.catalogs.industry'),
+    OCCUPATION: t('admin.catalogs.occupation'),
+    VISA_ROUTE: t('admin.catalogs.visaRoute'),
+    SOURCE: t('admin.catalogs.source'),
+  };
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-accent">{t('admin.catalogs.eyebrow')}</p>
+          <h1 className="mt-1 text-2xl font-bold text-text">{t('admin.catalogs.title')}</h1>
+          <p className="mt-2 text-sm text-text-muted">{t('admin.catalogs.description')}</p>
+        </div>
+        <Button variant="primary" onClick={() => setOpen(true)}>
+          {t('admin.catalogs.add')}
+        </Button>
+      </div>
+      <section className="overflow-x-auto rounded-lg border border-border bg-panel p-5">
+        <table className="w-full min-w-[44rem] text-left text-sm">
+          <thead>
+            <tr className="border-b border-border text-xs uppercase tracking-wide text-text-muted">
+              <th className="px-3 py-3">{t('admin.catalogs.type')}</th>
+              <th className="px-3 py-3">{t('admin.catalogs.code')}</th>
+              <th className="px-3 py-3">{t('admin.catalogs.label')}</th>
+              <th className="px-3 py-3">{t('admin.catalogs.usage')}</th>
+              <th className="px-3 py-3">{t('admin.catalogs.status')}</th>
+              <th className="px-3 py-3">{t('admin.catalogs.actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {query.data?.items.length ? (
+              query.data.items.map((item) => (
+                <tr key={item.id} className="border-b border-border last:border-0">
+                  <td className="px-3 py-3 text-text-muted">{typeLabels[item.type]}</td>
+                  <td className="px-3 py-3 font-semibold text-text">{item.code}</td>
+                  <td className="px-3 py-3 text-text">{item.label}</td>
+                  <td className="px-3 py-3 text-text-muted">{item.usageCount}</td>
+                  <td className="px-3 py-3">
+                    <StatusLabel tone={item.status === 'ACTIVE' ? 'success' : 'neutral'}>
+                      {item.status === 'ACTIVE'
+                        ? t('admin.catalogs.active')
+                        : item.status === 'DRAFT'
+                          ? t('admin.catalogs.draft')
+                          : t('admin.catalogs.retired')}
+                    </StatusLabel>
+                  </td>
+                  <td className="px-3 py-3">
+                    {item.status === 'ACTIVE' ? (
+                      <button
+                        type="button"
+                        className="text-sm font-semibold text-danger underline"
+                        aria-label={t('admin.catalogs.retire')}
+                        disabled={retire.isPending}
+                        onClick={() =>
+                          setRetireTarget({ id: item.id, label: item.label, version: item.version })
+                        }
+                      >
+                        {t('admin.catalogs.retire')}
+                      </button>
+                    ) : (
+                      <span className="text-sm text-text-muted">
+                        {t('admin.catalogs.noAction')}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="p-4">
+                  <EmptyState
+                    title={t('admin.catalogs.empty')}
+                    description={t('admin.catalogs.emptyDescription')}
+                    action={
+                      <Button variant="primary" onClick={() => setOpen(true)}>
+                        {t('admin.catalogs.add')}
+                      </Button>
+                    }
+                  />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </section>
+      <Modal
+        open={open}
+        title={t('admin.catalogs.addTitle')}
+        description={t('admin.catalogs.addDescription')}
+        onClose={() => setOpen(false)}
+        size="sm"
+        footer={
+          <>
+            <Button onClick={() => setOpen(false)}>{t('admin.catalogs.cancel')}</Button>
+            <Button variant="primary" disabled={create.isPending} onClick={submit}>
+              {t('admin.catalogs.save')}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {error ? (
+            <p role="alert" className="text-sm font-semibold text-danger">
+              {error}
+            </p>
+          ) : null}
+          <label className="block text-sm font-semibold text-text">
+            {t('admin.catalogs.type')}
+            <select
+              aria-label={t('admin.catalogs.typeAria')}
+              name="loai-danh-muc"
+              value={type}
+              onChange={(event) => setType(event.target.value as typeof type)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"
+            >
+              <option value="INDUSTRY">{t('admin.catalogs.industry')}</option>
+              <option value="OCCUPATION">{t('admin.catalogs.occupation')}</option>
+              <option value="VISA_ROUTE">{t('admin.catalogs.visaRoute')}</option>
+              <option value="SOURCE">{t('admin.catalogs.source')}</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {t('admin.catalogs.code')}
+            <input
+              aria-label={t('admin.catalogs.codeAria')}
+              name="ma-danh-muc"
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {t('admin.catalogs.label')}
+            <input
+              aria-label={t('admin.catalogs.labelAria')}
+              name="nhan-danh-muc"
+              value={label}
+              onChange={(event) => setLabel(event.target.value)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"
+            />
+          </label>
+        </div>
+      </Modal>
+      <Modal
+        open={Boolean(retireTarget)}
+        title={t('admin.catalogs.retireTitle')}
+        description={t('admin.catalogs.retireDescription')}
+        onClose={() => setRetireTarget(undefined)}
+        size="sm"
+        footer={
+          <>
+            <Button onClick={() => setRetireTarget(undefined)}>{t('admin.catalogs.cancel')}</Button>
+            <Button
+              variant="primary"
+              disabled={retire.isPending}
+              onClick={() => {
+                if (!retireTarget) return;
+                retire.mutate(
+                  { id: retireTarget.id, body: { version: retireTarget.version } },
+                  { onSuccess: () => setRetireTarget(undefined) },
+                );
+              }}
+            >
+              {t('admin.catalogs.confirmRetire')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-text">{retireTarget?.label}</p>
+      </Modal>
+    </div>
+  );
 }

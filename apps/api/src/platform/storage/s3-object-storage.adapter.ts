@@ -5,6 +5,7 @@ import type { ObjectStoragePort, StoredObjectMetadata } from './object-storage.p
 import { detectMagicContentType } from '../files/mime-detect.js';
 
 export interface S3CompatibleClient {
+  presignPutObject?(key: string, ttlSeconds: number, contentType: string, sizeBytes: number, checksum: string): Promise<{ url: string; expiresAt: Date }>;
   putObject(input: { key: string; body: Readable; contentType?: string }): Promise<{ sizeBytes?: number; checksum?: string }>;
   headObject(key: string): Promise<{ sizeBytes: number; checksum?: string; contentType?: string }>;
   presignGetObject(key: string, ttlSeconds: number): Promise<{ url: string; expiresAt: Date }>;
@@ -14,6 +15,7 @@ export interface S3CompatibleClient {
 @Injectable()
 export class S3ObjectStorageAdapter implements ObjectStoragePort {
   constructor(private readonly client: S3CompatibleClient) {}
+  async createSignedUpload(objectKey: string, ttlSeconds: number, contentType: string, sizeBytes: number, checksum: string) { if (!this.client.presignPutObject) throw new Error('OBJECT_STORAGE_UPLOAD_SIGNING_UNAVAILABLE'); return this.client.presignPutObject(objectKey, ttlSeconds, contentType, sizeBytes, checksum); }
 
   async putQuarantine(input: { objectKey: string; source: Readable; maxBytes: number; contentType?: string; expectedChecksum?: string }): Promise<StoredObjectMetadata> {
     let sizeBytes = 0;

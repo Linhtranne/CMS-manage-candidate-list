@@ -4,20 +4,31 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 
+type WebJobOrder = components['schemas']['JobOrder'];
+
+function normalizeOrder(order: WebJobOrder): WebJobOrder {
+  const status = order.status === 'OPEN'
+    ? 'RECRUITING'
+    : order.status === 'ON_HOLD'
+      ? 'PAUSED'
+      : order.status;
+  return status === order.status ? order : { ...order, status };
+}
+
 export async function fetchOrders(params: { query?: string; status?: string; industry?: string } = {}) {
   const response = await apiClient.GET('/orders', { params: { query: params } });
   if (response.error) throw new Error(response.error.message);
-  return response.data;
+  return { ...response.data, items: response.data.items.map(normalizeOrder) };
 }
 
 export async function fetchOrder(id: string) {
   const response = await apiClient.GET('/orders/{id}', { params: { path: { id } } });
   if (response.error) throw new Error(response.error.message);
-  return response.data;
+  return normalizeOrder(response.data);
 }
 
 export async function searchCandidatesForOrder(params: { orderId: string; query?: string; industry?: string; occupation?: string; skill?: string; japaneseLevel?: string; readiness?: string; hasActiveJourney?: string }) {
-  const response = await apiClient.GET('/candidates/search-for-order', { params: { query: params } });
+  const response = await apiClient.GET('/candidates/search-for-order', { params: { query: { orderId: params.orderId, query: params.query, industrySectorId: params.industry, occupationId: params.occupation, skill: params.skill, japaneseLevel: params.japaneseLevel, readinessStatus: params.readiness, hasActiveJourney: params.hasActiveJourney } } });
   if (response.error) throw new Error(response.error.message);
   return response.data;
 }

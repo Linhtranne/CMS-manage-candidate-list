@@ -15,6 +15,11 @@ function maskMailboxAddress(value: string): string {
   return `${(local?.slice(0, 1) ?? '*')}***@${domain}`;
 }
 
+function safeProviderDetail(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return value.replace(/[^A-Z0-9_.:-]/gi, '_').slice(0, 160);
+}
+
 @Controller('mailboxes')
 @UseGuards(SessionGuard, PolicyGuard)
 export class MailboxAdminController {
@@ -31,8 +36,39 @@ export class MailboxAdminController {
   async health(@Param('id') id: string) {
     const mailbox = await this.repository.findMailbox(id);
     if (!mailbox) throw Object.assign(new Error('MAILBOX_NOT_FOUND'), { code: 'MAILBOX_NOT_FOUND', statusCode: 404, messageKey: 'errors.mailboxNotFound' });
-    const provider = await this.provider.validateConnection();
-    return { id: mailbox.id, address: maskMailboxAddress(mailbox.address), provider: mailbox.provider, status: mailbox.status, providerHealth: { status: provider.status, checkedAt: provider.checkedAt, detail: provider.detail } };
+    const [provider, queue] = await Promise.all([this.readProviderHealth(), this.queue.healthCounts()]);
+    const cursorAgeSeconds = mailbox.syncCursorIssuedAt
+      ? Math.max(0, Math.floor((Date.now() - mailbox.syncCursorIssuedAt.getTime()) / 1000))
+      : null;
+    return {
+      id: mailbox.id,
+      address: maskMailboxAddress(mailbox.address),
+      provider: mailbox.provider,
+      status: mailbox.status,
+      lastSyncAt: mailbox.lastSyncAt,
+      lastSendAt: mailbox.lastSendAt,
+      subscriptionExpiresAt: mailbox.providerSubscriptionExpiresAt,
+      cursorAgeSeconds,
+      queue,
+      providerHealth: provider,
+    };
+  }
+
+  private async readProviderHealth(): Promise<{ status: string; checkedAt: Date; authExpiresAt: Date | null; detail?: string }> {
+    try {
+      const health = await this.provider.validateConnection();
+      const detail = safeProviderDetail(health.detail);
+      return {
+        status: health.status,
+        checkedAt: health.checkedAt,
+        authExpiresAt: health.authExpiresAt ?? null,
+        ...(detail ? { detail } : {}),
+      };
+    } catch (error) {
+      const candidate = error as { code?: unknown };
+      const detail = safeProviderDetail(typeof candidate.code === 'string' ? candidate.code : 'PROVIDER_HEALTH_UNAVAILABLE');
+      return { status: 'failed', checkedAt: new Date(), authExpiresAt: null, ...(detail ? { detail } : {}) };
+    }
   }
 
   @Post(':id/pause')

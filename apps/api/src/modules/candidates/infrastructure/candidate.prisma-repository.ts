@@ -6,7 +6,7 @@ import { RUNTIME_CONFIG, type RuntimeConfig } from '../../../platform/config/con
 import { decryptCandidateValue } from './candidate.crypto.js';
 import { decodeCandidateCursor, candidateLimit } from '../domain/pagination.js';
 import type { CandidateRepository } from '../application/candidate.service.js';
-import type { CandidateEntity, CandidateListQuery, OccupationProfileEntity } from '../domain/candidate.types.js';
+import type { CandidateEntity, CandidateListQuery, CandidateMatchEntity, OccupationProfileEntity } from '../domain/candidate.types.js';
 
 type CandidateClient = PrismaService | Prisma.TransactionClient;
 type CandidateRow = Prisma.CandidateGetPayload<{ include: { owner: { select: { displayName: true } }; profiles: true } }>;
@@ -104,6 +104,7 @@ export class CandidatePrismaRepository implements CandidateRepository {
       ];
     }
     if (query.readinessStatus) where.readinessStatus = query.readinessStatus;
+    if (query.japaneseLevel) where.japaneseLevel = query.japaneseLevel;
     if (query.contactabilityStatus) where.contactabilityStatus = query.contactabilityStatus;
     if (query.recordStatus) where.recordStatus = query.recordStatus;
     if (query.source) where.source = query.source;
@@ -160,6 +161,45 @@ export class CandidatePrismaRepository implements CandidateRepository {
     if (!table[0]?.exists) return 0;
     const rows = await this.prisma.$queryRawUnsafe<Array<{ count: bigint }>>("SELECT count(*) FROM applications WHERE candidate_id = $1 AND status NOT IN ('PASSED', 'FAILED', 'WITHDRAWN')", candidateId);
     return Number(rows[0]?.count ?? 0);
+  }
+
+  async searchForOrder(input: Parameters<NonNullable<CandidateRepository['searchForOrder']>>[0]): Promise<CandidateMatchEntity[]> {
+    const where: Prisma.CandidateWhereInput = { recordStatus: 'ACTIVE' };
+    if (input.scope === 'SELF') where.ownerId = input.ownerId;
+    else if (input.teamId) where.teamId = input.teamId;
+    else where.id = '__DENY_ALL__';
+    if (input.japaneseLevel) where.japaneseLevel = input.japaneseLevel;
+    if (input.readiness) where.readinessStatus = input.readiness;
+    if (input.query?.trim()) {
+      const term = input.query.trim();
+      where.OR = [
+        { code: { contains: term, mode: 'insensitive' } },
+        { name: { contains: term, mode: 'insensitive' } },
+        { normalizedName: { contains: term.toLocaleLowerCase(), mode: 'insensitive' } },
+        { occupation: { contains: term, mode: 'insensitive' } },
+      ];
+    }
+    if (input.occupation?.trim()) where.occupation = { contains: input.occupation.trim(), mode: 'insensitive' };
+    const rows = await this.prisma.candidate.findMany({ where, orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }], take: 200, include: { owner: { select: { displayName: true } }, profiles: true } });
+    const normalizedIndustry = input.industry?.trim().toLocaleLowerCase();
+    const normalizedSkill = input.skill?.trim().toLocaleLowerCase();
+    const filtered = rows.filter((row) => {
+      const profiles = row.profiles ?? [];
+      const labels = [...jsonArray(row.industryLabels), ...profiles.map((profile) => profile.industryLabel)];
+      const skills = profiles.flatMap((profile) => jsonArray(profile.skills));
+      return (!normalizedIndustry || labels.some((label) => label.toLocaleLowerCase() === normalizedIndustry)) && (!normalizedSkill || skills.some((skill) => skill.toLocaleLowerCase().includes(normalizedSkill)));
+    });
+    const ids = filtered.map((row) => row.id);
+    const [applications, journeys] = await Promise.all([
+      ids.length ? this.prisma.application.findMany({ where: { jobOrderId: input.orderId, candidateId: { in: ids }, status: { notIn: ['PASSED', 'FAILED', 'WITHDRAWN'] } }, select: { candidateId: true } }) : [],
+      ids.length ? this.prisma.supplyJourney.findMany({ where: { candidateId: { in: ids }, status: 'ACTIVE' }, select: { candidateId: true } }) : [],
+    ]);
+    const activeApplicationIds = new Set(applications.map((entry) => entry.candidateId));
+    const activeJourneyIds = new Set(journeys.map((entry) => entry.candidateId));
+    return filtered.map((row) => {
+      const profile = row.profiles.find((entry) => entry.status !== 'ARCHIVED') ?? row.profiles[0];
+      return { id: row.id, code: row.code, name: row.name, industryLabel: profile?.industryLabel ?? jsonArray(row.industryLabels)[0] ?? '', occupation: profile?.occupation ?? row.occupation, japaneseLevel: row.japaneseLevel, readinessStatus: row.readinessStatus as CandidateMatchEntity['readinessStatus'], recordStatus: row.recordStatus as CandidateMatchEntity['recordStatus'], hasActiveApplicationInOrder: activeApplicationIds.has(row.id), hasActiveJourney: activeJourneyIds.has(row.id), skills: profile ? jsonArray(profile.skills) : [], yearsExperience: profile?.yearsExperience ?? 0 };
+    });
   }
 
   private map(row: CandidateRow): CandidateEntity {

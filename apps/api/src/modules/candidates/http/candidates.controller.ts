@@ -20,6 +20,15 @@ export class CandidatesController {
     return { data: { items: result.items.map(serializeCandidate) }, page: result.page, requestId: this.requestId() };
   }
 
+  @Get('search-for-order')
+  @RequirePermission('candidate.view')
+  async searchForOrder(@Query() query: Record<string, string | undefined>, @Req() request: AuthenticatedRequest) {
+    if (!query.orderId?.trim()) throw Object.assign(new Error('ORDER_ID_REQUIRED'), { code: 'ORDER_ID_REQUIRED', statusCode: 422 });
+    const access = this.scope(request);
+    const items = await this.candidates.searchForOrder({ orderId: query.orderId, query: query.query, industry: query.industrySectorId ?? query.industry, occupation: query.occupationId ?? query.occupation, skill: query.skill, japaneseLevel: query.japaneseLevel, readiness: query.readinessStatus ?? query.readiness, hasActiveJourney: query.hasActiveJourney, ownerId: access.ownerId, teamId: access.teamId, scope: access.level });
+    return { data: { items }, page: { hasMore: false, nextCursor: null }, requestId: this.requestId() };
+  }
+
   @Post()
   @UseGuards(CsrfGuard)
   @RequirePermission('candidate.create')
@@ -55,13 +64,13 @@ export class CandidatesController {
   }
 
   private listQuery(query: Record<string, string | undefined>, request: AuthenticatedRequest): CandidateListQuery {
-    const allowed = new Set(['query', 'view', 'industrySectorId', 'readinessStatus', 'contactabilityStatus', 'occupationId', 'skill', 'desiredLocation', 'source', 'recordStatus', 'experience', 'cursor', 'limit']);
+    const allowed = new Set(['query', 'view', 'industrySectorId', 'readinessStatus', 'contactabilityStatus', 'occupationId', 'skill', 'desiredLocation', 'source', 'recordStatus', 'experience', 'cursor', 'limit', 'industry', 'readiness', 'contactability', 'occupation']);
     const unknown = Object.keys(query).filter((key) => !allowed.has(key));
     if (unknown.length) throw Object.assign(new Error('UNSUPPORTED_CANDIDATE_FILTER'), { code: 'UNSUPPORTED_CANDIDATE_FILTER', statusCode: 422 });
     const access = this.scope(request);
     return {
-      query: query.query, view: query.view, industrySectorId: query.industrySectorId, readinessStatus: query.readinessStatus as never,
-      contactabilityStatus: query.contactabilityStatus as never, occupationId: query.occupationId, skill: query.skill, desiredLocation: query.desiredLocation,
+      query: query.query, view: query.view, industrySectorId: query.industrySectorId ?? query.industry, readinessStatus: (query.readinessStatus ?? query.readiness) as never,
+      contactabilityStatus: (query.contactabilityStatus ?? query.contactability) as never, occupationId: query.occupationId ?? query.occupation, skill: query.skill, desiredLocation: query.desiredLocation,
       source: query.source, recordStatus: query.recordStatus as never, experience: query.experience, cursor: query.cursor,
       limit: query.limit ? Number(query.limit) : undefined, ownerId: request.auth!.userId, teamId: request.auth!.teamId, scope: access.level,
     };

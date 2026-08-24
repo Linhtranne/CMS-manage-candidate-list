@@ -13,6 +13,8 @@ required:
   - decisions
   - test_runs
   - approvals
+  - activation_flags
+  - security_artifacts
 properties:
   release:
     type: string
@@ -77,3 +79,23 @@ properties:
         status: { enum: [pending, approved, rejected] }
         identity: { type: string }
         at: { type: string, format: date-time }
+  activation_flags:
+    type: object
+    additionalProperties: false
+    required: [production_seed, documents, bulk_export, purge, break_glass]
+    properties:
+      production_seed: { type: boolean }
+      documents: { type: boolean }
+      bulk_export: { type: boolean }
+      purge: { type: boolean }
+      break_glass: { type: boolean }
+  security_artifacts:
+    type: object
+    additionalProperties:
+      type: object
+      additionalProperties: false
+      required: [checksum]
+      properties:
+        checksum:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'

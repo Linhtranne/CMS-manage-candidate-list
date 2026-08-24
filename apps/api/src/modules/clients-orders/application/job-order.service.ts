@@ -8,6 +8,7 @@ export interface JobOrderRepository {
   findById(id: string): Promise<JobOrderEntity | null>;
   updateStatus(id: string, expectedVersion: number, status: JobOrderStatus): Promise<JobOrderEntity>;
   updateRequirement(id: string, expectedVersion: number, requirementVersion: number, requirementSnapshot: RequirementSnapshot): Promise<JobOrderEntity>;
+  findActiveOccupationCatalogVersion?(occupation: string): Promise<string | null>;
   list(filter?: { query?: string; status?: JobOrderStatus; industry?: string; ownerId?: string; teamId?: string; cursor?: string; limit?: number }): Promise<JobOrderEntity[]>;
   findClientStatus?(clientId: string): Promise<string | null>;
   findCatalogStatus?(catalogVersionId: string): Promise<string | null>;
@@ -26,16 +27,18 @@ export class JobOrderService {
     code: string; position: string; clientId: string; industryLabel: string; occupation: string; location: string; target: number; deadline: Date;
     ownerId: string; teamId?: string | null; occupationCatalogVersionId: string; requirementSnapshot: unknown;
   }, context: OrderCommandContext): Promise<JobOrderEntity> {
-    validateJobOrderDraft(input);
-    const snapshot = validateRequirementSnapshot(input.requirementSnapshot);
     if (!input.code.trim() || input.position.trim().length < 2 || !input.clientId.trim() || !input.location.trim() || !input.ownerId.trim()) {
       throw new OrderDomainError('INVALID_ORDER_INPUT', 'errors.invalidOrderInput');
     }
     return this.repository.withTransaction(async (repository, transaction) => {
+      const occupationCatalogVersionId = input.occupationCatalogVersionId.trim() || await repository.findActiveOccupationCatalogVersion?.(input.occupation) || '';
+      const resolvedInput = { ...input, occupationCatalogVersionId };
+      validateJobOrderDraft(resolvedInput);
+      const snapshot = validateRequirementSnapshot({ ...((input.requirementSnapshot && typeof input.requirementSnapshot === 'object') ? input.requirementSnapshot : {}), catalogVersionId: occupationCatalogVersionId });
       const created = await repository.create({
         code: input.code.trim().toUpperCase(), position: input.position.trim(), clientId: input.clientId, industryLabel: input.industryLabel.trim(),
         occupation: input.occupation.trim().toUpperCase(), location: input.location.trim(), target: input.target, deadline: input.deadline,
-        ownerId: input.ownerId, teamId: input.teamId ?? null, requirementVersion: 1, requirementCatalogVersionId: input.occupationCatalogVersionId,
+        ownerId: input.ownerId, teamId: input.teamId ?? null, requirementVersion: 1, requirementCatalogVersionId: occupationCatalogVersionId,
         requirementSnapshot: snapshot,
       });
       await this.recordEffects(transaction, context, created, 'JOB_ORDER_CREATED', 'job_order.created');

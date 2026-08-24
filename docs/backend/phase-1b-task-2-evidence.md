@@ -4,7 +4,7 @@ status: ready_for_human_approval
 technical_review: complete
 external_approvals: pending
 version: 1.0.0
-updated_at: 2026-08-21
+updated_at: 2026-08-24
 owner: Backend Tech Lead
 risk: critical
 ---
@@ -18,6 +18,7 @@ risk: critical
 - Added `POST /api/v1/emails/previews` and `POST /api/v1/emails` with session, CSRF and `email.send` policy enforcement. Enqueue requires an idempotency key and rechecks candidate contactability inside the transaction.
 - Added a transaction that creates `QUEUED` immutable messages, recipients, conversation and ID-only `email.send.requested` outbox event plus audit evidence. Outbox/queue payloads do not contain body, recipient address or attachment data.
 - Added outbound send processor with DB CAS claim, mailbox kill-switch check, stable provider idempotency key, transactional delivery event and failure classification. Uncertain provider outcomes become `RECONCILING`; they are never blindly retried.
+- Retryable failures now use bounded exponential backoff with jitter and honor numeric/date `Retry-After` values from the provider error boundary.
 - Added reconciliation processor that searches the provider by the stable client reference before permitting `RETRY_WAIT` or marking `SENT`.
 - Added audited `POST /api/v1/email-messages/{id}/cancellations` and `POST /api/v1/email-messages/{id}/retry-attempts` commands. Cancellation is CAS-limited to `QUEUED|RETRY_WAIT`; manual retry is limited to `FAILED` and explicitly rejects `RECONCILING` uncertain sends.
 - Added `GET /api/v1/mailbox/conversations` and `GET /api/v1/mailbox/conversations/{id}` with allowlisted views, stable bounded cursor pagination, candidate/team policy filters and explicit manual-link access for unmatched messages. Detail serialization exposes only immutable message fields and safe attachment metadata; provider IDs, object keys, BCC and signed URLs never enter the DTO.
@@ -31,15 +32,15 @@ risk: critical
 pnpm --filter @cms/api typecheck                                  # passed
 pnpm --filter @cms/api lint                                       # passed; MODULE_BOUNDARY_VIOLATIONS=0
 pnpm --filter @cms/api build                                      # passed
-vitest run test/email --pool=threads --maxWorkers=1               # 7 files, 39 tests passed
-vitest run test/email/outbound-resilience.spec.ts --pool=threads --maxWorkers=1 # 15 tests passed
-vitest run (API) --pool=threads --maxWorkers=1                     # 44 files passed, 4 skipped; 148 passed, 15 skipped (163 total)
+vitest run test/email --pool=threads --maxWorkers=1               # 7 files, 40 tests passed
+vitest run test/email/outbound-resilience.spec.ts --pool=threads --maxWorkers=1 # 18 tests passed
+vitest run (API) --pool=threads --maxWorkers=1                     # 48 files passed, 4 skipped; 172 passed, 15 skipped (187 total)
 pnpm --filter @cms/contracts generate                             # passed
 pnpm --filter @cms/contracts typecheck                            # passed
 pnpm --filter @cms/contracts test --pool=threads --maxWorkers=1   # 7 tests passed
 ```
 
-The focused outbound suite covers expired/tampered previews, DNC and unsafe attachment rejection, auto-reply loop blocking, signed preview binding, DB claim loss, kill switch, uncertain send, provider reconciliation and ID-only outbox payloads. The first focused run was intentionally RED before the new application/worker files existed.
+The focused outbound suite covers expired/tampered previews, DNC and unsafe attachment rejection, auto-reply loop blocking, signed preview binding, DB claim loss, kill switch, bounded policy retry, uncertain send, provider reconciliation and ID-only outbox payloads. The first focused run was intentionally RED before the new application/worker files existed.
 
 ## Remaining gates
 

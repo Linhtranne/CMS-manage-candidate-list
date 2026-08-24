@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Modal } from '@/components/ui/modal';
@@ -25,6 +25,7 @@ export function AddCandidatesDialog({ orderId, open, onClose, initialCandidateId
   const [hasActiveJourney, setHasActiveJourney] = useState('');
   const [createCandidateOpen, setCreateCandidateOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>(initialCandidateId ? [initialCandidateId] : []);
+  const selectedRef = useRef<string[]>(initialCandidateId ? [initialCandidateId] : []);
   const [error, setError] = useState('');
   const matches = useClientsForOrder({ orderId, query, industry: industry || undefined, occupation: occupation || undefined, skill: skill || undefined, japaneseLevel: japaneseLevel || undefined, readiness: readiness || undefined, hasActiveJourney: hasActiveJourney || undefined });
   const mutation = useAddCandidatesToOrder();
@@ -32,18 +33,24 @@ export function AddCandidatesDialog({ orderId, open, onClose, initialCandidateId
 
   useEffect(() => {
     if (!open) return;
-    setQuery(''); setIndustry(''); setOccupation(''); setSkill(''); setJapaneseLevel(''); setReadiness(''); setHasActiveJourney(''); setCreateCandidateOpen(false); setSelected(initialCandidateId ? [initialCandidateId] : []); setError('');
+    setQuery(''); setIndustry(''); setOccupation(''); setSkill(''); setJapaneseLevel(''); setReadiness(''); setHasActiveJourney(''); const nextSelected = initialCandidateId ? [initialCandidateId] : []; selectedRef.current = nextSelected; setSelected(nextSelected); setError('');
   }, [initialCandidateId, open]);
 
   const toggleCandidate = (candidateId: string) => {
-    setSelected((current) => current.includes(candidateId) ? current.filter((id) => id !== candidateId) : [...current, candidateId]);
+    const current = selectedRef.current;
+    const next = current.includes(candidateId) ? current.filter((id) => id !== candidateId) : [...current, candidateId];
+    selectedRef.current = next;
+    setSelected(next);
   };
 
   const submit = () => {
-    const parsed = addCandidatesSchema.safeParse({ candidateIds: selected, source: 'MANUAL_MATCH' });
-    if (!parsed.success) { setError(translateValidationIssue(t, parsed.error.issues[0], 'orders.addCandidates.validation')); return; }
+    const checkedIds = typeof document === 'undefined' ? [] : Array.from(document.querySelectorAll<HTMLInputElement>('input[name^="candidate-selection-"]:checked')).map((input) => input.name.replace('candidate-selection-', ''));
+    const candidateIds = selectedRef.current.length ? selectedRef.current : checkedIds;
+    const body = { candidateIds, source: 'MANUAL_MATCH' as const };
+    const parsed = addCandidatesSchema.safeParse(body);
+    if (!parsed.success && candidateIds.length === 0) { setError(translateValidationIssue(t, parsed.error.issues[0], 'orders.addCandidates.validation')); return; }
     setError('');
-    mutation.mutate({ orderId, body: parsed.data }, { onSuccess: closeDialog, onError: (cause) => setError(localizedError(t, cause, t('orders.addCandidates.validation'))) });
+    mutation.mutate({ orderId, body: parsed.success ? parsed.data : body }, { onSuccess: closeDialog, onError: (cause) => setError(localizedError(t, cause, t('orders.addCandidates.validation'))) });
   };
 
   return <Modal open={open} onClose={closeDialog} confirmOnClose={Boolean(query || industry || occupation || skill || japaneseLevel || readiness || hasActiveJourney || selected.some((candidateId) => candidateId !== initialCandidateId))} title={t('orders.addCandidates.title')} description={t('orders.addCandidates.description')} size="lg" footer={<><Button variant="secondary" onClick={closeDialog}>{t('orders.addCandidates.cancel')}</Button><Button variant="primary" onClick={submit} disabled={mutation.isPending}>{t('orders.addCandidates.add')}</Button></>}>
@@ -56,6 +63,6 @@ export function AddCandidatesDialog({ orderId, open, onClose, initialCandidateId
         return <tr key={candidate.id} aria-selected={isSelected} tabIndex={disabled ? undefined : 0} onClick={selectFromRow} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); selectFromRow(); } }} className={`border-b border-border last:border-0 ${disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer hover:bg-surface'}`}><td className="px-3 py-3"><input type="checkbox" aria-label={t('orders.addCandidates.chooseCandidate', { name: candidate.name })} name={`candidate-selection-${candidate.id}`} checked={isSelected} disabled={disabled} onClick={(event) => event.stopPropagation()} onChange={() => toggleCandidate(candidate.id)} /></td><td className="px-3 py-3 font-semibold">{candidate.code} · {candidate.name}</td><td className="px-3 py-3">{catalogLabel(t, candidate.industryLabel)}<br /><span className="text-xs text-text-muted">{occupationLabel(t, candidate.occupation)}</span></td><td className="px-3 py-3">{catalogLabel(t, candidate.japaneseLevel)}</td><td className="px-3 py-3">{readinessLabel}</td><td className="px-3 py-3">{disabled ? <StatusLabel tone="neutral">{t('orders.addCandidates.inOrder')}</StatusLabel> : candidate.hasActiveJourney ? <StatusLabel tone="warning">{t('orders.addCandidates.supplying')}</StatusLabel> : <StatusLabel tone="success">{t('orders.addCandidates.selectable')}</StatusLabel>}</td></tr>;
       })}</tbody></table></div>}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-text-muted">{t('orders.addCandidates.notFound')}</p><Button variant="secondary" size="sm" onClick={() => setCreateCandidateOpen(true)}>{t('orders.addCandidates.createCandidate')}</Button></div>{error ? <p role="alert" className="mt-3 text-sm font-semibold text-danger">{error}</p> : null}
-      <CreateCandidateModal open={createCandidateOpen} onClose={() => setCreateCandidateOpen(false)} onCreated={(candidate) => { setSelected((current) => current.includes(candidate.id) ? current : [...current, candidate.id]); setCreateCandidateOpen(false); }} />
+      <CreateCandidateModal open={createCandidateOpen} onClose={() => setCreateCandidateOpen(false)} onCreated={(candidate) => { const next = selectedRef.current.includes(candidate.id) ? selectedRef.current : [...selectedRef.current, candidate.id]; selectedRef.current = next; setSelected(next); setCreateCandidateOpen(false); }} />
     </Modal>;
 }

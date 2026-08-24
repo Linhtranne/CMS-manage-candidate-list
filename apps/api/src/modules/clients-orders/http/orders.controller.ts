@@ -30,8 +30,8 @@ export class OrdersController {
   create(@Body() body: CreateOrderDto, @Req() request: AuthenticatedRequest) {
     return this.orders.create({
       code: `JO-${randomUUID().slice(0, 12).toUpperCase()}`, position: body.position, clientId: body.clientId, industryLabel: body.industryLabel, occupation: body.occupation,
-      location: body.location, target: body.target, deadline: new Date(body.deadline), ownerId: body.ownerId, teamId: body.teamId,
-      occupationCatalogVersionId: body.occupationCatalogVersionId ?? '', requirementSnapshot: { catalogVersionId: body.occupationCatalogVersionId ?? '', occupation: body.occupation, criteria: body.criteria },
+      location: body.location, target: body.target, deadline: new Date(body.deadline), ownerId: request.auth!.userId, teamId: request.auth!.teamId,
+      occupationCatalogVersionId: body.occupationCatalogVersionId ?? '', requirementSnapshot: { catalogVersionId: body.occupationCatalogVersionId ?? '', occupation: body.occupation, criteria: body.criteria, salary: body.salary ?? '', contractType: body.contractType ?? '', japaneseLevel: body.japaneseLevel ?? '' },
     }, this.context(request)).then(serializeOrder);
   }
 

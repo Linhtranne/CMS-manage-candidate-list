@@ -20,7 +20,7 @@ export const orderTabs = [
 ] as const;
 export type OrderTab = (typeof orderTabs)[number]['id'];
 
-function statusKey(status: string) { return status === 'RECRUITING' ? 'orders.status.recruiting' : status === 'DRAFT' ? 'orders.status.draft' : status === 'PAUSED' ? 'orders.status.paused' : status === 'FILLED' ? 'orders.status.filled' : status === 'CLOSED' ? 'orders.status.closed' : undefined; }
+function statusKey(status: string) { return status === 'RECRUITING' || status === 'OPEN' ? 'orders.status.recruiting' : status === 'DRAFT' ? 'orders.status.draft' : status === 'PAUSED' || status === 'ON_HOLD' ? 'orders.status.paused' : status === 'FILLED' ? 'orders.status.filled' : status === 'CLOSED' || status === 'CANCELLED' ? 'orders.status.closed' : undefined; }
 function scheduleStatusLabel(t: ReturnType<typeof useI18n>['t'], status: string) { return status === 'SCHEDULED' ? t('applications.profile.scheduled') : status === 'COMPLETED' ? t('applications.profile.completed') : status === 'CANCELLED' ? t('applications.profile.cancelled') : status === 'NO_SHOW' ? t('applications.profile.noShow') : status; }
 
 function OrderTabContent({ order, activeTab }: { order: JobOrder; activeTab: Exclude<OrderTab, 'overview' | 'criteria'> }) {

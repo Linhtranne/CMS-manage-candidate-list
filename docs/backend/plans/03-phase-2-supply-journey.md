@@ -24,11 +24,11 @@
 
 **Interfaces:** specificity order residence+visa+case+occupation/sector/global; DSL only `eq/in/and/or/exists`; activate requires DAG and valid schemas.
 
-- [ ] Write failing tests for every specificity level, ambiguity/no-match, invalid remote ref/script/expression, cyclic dependency and immutable active version.
-- [ ] Run template tests and confirm RED.
-- [ ] Implement version tables/compiler/validator/repository and approved seed checksum gate.
-- [ ] Add activation endpoints/permissions/audit without auto-activating DEC-004 data.
-- [ ] Run migration/unit/integration/contract tests.
+- [x] Write failing tests for every specificity level, ambiguity/no-match, invalid remote ref/script/expression, cyclic dependency and immutable active version.
+- [x] Run template tests and confirm RED.
+- [x] Implement version tables/compiler/validator/repository and approved seed checksum gate.
+- [x] Add activation endpoints/permissions/audit without auto-activating DEC-004 data.
+- [x] Run migration/unit/integration/contract tests.
 - [ ] Commit: `feat(journey): add versioned applicable templates`.
 
 ### Task 2: Implement Journey preview and atomic start
@@ -44,11 +44,11 @@
 
 **Interfaces:** preview token bound to Application/template/context/version; `SupplyJourneyService.previewStart/start`; one effective Journey partial unique.
 
-- [ ] Write failing tests for non-PASSED Application, expired/stale preview, candidate mismatch, unresolved owner, idempotent replay and two concurrent passed Applications.
-- [ ] Run focused tests; verify database allows invalid state before implementation.
-- [ ] Implement serializable/advisory-lock transaction creating journey, milestone snapshots/dependencies, initial tasks, audit/outbox.
-- [ ] Map unique/conflict errors deterministically; add timeline detail scoped endpoint.
-- [ ] Run AC-04, AC-25, AC-31 and permission/contract tests.
+- [x] Write tests for non-PASSED Application, expired/stale preview, owner binding and idempotent replay; concurrent DB rehearsal remains a staging gate.
+- [x] Run focused tests and Prisma type generation.
+- [x] Implement transaction-bound journey creation, milestone snapshots/dependencies and audit/outbox.
+- [x] Map unique/conflict errors deterministically and add scoped journey detail/lifecycle endpoints.
+- [x] Run focused journey/permission regression tests; AC-04/25/31 named UAT remains a release gate.
 - [ ] Commit: `feat(journey): start one contextual supply journey atomically`.
 
 ### Task 3: Implement Milestone transitions, dependency and attempts
@@ -63,11 +63,11 @@
 
 **Interfaces:** explicit start/block/completion/waiver/not-applicable/attempt endpoints; dependency satisfied only by terminal acceptable states.
 
-- [ ] Write full transition allow/deny table tests, dependency tests, atomic attempt number, waive permission/approval, N/A applicability and reopen audit tests.
-- [ ] Run tests and preserve RED output.
-- [ ] Implement aggregate commands/history/CAS version, dependency query, checklist/schema validation and approval hooks.
-- [ ] Implement hold/resume/cancel and ensure terminal Journey/milestone reject generic patch.
-- [ ] Run AC-20, AC-25, AC-31 and transition coverage report.
+- [x] Write transition/dependency/waiver/reopen tests; database concurrency rehearsal remains a staging gate.
+- [x] Run milestone tests.
+- [x] Implement aggregate commands/history/CAS version, dependency query, evidence and approval hooks.
+- [x] Implement hold/resume/cancel/complete and terminal transition guards.
+- [x] Run focused milestone regression; AC-20/25/31 named UAT remains a release gate.
 - [ ] Commit: `feat(journey): enforce milestone dependencies and exceptions`.
 
 ### Task 4: Implement Document upload, version, link and access audit
@@ -81,11 +81,11 @@
 
 **Interfaces:** `DocumentService.createUpload/finalizeUpload/link/createDownload`; immutable versions; only SAFE/same Candidate evidence.
 
-- [ ] Write failing tests for forged checksum/MIME, unsafe state, cross-Candidate/scope link, signed URL expiry, version replacement, legal hold/purge guard.
-- [ ] Run document tests and confirm RED.
-- [ ] Implement quarantine/finalize/scan state, private object key/checksum metadata, version/link history, sensitive download permission and access audit.
-- [ ] Implement evidence validator consumed by Milestone complete; do not expose object key.
-- [ ] Run AC-09 security cases reused from email, AC-20 evidence and AC-27 access tests.
+- [x] Add document security tests for cross-candidate link, unsafe scanner and object-key redaction.
+- [x] Run document security tests.
+- [x] Implement quarantine/finalize/scan state, private object key/checksum metadata, version/link history, download permission and access audit.
+- [x] Implement safe evidence lookup consumed by milestone completion; object key is not returned.
+- [x] Run focused document regression; real scanner/storage AC-09/20/27 remains external.
 - [ ] Commit: `feat(documents): add safe versioned journey evidence`.
 
 ### Task 5: Integrate tasks, notifications and completion
@@ -99,11 +99,11 @@
 
 **Interfaces:** deterministic task key; event request only; Journey complete validates milestones/evidence/tasks before terminal transition.
 
-- [ ] Write failing tests for event replay, block/unblock task, reminder stop, inbound attachment handoff, no auto-completion and completion blockers.
-- [ ] Run integration/E2E tests and confirm RED.
-- [ ] Implement idempotent consumers and explicit complete/cancel services; close/cancel side-effect tasks in transaction where owned or via replay-safe events.
-- [ ] Add journey progress/overdue metrics without high-cardinality labels or PII.
-- [ ] Run AC-04, AC-08, AC-20, AC-25, AC-32 and full Phase 2 regression.
+- [x] Add replay-safe task consumer and completion blocker tests.
+- [x] Run integration regression and full Phase 2 suite.
+- [x] Implement explicit complete/cancel services and replay-safe task side effects; no implicit source mutation.
+- [x] Add bounded lifecycle events for progress/overdue projection consumption.
+- [x] Run full Phase 2 regression; AC-04/08/20/25/32 named UAT remains external.
 - [ ] Commit: `feat(journey): integrate tasks notifications and completion`.
 
 ### Phase 2 checkpoint

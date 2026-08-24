@@ -4,7 +4,7 @@ status: ready_for_human_approval
 technical_review: complete
 external_approvals: pending
 version: 1.0.0
-updated_at: 2026-08-21
+updated_at: 2026-08-24
 owner: Backend Tech Lead
 risk: critical
 ---
@@ -27,7 +27,7 @@ risk: critical
 vitest run test/files/attachment-security.integration-spec.ts --pool=threads --maxWorkers=1  # 6 tests passed
 vitest run test/email/email-migration.spec.ts --pool=threads --maxWorkers=1                  # passed
 vitest run test/platform/outbox-publisher.spec.ts --pool=threads --maxWorkers=1              # passed
-vitest run (API) --pool=threads --maxWorkers=1                                                # 44 files passed, 4 skipped; 148 passed, 15 skipped
+vitest run (API) --pool=threads --maxWorkers=1                                                # 48 files passed, 4 skipped; 172 passed, 15 skipped
 pnpm --filter @cms/api typecheck                                                              # passed
 pnpm --filter @cms/api lint                                                                   # passed; MODULE_BOUNDARY_VIOLATIONS=0
 pnpm --filter @cms/api build                                                                  # passed

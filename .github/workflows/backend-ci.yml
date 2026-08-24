@@ -76,6 +76,9 @@ jobs:
       - run: pnpm --filter @cms/api test:security
       - name: Run complete API regression suite
         run: pnpm --filter @cms/api test
+      - run: pnpm --filter @cms/web lint
+      - run: pnpm --filter @cms/web typecheck
+      - run: pnpm --filter @cms/web test:ci
       - run: pnpm --filter @cms/api build
       - run: docker build -f apps/api/Dockerfile -t cms-api:ci .
       - name: Build migration image

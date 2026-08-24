@@ -1,6 +1,6 @@
 import { CandidateDomainError, assertArchiveAllowed, validateCandidateInput, validateProfileAttributes } from '../domain/candidate.rules.js';
 import { assertCandidateScope } from '../domain/candidate.scope.js';
-import type { CandidateCommandContext, CandidateEntity, CandidateListQuery, OccupationProfileEntity } from '../domain/candidate.types.js';
+import type { CandidateCommandContext, CandidateEntity, CandidateListQuery, CandidateMatchEntity, OccupationProfileEntity } from '../domain/candidate.types.js';
 
 export interface CandidateRepository {
   withTransaction<T>(work: (repository: CandidateRepository, transaction: unknown) => Promise<T>): Promise<T>;
@@ -20,6 +20,7 @@ export interface CandidateRepository {
   }): Promise<OccupationProfileEntity>;
   findActiveProfileSchema(schemaVersionId: string): Promise<{ industryCode: string; schema: Record<string, unknown> } | null>;
   countActiveWork(candidateId: string): Promise<number>;
+  searchForOrder?(input: { orderId: string; query?: string; industry?: string; occupation?: string; skill?: string; japaneseLevel?: string; readiness?: string; hasActiveJourney?: string; ownerId: string; teamId?: string; scope: 'SELF' | 'TEAM' }): Promise<CandidateMatchEntity[]>;
 }
 
 export interface CandidateMutationEffects {
@@ -144,6 +145,15 @@ export class CandidateService {
     const last = result.items.at(-1);
     const { encodeCandidateCursor } = await import('../domain/pagination.js');
     return { items: result.items, page: { hasMore: result.hasMore, nextCursor: result.hasMore && last ? encodeCandidateCursor({ updatedAt: last.updatedAt.toISOString(), id: last.id }) : null } };
+  }
+
+  async searchForOrder(input: Parameters<NonNullable<CandidateRepository['searchForOrder']>>[0]): Promise<CandidateMatchEntity[]> {
+    if (this.repository.searchForOrder) return this.repository.searchForOrder(input);
+    const result = await this.list({ query: input.query, industrySectorId: input.industry, occupationId: input.occupation, skill: input.skill, japaneseLevel: input.japaneseLevel, readinessStatus: input.readiness as never, ownerId: input.ownerId, teamId: input.teamId, scope: input.scope });
+    return result.items.map((candidate) => {
+      const profile = candidate.profiles.find((entry) => entry.status !== 'ARCHIVED') ?? candidate.profiles[0];
+      return { id: candidate.id, code: candidate.code, name: candidate.name, industryLabel: profile?.industryLabel ?? candidate.industryLabels[0] ?? '', occupation: profile?.occupation ?? candidate.occupation, japaneseLevel: candidate.japaneseLevel, readinessStatus: candidate.readinessStatus, recordStatus: candidate.recordStatus, hasActiveApplicationInOrder: false, hasActiveJourney: false, skills: profile?.skills ?? [], yearsExperience: profile?.yearsExperience ?? 0 };
+    });
   }
 
   private async recordEffects(transaction: unknown, context: CandidateCommandContext, entity: { id: string }, action: string, eventType: string): Promise<void> {

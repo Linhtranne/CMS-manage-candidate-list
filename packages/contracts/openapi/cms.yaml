@@ -1559,6 +1559,206 @@ paths:
       security:
         - sessionCookie: []
           csrfHeader: []
+  /tasks:
+    get:
+      operationId: listTasks
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [NEW, IN_PROGRESS, DONE, CANCELLED]
+        - in: query
+          name: assigneeUserId
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scoped task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTasksResponseEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+    post:
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scoped task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+  /tasks/{id}/assignment:
+    post:
+      operationId: assignTask
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignTaskRequest'
+      responses:
+        '200':
+          description: Task assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /tasks/{id}/start:
+    post:
+      operationId: startTask
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionedTaskActionRequest'
+      responses:
+        '200':
+          description: Task started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /tasks/{id}/completion:
+    post:
+      operationId: completeTask
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionedTaskActionRequest'
+      responses:
+        '200':
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+  /tasks/{id}/cancellation:
+    post:
+      operationId: cancelTask
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionedTaskActionRequest'
+      responses:
+        '200':
+          description: Task cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTaskEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
   /reports/summary:
     get:
       operationId: getReportSummary
@@ -2213,6 +2413,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiOidcRedirectEnvelope'
+  /auth/login:
+    post:
+      operationId: loginWithPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Password login completed and session cookies were set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSessionEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /auth/oidc/callback:
     get:
       operationId: completeOidcLogin
@@ -2229,12 +2448,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OIDC callback completed
-          content:
-            application/json:
+        '303':
+          description: OIDC callback completed and browser redirected to the CMS app
+          headers:
+            Location:
+              required: true
               schema:
-                $ref: '#/components/schemas/ApiSessionEnvelope'
+                type: string
   /auth/session:
     get:
       operationId: getAuthSession
@@ -2761,7 +2981,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/CreateDocumentUploadRequest'
       responses:
         '200':
           description: createDocumentUpload
@@ -2803,7 +3023,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericCommand'
+              $ref: '#/components/schemas/LinkDocumentRequest'
       responses:
         '200':
           description: linkDocument
@@ -5528,6 +5748,152 @@ components:
         version:
           type: integer
           minimum: 0
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - assigneeUserId
+        - teamId
+        - waitingOn
+        - dueAt
+        - noDueDateReason
+        - ruleCode
+        - sourceEventId
+        - dedupeKey
+        - referenceEntityType
+        - referenceEntityId
+        - version
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [NEW, IN_PROGRESS, DONE, CANCELLED]
+        assigneeUserId:
+          type: string
+        teamId:
+          type: string
+          nullable: true
+        waitingOn:
+          type: string
+          enum: [CANDIDATE, CLIENT_PARTNER, INTERNAL, OTHER]
+          nullable: true
+        dueAt:
+          type: string
+          format: date-time
+          nullable: true
+        noDueDateReason:
+          type: string
+          nullable: true
+        ruleCode:
+          type: string
+          nullable: true
+        sourceEventId:
+          type: string
+          nullable: true
+        dedupeKey:
+          type: string
+          nullable: true
+        referenceEntityType:
+          type: string
+        referenceEntityId:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+    CreateTaskRequest:
+      type: object
+      required: [title, assigneeUserId, referenceEntityType, referenceEntityId]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        description:
+          type: string
+          nullable: true
+        assigneeUserId:
+          type: string
+        teamId:
+          type: string
+          nullable: true
+        waitingOn:
+          type: string
+          enum: [CANDIDATE, CLIENT_PARTNER, INTERNAL, OTHER]
+          nullable: true
+        dueAt:
+          type: string
+          format: date-time
+          nullable: true
+        noDueDateReason:
+          type: string
+          nullable: true
+        ruleCode:
+          type: string
+          nullable: true
+        sourceEventId:
+          type: string
+          nullable: true
+        dedupeKey:
+          type: string
+          nullable: true
+        referenceEntityType:
+          type: string
+        referenceEntityId:
+          type: string
+    VersionedTaskActionRequest:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          nullable: true
+    AssignTaskRequest:
+      type: object
+      required: [version, assigneeUserId]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        assigneeUserId:
+          type: string
+        teamId:
+          type: string
+          nullable: true
+    TasksResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    ApiTaskEnvelope:
+      type: object
+      required: [data, requestId]
+      properties:
+        data:
+          $ref: '#/components/schemas/Task'
+        requestId:
+          type: string
+    ApiTasksResponseEnvelope:
+      type: object
+      required: [data, requestId]
+      properties:
+        data:
+          $ref: '#/components/schemas/TasksResponse'
+        requestId:
+          type: string
     ReportMetric:
       type: object
       required:
@@ -6206,6 +6572,11 @@ components:
         - address
         - provider
         - status
+        - lastSyncAt
+        - lastSendAt
+        - subscriptionExpiresAt
+        - cursorAgeSeconds
+        - queue
         - providerHealth
       properties:
         id:
@@ -6216,19 +6587,68 @@ components:
           type: string
         status:
           type: string
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSendAt:
+          type: string
+          format: date-time
+          nullable: true
+        subscriptionExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        cursorAgeSeconds:
+          type: integer
+          minimum: 0
+          nullable: true
+        queue:
+          $ref: '#/components/schemas/MailboxQueueHealth'
         providerHealth:
           type: object
           required:
             - status
             - checkedAt
+            - authExpiresAt
           properties:
             status:
               type: string
             checkedAt:
               type: string
               format: date-time
+            authExpiresAt:
+              type: string
+              format: date-time
+              nullable: true
             detail:
               type: string
+    MailboxQueueHealth:
+      type: object
+      required:
+        - enabled
+        - available
+        - waiting
+        - active
+        - delayed
+        - failed
+      properties:
+        enabled:
+          type: boolean
+        available:
+          type: boolean
+        waiting:
+          type: integer
+          minimum: 0
+        active:
+          type: integer
+          minimum: 0
+        delayed:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
     AdminAuditEvent:
       type: object
       required:
@@ -6362,6 +6782,21 @@ components:
         redirectUrl:
           type: string
           format: uri
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
     WebhookAccepted:
       type: object
       required:
@@ -6948,6 +7383,47 @@ components:
     GenericCommand:
       type: object
       additionalProperties: true
+    CreateDocumentUploadRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - candidateId
+        - title
+        - category
+        - claimedMime
+        - sizeBytes
+        - checksum
+      properties:
+        candidateId:
+          type: string
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        category:
+          type: string
+          minLength: 1
+          maxLength: 80
+        claimedMime:
+          type: string
+        sizeBytes:
+          type: integer
+          minimum: 1
+        checksum:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+    LinkDocumentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - candidateId
+      properties:
+        candidateId:
+          type: string
+        journeyId:
+          type: string
+        milestoneId:
+          type: string
     EmailActionRequest:
       type: object
       additionalProperties: false

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 const migration = readFileSync(new URL('../../prisma/migrations/20260820020100_email_hub/migration.sql', import.meta.url), 'utf8');
 const inboundMigration = readFileSync(new URL('../../prisma/migrations/20260821000100_email_inbound/migration.sql', import.meta.url), 'utf8');
 const attachmentMigration = readFileSync(new URL('../../prisma/migrations/20260821000200_email_attachment_quarantine/migration.sql', import.meta.url), 'utf8');
+const subscriptionMigration = readFileSync(new URL('../../prisma/migrations/20260824000100_mailbox_subscription_lifecycle/migration.sql', import.meta.url), 'utf8');
 
 describe('email hub migration contract', () => {
   it('creates provider/message dedupe constraints and the immutable message trigger', () => {
@@ -32,5 +33,13 @@ describe('email hub migration contract', () => {
     expect(attachmentMigration).toMatch(/SCANNING/);
     expect(attachmentMigration).toMatch(/SAFE/);
     expect(attachmentMigration).toMatch(/REJECTED/);
+  });
+
+  it('persists subscription expiry and keeps renewal selection indexed and non-destructive', () => {
+    expect(subscriptionMigration).toMatch(/provider_subscription_id/);
+    expect(subscriptionMigration).toMatch(/provider_subscription_expires_at/);
+    expect(subscriptionMigration).toMatch(/mailboxes_subscription_renewal_idx/);
+    expect(subscriptionMigration).toMatch(/GRANT SELECT, UPDATE ON mailboxes TO cms_api/);
+    expect(subscriptionMigration).toMatch(/REVOKE DELETE ON mailboxes FROM cms_api/);
   });
 });

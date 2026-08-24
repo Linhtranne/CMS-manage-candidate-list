@@ -7,11 +7,14 @@ function request() {
 
 describe('mailbox admin operations', () => {
   it('masks mailbox address and provider health output', async () => {
-    const repository = { findMailbox: vi.fn().mockResolvedValue({ id: 'mailbox-1', address: 'shared@example.com', provider: 'DISABLED', status: 'NOT_CONFIGURED' }) };
+    const repository = { findMailbox: vi.fn().mockResolvedValue({ id: 'mailbox-1', address: 'shared@example.com', provider: 'DISABLED', status: 'NOT_CONFIGURED', lastSyncAt: null, lastSendAt: null, providerSubscriptionExpiresAt: null, syncCursorIssuedAt: null }) };
     const provider = { validateConnection: vi.fn().mockResolvedValue({ provider: 'DISABLED', status: 'not_configured', checkedAt: new Date(), detail: 'MAIL_PROVIDER=DISABLED' }) };
-    const controller = new MailboxAdminController(repository as never, {} as never, provider as never, {} as never, {} as never);
-    await expect(controller.health('mailbox-1')).resolves.toMatchObject({ id: 'mailbox-1', address: 's***@example.com', providerHealth: { status: 'not_configured' } });
-    expect(JSON.stringify(await controller.health('mailbox-1'))).not.toContain('shared@example.com');
+    const queue = { healthCounts: vi.fn().mockResolvedValue({ enabled: false, available: true, waiting: 0, active: 0, delayed: 0, failed: 0 }) };
+    const controller = new MailboxAdminController(repository as never, queue as never, provider as never, {} as never, {} as never);
+    await expect(controller.health('mailbox-1')).resolves.toMatchObject({ id: 'mailbox-1', address: 's***@example.com', lastSyncAt: null, lastSendAt: null, subscriptionExpiresAt: null, cursorAgeSeconds: null, queue: { failed: 0 }, providerHealth: { status: 'not_configured', authExpiresAt: null } });
+    const response = await controller.health('mailbox-1');
+    expect(JSON.stringify(response)).not.toContain('shared@example.com');
+    expect(JSON.stringify(response)).not.toContain('MAIL_PROVIDER=DISABLED');
   });
 
   it('audits pause/resume and refuses resume while provider is disabled', async () => {
@@ -22,6 +25,16 @@ describe('mailbox admin operations', () => {
     await expect(controller.pause('mailbox-1', request())).resolves.toEqual({ id: 'mailbox-1', status: 'PAUSED_OPERATOR' });
     expect(audit.append).toHaveBeenCalledWith({}, expect.objectContaining({ action: 'MAILBOX_PAUSED', entityId: 'mailbox-1' }));
     await expect(controller.resume('mailbox-1', request())).rejects.toThrow('MAILBOX_RESUME_BLOCKED');
+  });
+
+  it('returns a failed, redacted provider health state when validation errors', async () => {
+    const repository = { findMailbox: vi.fn().mockResolvedValue({ id: 'mailbox-1', address: 'shared@example.com', provider: 'MICROSOFT_GRAPH', status: 'HEALTHY', lastSyncAt: null, lastSendAt: null, providerSubscriptionExpiresAt: null, syncCursorIssuedAt: null }) };
+    const provider = { validateConnection: vi.fn().mockRejectedValue(Object.assign(new Error('secret-token'), { code: 'AUTH_INVALID' })) };
+    const queue = { healthCounts: vi.fn().mockResolvedValue({ enabled: false, available: true, waiting: 0, active: 0, delayed: 0, failed: 0 }) };
+    const controller = new MailboxAdminController(repository as never, queue as never, provider as never, {} as never, {} as never);
+    const health = await controller.health('mailbox-1');
+    expect(health.providerHealth).toMatchObject({ status: 'failed', detail: 'AUTH_INVALID', authExpiresAt: null });
+    expect(JSON.stringify(health)).not.toContain('secret-token');
   });
 
   it('queues sync with mailbox ID only and fails closed when queue is disabled', async () => {

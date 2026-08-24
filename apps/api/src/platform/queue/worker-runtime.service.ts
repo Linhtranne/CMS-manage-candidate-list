@@ -17,6 +17,15 @@ export class WorkerRuntimeService implements OnModuleInit {
   onModuleInit(): void {
     if (!this.queue.enabled) return;
     if (!this.handlers.length) throw new Error('QUEUE_HANDLER_NOT_REGISTERED');
+    const configured = this.queue.configuredQueueNames;
+    const registered = new Set<string>();
+    for (const registration of this.handlers) {
+      if (registered.has(registration.name)) throw new Error(`QUEUE_HANDLER_DUPLICATE:${registration.name}`);
+      if (!configured.includes(registration.name)) throw new Error(`QUEUE_HANDLER_NOT_ALLOWED:${registration.name}`);
+      registered.add(registration.name);
+    }
+    const missing = configured.filter((name) => !registered.has(name));
+    if (missing.length) throw new Error(`QUEUE_HANDLER_NOT_REGISTERED:${missing.join(',')}`);
     for (const registration of this.handlers) this.queue.startWorker(registration.name, registration.handler);
   }
 }

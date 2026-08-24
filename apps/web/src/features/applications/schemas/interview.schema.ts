@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const common = {
   scheduledAt: z.string().min(1, 'validation.interview.scheduledAt'),
+  scheduledEndAt: z.string().min(1, 'validation.interview.scheduledEndAt'),
   timeZone: z.string().min(1, 'validation.interview.timeZone'),
   participants: z.array(z.string()).min(1, 'validation.interview.participants')
 };

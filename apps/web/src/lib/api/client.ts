@@ -60,7 +60,39 @@ const apiOrigin =
 const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
 const apiBaseUrl = (configuredApiBaseUrl || `${apiOrigin}/api/v1`).replace(/\/$/, '');
 
+function readCsrfToken() {
+  if (typeof document === 'undefined') return undefined;
+  const entry = document.cookie.split('; ').find((cookie) => cookie.startsWith('cms_csrf='));
+  return entry ? decodeURIComponent(entry.slice('cms_csrf='.length)) : undefined;
+}
+
+let csrfTokenPromise: Promise<string | undefined> | undefined;
+
+async function getCsrfToken() {
+  const cookieToken = readCsrfToken();
+  if (cookieToken) return cookieToken;
+  if (typeof window === 'undefined') return undefined;
+  csrfTokenPromise ??= globalThis.fetch(`${apiBaseUrl}/auth/csrf`, { credentials: 'include' })
+    .then((response) => normalizeApiResponse(response))
+    .then(async (response) => {
+      if (!response.ok) return undefined;
+      const payload = await response.json() as { token?: unknown };
+      return typeof payload.token === 'string' ? payload.token : undefined;
+    })
+    .catch(() => undefined)
+    .finally(() => { csrfTokenPromise = undefined; });
+  return csrfTokenPromise;
+}
+
 export const apiClient = createClient<paths>({
   baseUrl: apiBaseUrl,
-  fetch: async (input: Request) => normalizeApiResponse(await globalThis.fetch(input, { credentials: 'include' }))
+  fetch: async (input: Request) => {
+    const method = input.method.toUpperCase();
+    const csrfToken = input.url.endsWith('/auth/login') ? undefined : await getCsrfToken();
+    const headers = new Headers(input.headers);
+    if (csrfToken && method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && !headers.has('x-csrf-token')) {
+      headers.set('x-csrf-token', csrfToken);
+    }
+    return normalizeApiResponse(await globalThis.fetch(new Request(input, { headers }), { credentials: 'include' }));
+  }
 });

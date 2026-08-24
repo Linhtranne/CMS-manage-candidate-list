@@ -4,7 +4,7 @@ status: ready_for_human_approval
 technical_review: complete
 external_approvals: pending
 version: 1.0.0
-updated_at: 2026-08-21
+updated_at: 2026-08-24
 owner: Backend Tech Lead
 risk: critical
 ---
@@ -29,7 +29,7 @@ pnpm --filter @cms/api lint                             # MODULE_BOUNDARY_VIOLAT
 pnpm --filter @cms/api build                            # passed
 pnpm --filter @cms/contracts generate                    # passed
 pnpm --filter @cms/contracts test                       # 7 tests passed
-PostgreSQL disposable migration                         # 10 migrations applied; status up to date
+PostgreSQL disposable migration                         # 12 migrations applied; status up to date
 PostgreSQL trigger/privilege smoke                       # EMAIL_HUB_DB_INVARIANTS_OK; cms_api DELETE=false
 ```
 

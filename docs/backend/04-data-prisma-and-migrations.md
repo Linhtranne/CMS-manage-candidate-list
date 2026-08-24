@@ -194,6 +194,7 @@ Production dùng `CREATE INDEX CONCURRENTLY` ngoài transaction. Migration runne
 - Command platform migration `20260820000200_command_platform` bổ sung durable idempotency records; audit/outbox writes dùng chung transaction callback với aggregate.
 - Identity access migration `20260820000300_identity_access` bổ sung `oidc_login_states` để consume OIDC state exactly once; chỉ lưu hash/expiry/used timestamp, không lưu raw token.
 - Staging/production dùng `pnpm --filter @cms/api db:migrate:deploy`, một wrapper kiểm tra `DATABASE_URL` rồi mới gọi `prisma migrate deploy` từ immutable image.
+- Production API/worker/scheduler phải dùng một database `LOGIN` runtime role riêng (được khai báo qua `DATABASE_RUNTIME_ROLE`) với quyền tối thiểu; `cms_api` là role schema `NOLOGIN` và không được đặt trong username của `DATABASE_URL`.
 - API/worker/scheduler không tự chạy migration khi boot; migration là release step riêng và không in connection string.
 - Không chạy `db push` trên shared/prod environment.
 

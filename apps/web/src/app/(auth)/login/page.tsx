@@ -12,7 +12,7 @@ export default function LoginPage() {
   const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [feedback, setFeedback] = useState<{ tone: 'error' | 'success'; text: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ tone: 'error' | 'success'; key: 'invalidCredentials' | 'connectionError' } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -23,13 +23,14 @@ export default function LoginPage() {
     try {
       const response = await apiClient.POST('/auth/login', { body: { email, password } });
       if (response.error) {
-        setFeedback({ tone: 'error', text: t('auth.login.connectionError') });
+        const errorCode = typeof response.error.code === 'string' ? response.error.code : undefined;
+        setFeedback({ tone: 'error', key: errorCode === 'INVALID_CREDENTIALS' || response.response.status === 401 ? 'invalidCredentials' : 'connectionError' });
         return;
       }
 
       router.replace('/work');
     } catch {
-      setFeedback({ tone: 'error', text: t('auth.login.connectionError') });
+      setFeedback({ tone: 'error', key: 'connectionError' });
     } finally {
       setIsSubmitting(false);
     }
@@ -51,7 +52,7 @@ export default function LoginPage() {
             <input id="password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} className="min-h-11 w-full rounded-control border border-border px-3 text-sm" />
           </div>
           <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>{isSubmitting ? t('auth.login.submitting') : t('auth.login.submit')}</Button>
-          {feedback ? <p className={feedback.tone === 'error' ? 'text-sm text-danger' : 'text-sm text-text-muted'} role={feedback.tone === 'error' ? 'alert' : 'status'}>{feedback.text}</p> : null}
+          {feedback ? <p className={feedback.tone === 'error' ? 'text-sm text-danger' : 'text-sm text-text-muted'} role={feedback.tone === 'error' ? 'alert' : 'status'}>{feedback.key === 'invalidCredentials' ? t('auth.login.invalidCredentials') : t('auth.login.connectionError')}</p> : null}
         </form>
       </section>
     </main>

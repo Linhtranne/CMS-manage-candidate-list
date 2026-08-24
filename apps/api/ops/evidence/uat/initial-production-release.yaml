@@ -1,0 +1,7 @@
+status: pending_external_uat
+release: null
+image: null
+dataset: synthetic_or_staging_only
+required_signatories: [Product, Backend, QA, Security, Operations]
+required_decisions: [DEC-001, DEC-002, DEC-003, DEC-004, DEC-005, DEC-006, DEC-007]
+evidence: []

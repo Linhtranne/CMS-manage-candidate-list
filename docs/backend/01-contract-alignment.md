@@ -64,16 +64,13 @@ security:
 
 ## 4. Auth endpoint changes
 
-Loại khỏi production contract:
-
-- `POST /auth/login` với email/password.
-
-Thay bằng:
+Luồng đăng nhập chính của CMS là email/password cho tài khoản nhân viên nội bộ đã được provision. Mật khẩu chỉ được lưu dưới dạng scrypt hash; endpoint không trả session token trong JSON mà set opaque session và CSRF cookies.
 
 | Method | Path | Behavior |
 |---|---|---|
+| POST | `/auth/login` | Validate email/password, yêu cầu user `ACTIVE`, tạo session, set `cms_sid`/`cms_csrf`; credential sai trả `401 INVALID_CREDENTIALS` |
 | GET | `/auth/oidc/start?returnTo=` | Validate returnTo allowlist, tạo state/nonce/PKCE và redirect IdP |
-| GET | `/auth/oidc/callback` | Verify state/nonce/code, resolve an existing active internal identity link, tạo session và trả session envelope |
+| GET | `/auth/oidc/callback` | Verify state/nonce/code, resolve an existing active internal identity link, tạo session, set cookies và redirect browser về `APP_ORIGIN` theo return path đã ký |
 | GET | `/auth/session` | Trả user, roles, permissions, scopes và expiry |
 | POST | `/auth/logout` | Revoke session, clear cookie, audit |
 | GET | `/auth/csrf` | Trả CSRF token gắn session |
@@ -272,7 +269,7 @@ Test hiện chỉ kiểm năm path literal phải được thay bằng kiểm tr
 
 ## 12. Alignment exit criteria
 
-- Không còn `/auth/login` password contract.
+- `/auth/login` password contract, OpenAPI generated client và UI login cùng dùng một schema.
 - Không còn enum Candidate/JobOrder cũ.
 - Mọi list có cursor/page contract.
 - Mọi mutation có auth, CSRF, permission và documented errors.

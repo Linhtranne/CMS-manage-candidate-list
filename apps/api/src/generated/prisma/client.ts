@@ -241,3 +241,93 @@ export type EmailAttachment = Prisma.EmailAttachmentModel
  * 
  */
 export type EmailMatchDecision = Prisma.EmailMatchDecisionModel
+/**
+ * Model SupplyJourneyTemplate
+ * 
+ */
+export type SupplyJourneyTemplate = Prisma.SupplyJourneyTemplateModel
+/**
+ * Model SupplyJourneyTemplateVersion
+ * 
+ */
+export type SupplyJourneyTemplateVersion = Prisma.SupplyJourneyTemplateVersionModel
+/**
+ * Model JourneyMilestoneTemplate
+ * 
+ */
+export type JourneyMilestoneTemplate = Prisma.JourneyMilestoneTemplateModel
+/**
+ * Model TaskRuleVersion
+ * 
+ */
+export type TaskRuleVersion = Prisma.TaskRuleVersionModel
+/**
+ * Model Task
+ * 
+ */
+export type Task = Prisma.TaskModel
+/**
+ * Model ReportProjectionWatermark
+ * 
+ */
+export type ReportProjectionWatermark = Prisma.ReportProjectionWatermarkModel
+/**
+ * Model ReportProjectionRow
+ * 
+ */
+export type ReportProjectionRow = Prisma.ReportProjectionRowModel
+/**
+ * Model ReportExportJob
+ * 
+ */
+export type ReportExportJob = Prisma.ReportExportJobModel
+/**
+ * Model SupplyJourney
+ * 
+ */
+export type SupplyJourney = Prisma.SupplyJourneyModel
+/**
+ * Model JourneyMilestone
+ * 
+ */
+export type JourneyMilestone = Prisma.JourneyMilestoneModel
+/**
+ * Model JourneyMilestoneHistory
+ * 
+ */
+export type JourneyMilestoneHistory = Prisma.JourneyMilestoneHistoryModel
+/**
+ * Model JourneyMilestoneAttempt
+ * 
+ */
+export type JourneyMilestoneAttempt = Prisma.JourneyMilestoneAttemptModel
+/**
+ * Model Document
+ * 
+ */
+export type Document = Prisma.DocumentModel
+/**
+ * Model DocumentVersion
+ * 
+ */
+export type DocumentVersion = Prisma.DocumentVersionModel
+/**
+ * Model DocumentLink
+ * 
+ */
+export type DocumentLink = Prisma.DocumentLinkModel
+/**
+ * Model DocumentAccessAudit
+ * 
+ */
+export type DocumentAccessAudit = Prisma.DocumentAccessAuditModel
+/**
+ * Model RetentionPolicy
+ * 
+ */
+export type RetentionPolicy = Prisma.RetentionPolicyModel
+/**
+ * Model LegalHold
+ * 
+ */
+export type LegalHold = Prisma.LegalHoldModel

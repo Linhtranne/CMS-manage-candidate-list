@@ -30,6 +30,9 @@ export class CreateOrderDto {
   @IsUUID() ownerId!: string;
   @IsOptional() @IsUUID() teamId?: string;
   @IsOptional() @IsUUID() occupationCatalogVersionId?: string;
+  @IsOptional() @IsString() @MaxLength(160) salary?: string;
+  @IsOptional() @IsString() @MaxLength(120) contractType?: string;
+  @IsOptional() @IsString() @MaxLength(40) japaneseLevel?: string;
   @IsArray() @IsString({ each: true }) criteria!: string[];
 }
 

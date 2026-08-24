@@ -1,101 +1,189 @@
 # Japan Candidate Supply CMS
 
-CMS nội bộ cho bộ phận Kinh doanh/Tuyển dụng quản lý ứng viên đa ngành và cung ứng nhân sự sang Nhật. Nhân viên làm việc trên CMS; ứng viên không đăng nhập mà nhận và phản hồi qua hộp thư chung có lưu vết.
+CMS nội bộ cho đội Kinh doanh, Tuyển dụng và Điều phối quản lý ứng viên đa ngành, khách hàng Nhật, Job Order, Application/Interview, Supply Journey, mailbox và báo cáo vận hành.
 
-## Phạm vi sản phẩm
+Ứng viên không đăng nhập vào CMS. Nhân viên nội bộ đăng nhập bằng email/password ở local; OIDC, provider email thật, object storage và các activation gate production vẫn được bật fail-closed.
 
-- Quản lý hồ sơ ứng viên gốc, nghề nghiệp và trạng thái vận hành.
-- Quản lý khách hàng, đơn tuyển và pipeline ứng viên.
-- Theo dõi lịch phỏng vấn, kết quả và quyết định trúng tuyển.
-- Theo dõi Supply Journey từ sau trúng tuyển đến khi doanh nghiệp Nhật tiếp nhận.
-- Hộp thư chung: lưu nội dung, thời gian, tệp đính kèm, phản hồi và lịch sử ghép email.
-- Báo cáo vận hành, audit log, người dùng, quyền, danh mục và template.
+## Quick start local bằng Docker
 
-IT chỉ là một ngành trong catalog. Hệ thống được thiết kế để mở rộng cho điều dưỡng, cơ khí, sản xuất, dịch vụ lưu trú và các ngành khác.
+### Yêu cầu
 
-## Trạng thái hiện tại
+- Docker Desktop đang chạy và có Compose v2.
+- Node.js `>=22.15`.
+- pnpm `>=11.6` (`corepack enable` nếu máy chưa có pnpm).
+- Cổng trống: `3000` (web), `3100` (API), `5432` (PostgreSQL), `6379` (Redis).
 
-Frontend và mock runtime của Sprint 0–4 đã được triển khai bằng Next.js. Các route chính, modal/form nghiệp vụ, trạng thái loading/empty/error/permission và critical path đã có test tương ứng.
+### 1. Tạo môi trường local
 
-Phần chưa phải production gồm backend NestJS, database migration, email provider thật, worker gửi email, object storage, persistence cho audit và kết nối dữ liệu thật. MSW chỉ dùng cho development/test.
+PowerShell:
 
-Gói đặc tả và implementation plan backend production đã được viết ở trạng thái `ready_for_human_approval`. Đội backend bắt đầu Phase 0 sau khi Tech Lead duyệt contract/kiến trúc và chỉ bật SSO, email, dữ liệu thật, export hoặc purge sau các approval gate tương ứng.
+```powershell
+Copy-Item .env.example .env
+```
 
-## Chạy local
+macOS/Linux:
 
-Yêu cầu Node.js `>=22.15` và pnpm `>=11.6`.
+```bash
+cp .env.example .env
+```
+
+Local mặc định dùng API thật ở `http://localhost:3100/api/v1`, PostgreSQL/Redis trong Docker, OIDC tắt, mailbox provider `DISABLED`, và MSW tắt. Không đặt credential production vào `.env`.
+
+### 2. Cài dependency và khởi động database
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm dev
+docker compose up -d postgres redis
 ```
 
-Mở [http://localhost:3000/work](http://localhost:3000/work). Một số route chính:
-
-- `/clients` — khách hàng
-- `/orders` — đơn tuyển
-- `/candidates` — ứng viên
-- `/applications` — ứng tuyển và phỏng vấn
-- `/supply-journeys` — lộ trình cung ứng
-- `/mailbox` — hộp thư chung
-- `/reports` — báo cáo
-- `/admin/users` — quản trị người dùng và quyền
-
-Trong development, MSW tự khởi động để mô phỏng API. Khi chạy production, đặt `NEXT_PUBLIC_MSW_ENABLED=false` và cung cấp API thật qua `NEXT_PUBLIC_API_BASE_URL`.
-
-## Kiểm tra chất lượng
+### 3. Apply migration và tạo tài khoản local
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm e2e
+pnpm --filter @cms/api db:migrate:deploy
+pnpm --filter @cms/api db:migrate:status
+pnpm --filter @cms/api db:seed:local
 ```
 
-Sinh lại TypeScript types từ OpenAPI:
+Seed mặc định là repeatable và chỉ dành cho local. Tài khoản mặc định:
+
+Lệnh seed cũng tạo một interview-question template local ở trạng thái `ACTIVE`, để luồng lên lịch phỏng vấn trên UI chạy được ngay sau khi khởi động.
+
+| Email | Password | Role |
+| --- | --- | --- |
+| `admin@local.test` | `LocalOnly-2026!` | `MANAGER`, `CONFIG_ADMIN` |
+
+Có thể đổi tài khoản seed bằng `LOCAL_AUTH_EMAIL`, `LOCAL_AUTH_PASSWORD`, `LOCAL_AUTH_DISPLAY_NAME` và `LOCAL_AUTH_ROLES` trong `.env`, sau đó chạy lại `db:seed:local`.
+
+Ví dụ tạo recruiter local bằng PowerShell:
+
+```powershell
+$env:LOCAL_AUTH_EMAIL = 'recruiter@local.test'
+$env:LOCAL_AUTH_PASSWORD = 'LocalRecruiter-2026!'
+$env:LOCAL_AUTH_DISPLAY_NAME = 'Local Recruiter'
+$env:LOCAL_AUTH_ROLES = 'RECRUITER'
+pnpm --filter @cms/api db:seed:local
+Remove-Item Env:LOCAL_AUTH_EMAIL,Env:LOCAL_AUTH_PASSWORD,Env:LOCAL_AUTH_DISPLAY_NAME,Env:LOCAL_AUTH_ROLES
+```
+
+### 4. Build và chạy web/API
 
 ```bash
-pnpm generate:contracts
+docker compose up -d --build api web
+docker compose ps
 ```
 
-## Docker trên Ubuntu
+Mở:
+
+- Web: [http://localhost:3000/login](http://localhost:3000/login)
+- API liveness: [http://localhost:3100/api/v1/health/live](http://localhost:3100/api/v1/health/live)
+- API readiness: [http://localhost:3100/api/v1/health/ready](http://localhost:3100/api/v1/health/ready)
+
+Đăng nhập bằng tài khoản seed rồi vào `/work`. Các route chính:
+
+| Route | Chức năng |
+| --- | --- |
+| `/candidates` | Candidate master và hồ sơ nghề nghiệp |
+| `/clients` | Khách hàng/receiving organization |
+| `/orders` | Job Order, trạng thái và pipeline |
+| `/applications` | Application, Interview và decision |
+| `/supply-journeys` | Supply Journey và milestone |
+| `/mailbox` | Shared mailbox nội bộ |
+| `/reports` | Báo cáo vận hành |
+| `/admin/users` | User/role administration |
+
+Nếu thay đổi `NEXT_PUBLIC_API_BASE_URL`, phải build/recreate web để giá trị được nhúng vào Next.js:
 
 ```bash
 docker compose build web
 docker compose up -d web
 ```
 
-Docker Compose hiện phục vụ frontend. Production cần API backend tương ứng; không bật fixture cho môi trường thật.
+## Chạy không dùng Docker cho web
 
-## Thiết kế và tài liệu
+Có thể dùng Docker cho PostgreSQL/Redis và chạy Next.js bằng pnpm:
 
-- [Thiết kế Figma](https://www.figma.com/design/3ANKdwAmkgK6Bm7LcqgmP4)
-- [Bản trình bày HTML](./presentation/candidate-cms-presentation.html)
-- [PRODUCT.md](./PRODUCT.md) — mục tiêu, người dùng và ranh giới sản phẩm
-- [Tổng quan tài liệu](./docs/00-tong-quan.md)
-- [Gói bàn giao backend production](./docs/backend/README.md)
-- [Implementation plan backend Phase 0–4](./docs/backend/plans/README.md)
-- [Roadmap UI/UX](./docs/backlogs/00-ui-ux-roadmap.md)
-- [OpenAPI contract](./packages/contracts/openapi/cms.yaml)
+```bash
+docker compose up -d postgres redis
+pnpm --filter @cms/api db:migrate:deploy
+pnpm --filter @cms/api db:seed:local
+pnpm --filter @cms/web dev
+```
+
+Trong trường hợp này `.env` phải giữ `NEXT_PUBLIC_API_BASE_URL=http://localhost:3100/api/v1`, còn API có thể chạy riêng bằng:
+
+```bash
+pnpm --filter @cms/api dev
+```
+
+## Kiểm tra chất lượng
+
+Chạy từ repository root:
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm docs:validate
+```
+
+Frontend E2E dùng Playwright:
+
+```bash
+pnpm e2e
+```
+
+Sinh lại TypeScript contract từ OpenAPI:
+
+```bash
+pnpm generate:contracts
+```
+
+## Dừng và reset dữ liệu local
+
+```bash
+docker compose down
+```
+
+Lệnh trên giữ volume dữ liệu. Muốn reset toàn bộ database/Redis local (mất dữ liệu synthetic) mới dùng:
+
+```bash
+docker compose down -v
+```
+
+Sau reset, chạy lại bước migration và seed ở trên.
+
+## Cấu hình và activation gate
+
+- `.env.example` chỉ chứa giá trị development an toàn; `.env` không được commit.
+- Local login là email/password. OIDC không cần để chạy local và không xuất hiện trên màn hình login.
+- `MAIL_PROVIDER=DISABLED` là mặc định an toàn. Provider thật cần approval record tương ứng.
+- Catalog production, document storage, bulk export, purge, break-glass và các tính năng rủi ro cao chỉ bật khi có approval artifact đúng decision register.
+- API không tự chạy migration khi boot; migration là release/local step riêng.
 
 ## Cấu trúc repository
 
 ```text
+apps/api/                 NestJS API, Prisma, workers và scheduler
 apps/web/                 Next.js frontend
-packages/contracts/       OpenAPI và generated TypeScript types
-tests/e2e/                Playwright smoke và critical-path tests
-docs/                     SRS, kiến trúc, ERD, UI/UX và backlog
-docs/backend/             Spec và plan bàn giao backend production
-presentation/             HTML deck trình bày dự án
+packages/contracts/       OpenAPI canonical contract và generated types
+apps/api/prisma/          Schema và migrations
+tests/e2e/                Playwright UI tests
+docs/                     BRD/SRS, kiến trúc, dữ liệu, vận hành và backend handoff
+docs/backend/             Contract, security, release gates và phase plans
 ```
 
-## Nguyên tắc ranh giới
+Tài liệu chính:
 
-- CMS chỉ dành cho nhân viên nội bộ; không xây candidate portal trong baseline này.
-- Candidate, Application, Interview và Supply Journey là các lớp dữ liệu riêng.
-- Supply Journey là lộ trình cung ứng nhân sự, không phải hệ thống quản lý chuyến bay.
+- [PRODUCT.md](./PRODUCT.md)
+- [Tổng quan sản phẩm](./docs/00-tong-quan.md)
+- [Backend Production Handoff](./docs/backend/README.md)
+- [Implementation plans Phase 0–4](./docs/backend/plans/README.md)
+- [OpenAPI contract](./packages/contracts/openapi/cms.yaml)
+
+## Ranh giới an toàn
+
+- CMS chỉ dành cho nhân viên nội bộ; không có candidate portal trong baseline.
+- Candidate, Application, Interview và Supply Journey là các aggregate/lớp dữ liệu riêng.
 - Không dùng AI để tự quyết định đỗ/trượt.
-- Không đưa PII, nội dung email thật, credential, file upload hoặc backup production vào Git.
-
-`.gitignore` loại dependency, build output, secrets, dữ liệu runtime, file agent/skill và script cục bộ khỏi repository; riêng `scripts/validate-docs.mjs` được version để CI/đội backend kiểm gói tài liệu.
+- Không commit PII thật, email thật, credential, upload, backup, `.env`, build output hoặc runtime data.

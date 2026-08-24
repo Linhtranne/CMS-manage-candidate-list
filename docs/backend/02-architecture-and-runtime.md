@@ -202,6 +202,20 @@ Nhóm biến:
 - observability endpoints;
 - feature activation flags có decision record.
 
+Document activation additionally requires `STORAGE_ENDPOINT`,
+`STORAGE_BUCKET`, `MALWARE_SCANNER_ENDPOINT` and bounded signed URL/scanner
+timeouts (`STORAGE_UPLOAD_TTL_SECONDS`, `STORAGE_DOWNLOAD_TTL_SECONDS`,
+`MALWARE_SCANNER_TIMEOUT_MS`). Credentials and client implementations are
+injected outside the repository.
+
+High-risk activation variables are `PRODUCTION_SEED_ACTIVATION`,
+`DOCUMENTS_ENABLED`, `BULK_EXPORT_ENABLED`, `PURGE_ENABLED` and
+`BREAK_GLASS_ENABLED`. Each requested flag must point to a server-owned
+approval record (`CATALOG_APPROVAL_RECORD_FILE`,
+`DOCUMENT_APPROVAL_RECORD_FILE`, `EXPORT_APPROVAL_RECORD_FILE`,
+`RETENTION_APPROVAL_RECORD_FILE` or `BREAK_GLASS_APPROVAL_RECORD_FILE`);
+the flag alone can never activate the feature.
+
 Phase 0 hiện thực hóa `apps/api/src/platform/config/config.schema.ts`: local `development/test` có safe defaults, còn `staging/production` fail-closed nếu thiếu `APP_ORIGIN`, database/Redis URL, `ENCRYPTION_KEY` hoặc `SESSION_SECRET`. OIDC chỉ enabled khi đủ issuer/client/redirect/audience và có JSON approval record DEC-002 đúng scope; trước approval API vẫn boot safe với OIDC disabled. Staging/production bắt buộc issuer và redirect URI dùng HTTPS; approval checksum phải là SHA-256 đầy đủ. Partial OIDC config hoặc approval record không hợp lệ làm process fail trước listen. Queue transport mặc định tắt; strict environment không được bật queue cho tới khi có consumer handler production. `MAIL_PROVIDER=DISABLED` là safe mode hợp lệ; secret không xuất hiện trong lỗi validation.
 
 Không log giá trị config secret. `/admin/mailbox` chỉ trả `credentialConfigured`.

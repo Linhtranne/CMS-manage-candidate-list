@@ -5,6 +5,7 @@ import { PrismaService } from '../../../platform/database/prisma.service.js';
 import { AuditWriter } from '../../../modules/audit/audit-writer.js';
 import { getRequestContext } from '../../../platform/http/request-context.middleware.js';
 import type { OidcClaims } from '../infrastructure/oidc.adapter.js';
+import { verifyPassword } from '../infrastructure/password-hasher.js';
 import { ROLE_ACTION_SCOPES, type ActorRole, type PermissionAction, type ScopeLevel } from '../domain/permission.registry.js';
 
 const ABSOLUTE_SESSION_MS = 8 * 60 * 60 * 1000;
@@ -45,6 +46,17 @@ export class SessionAuthenticationError extends Error {
   constructor(message = 'Session is not valid') {
     super(message);
     this.name = 'SessionAuthenticationError';
+  }
+}
+
+export class PasswordAuthenticationError extends Error {
+  readonly statusCode = 401;
+  readonly code = 'INVALID_CREDENTIALS';
+  readonly messageKey = 'errors.invalidCredentials';
+
+  constructor() {
+    super('Invalid credentials');
+    this.name = 'PasswordAuthenticationError';
   }
 }
 
@@ -130,6 +142,26 @@ export class SessionService {
       await this.prisma.session.create({ data: { userId, sessionHash, csrfHash, expiresAt } });
     }
     return { sessionToken, csrfToken, expiresAt, user: toUser(user, user.userRoles) };
+  }
+
+  async authenticateWithPassword(email: string, password: string): Promise<CreatedSession> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+      include: { userRoles: { include: { role: true } } },
+    });
+    const valid = Boolean(user?.passwordHash) && await verifyPassword(password, user?.passwordHash ?? '');
+    if (!user || user.status !== 'ACTIVE' || !valid) {
+      await this.appendAuditSafely({
+        actorUserId: user?.id,
+        action: 'AUTH_LOGIN_FAILED',
+        entityType: 'SESSION',
+        correlationId: this.correlationId(),
+        metadataJson: { reason: 'INVALID_CREDENTIALS' },
+      });
+      throw new PasswordAuthenticationError();
+    }
+    return this.createSession(user.id);
   }
 
   async establishFromOidc(claims: OidcClaims): Promise<CreatedSession> {

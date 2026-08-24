@@ -27,7 +27,7 @@ export function ApplicationDecisionDialog({ application, open, onClose, onSaved 
     const completed = application.interviews.filter((item) => item.scheduleStatus === 'COMPLETED' && item.result !== 'PENDING');
     if (status === 'PASSED' && !completed.length) { setError(t('applications.decision.interviewRequired')); return; }
     if (status === 'PASSED' && !completed.some((item) => item.result === 'PASS')) { setError(t('applications.decision.interviewNotPassed')); return; }
-    if ((status === 'FAILED' || status === 'WITHDRAWN') && !reasonCode.trim()) { setError(t('applications.decision.reasonRequired')); return; }
+    if (['PASSED', 'FAILED', 'WITHDRAWN'].includes(status) && !reasonCode.trim()) { setError(t('applications.decision.reasonRequired')); return; }
     try { const saved = await decide.mutateAsync({ applicationId: application.id, body: { status, reasonCode: reasonCode || null, note: note || null, decidedAt: new Date().toISOString(), version: application.version } }); onSaved?.(saved); onClose(); } catch (cause) { setError(localizedError(t, cause, t('applications.decision.saveError'))); }
   };
 

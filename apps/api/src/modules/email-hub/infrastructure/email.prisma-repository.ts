@@ -139,6 +139,43 @@ export class EmailPrismaRepository {
     });
   }
 
+  findMailboxesDueForSubscriptionRenewal(now: Date, leadMs: number, limit = 100) {
+    const boundedLeadMs = Math.max(0, Math.min(leadMs, 7 * 24 * 60 * 60 * 1000));
+    const dueBefore = new Date(now.getTime() + boundedLeadMs);
+    return this.prisma.mailbox.findMany({
+      where: {
+        providerSubscriptionId: { not: null },
+        status: { in: ['HEALTHY', 'DEGRADED'] },
+        OR: [
+          { providerSubscriptionExpiresAt: null },
+          { providerSubscriptionExpiresAt: { lte: dueBefore } },
+        ],
+      },
+      select: { id: true, providerSubscriptionExpiresAt: true },
+      orderBy: [{ providerSubscriptionExpiresAt: 'asc' }, { id: 'asc' }],
+      take: Math.max(1, Math.min(limit, 500)),
+    });
+  }
+
+  markSubscriptionRenewed(mailboxId: string, input: { subscriptionId: string; expiresAt: Date; renewedAt?: Date }) {
+    return this.prisma.mailbox.updateMany({
+      where: { id: mailboxId, status: { in: ['HEALTHY', 'DEGRADED'] } },
+      data: {
+        providerSubscriptionId: input.subscriptionId,
+        providerSubscriptionExpiresAt: input.expiresAt,
+        lastSubscriptionRenewedAt: input.renewedAt ?? new Date(),
+        version: { increment: 1 },
+      },
+    });
+  }
+
+  markSubscriptionRenewalFailure(mailboxId: string, status: 'DEGRADED' | 'PAUSED_AUTH') {
+    return this.prisma.mailbox.updateMany({
+      where: { id: mailboxId, status: { not: 'PAUSED_OPERATOR' } },
+      data: { status, version: { increment: 1 } },
+    });
+  }
+
   createConversation(input: CreateConversationInput) {
     return this.prisma.emailConversation.create({
       data: {
@@ -320,6 +357,8 @@ export class EmailPrismaRepository {
   }
 
   async markSent(id: string, result: ProviderSendResult): Promise<boolean> {
+    const message = await this.prisma.emailMessage.findUnique({ where: { id }, select: { mailboxId: true } });
+    if (!message) return false;
     const updated = await this.prisma.emailMessage.updateMany({
       where: { id, status: 'SENDING' },
       data: {
@@ -330,6 +369,9 @@ export class EmailPrismaRepository {
         version: { increment: 1 },
       },
     });
+    if (updated.count === 1) {
+      await this.prisma.mailbox.update({ where: { id: message.mailboxId }, data: { lastSendAt: result.acceptedAt, version: { increment: 1 } } });
+    }
     return updated.count === 1;
   }
 
@@ -339,6 +381,8 @@ export class EmailPrismaRepository {
   }
 
   async markReconciledSent(id: string, result: ProviderSendResult): Promise<boolean> {
+    const message = await this.prisma.emailMessage.findUnique({ where: { id }, select: { mailboxId: true } });
+    if (!message) return false;
     const updated = await this.prisma.emailMessage.updateMany({
       where: { id, status: 'RECONCILING' },
       data: {
@@ -349,6 +393,9 @@ export class EmailPrismaRepository {
         version: { increment: 1 },
       },
     });
+    if (updated.count === 1) {
+      await this.prisma.mailbox.update({ where: { id: message.mailboxId }, data: { lastSendAt: result.acceptedAt, version: { increment: 1 } } });
+    }
     return updated.count === 1;
   }
 
