@@ -9,5 +9,6 @@ import { journeysHandlers } from './handlers/journeys';
 import { mailHandlers } from './handlers/mail';
 import { reportsAdminHandlers } from './handlers/reports-admin';
 import { candidatesHandlers } from './handlers/candidates';
+import { notificationsHandlers } from './handlers/notifications';
 
-export const server = setupServer(...systemHandlers, ...searchAuthHandlers, ...savedViewHandlers, ...workHandlers, ...clientsOrdersHandlers, ...candidatesHandlers, ...applicationsHandlers, ...journeysHandlers, ...mailHandlers, ...reportsAdminHandlers);
+export const server = setupServer(...systemHandlers, ...searchAuthHandlers, ...savedViewHandlers, ...workHandlers, ...clientsOrdersHandlers, ...candidatesHandlers, ...applicationsHandlers, ...journeysHandlers, ...mailHandlers, ...reportsAdminHandlers, ...notificationsHandlers);

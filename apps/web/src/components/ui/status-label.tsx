@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { type HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-const statusLabelVariants = cva('inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold', {
+const statusLabelVariants = cva('inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold', {
   variants: {
     tone: {
       neutral: 'bg-surface text-text-muted',

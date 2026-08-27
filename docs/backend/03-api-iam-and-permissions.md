@@ -249,3 +249,15 @@ Không log OIDC code, access token, refresh token, session cookie hoặc CSRF to
 - Break-glass expiry và alert.
 
 Permission-negative suite cho registry mục 5 phải đạt 100% trước release.
+
+## 15. Phase 0 implementation evidence
+
+Phase 0 Task 5 hiện đã có implementation trong `apps/api`:
+
+- `identity-access` module exposes `/api/v1/auth/oidc/start`, `/api/v1/auth/oidc/callback`, `/api/v1/auth/session`, `/api/v1/auth/csrf` và `/api/v1/auth/logout`.
+- `OidcAdapter` dùng discovery metadata, Authorization Code + PKCE S256, encrypted state (AES-256-GCM), state hash persisted trong `oidc_login_states`, one-time consume, issuer/audience/nonce/subject validation và reject open redirect.
+- `SessionService` tạo opaque 256-bit session/CSRF token; database chỉ lưu HMAC hash. Session có absolute 8 giờ, idle 30 phút, revoke từng session hoặc toàn user; callback chỉ link vào user `ACTIVE`, không tự cấp role.
+- `SessionGuard`, `CsrfGuard` và `PolicyGuard` thực hiện authentication -> CSRF -> action check. `PolicyService` deny-by-default, enforce sensitivity/reason/approval, scope filter và không cho role scope trong database mở rộng grant baseline.
+- Khi OIDC config thiếu, `/auth/oidc/start` trả `503 OIDC_DISABLED`; khi thiếu/không hợp lệ session trả `401 UNAUTHENTICATED`; lỗi được map về canonical envelope và không lộ token/secret.
+
+Đã kiểm chứng bằng security suite: 10 test pass khi chạy không có database; với PostgreSQL 17 disposable, toàn bộ 11/11 test pass (bao gồm tạo/validate/CSRF/revoke session). External IdP/JWKS thật chưa được claim vì DEC-002 vẫn `blocked_by_external_decision`; staging/production phải giữ fail-closed cho tới khi DEC-002 được approved và có smoke test provider thật.

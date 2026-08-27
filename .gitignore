@@ -11,6 +11,9 @@ test-results/
 .env
 .env.*
 !.env.example
+.local-secrets/
+tmp/
+output/
 *.log
 *.pem
 *.key
@@ -21,6 +24,7 @@ uploads/
 exports/
 backups/
 storage/
+!apps/api/src/platform/storage/
 *.sqlite
 *.sqlite3
 

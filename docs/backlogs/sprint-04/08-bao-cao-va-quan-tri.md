@@ -1,13 +1,13 @@
 # Báo cáo và quản trị Implementation Plan
 
-status: implemented (frontend/mock contract)
+status: implemented (API projection + production-first UI)
 
 ## Evidence
 
 - Routes: `/reports`, `/admin/users`, `/admin/catalogs`, `/admin/templates`, `/admin/mailbox`, `/admin/audit`.
-- Contract and MSW handlers cover report summary/funnel/export and admin users/roles/catalogs/templates/mailbox/audit.
-- Verification: `pnpm test` (63 web tests + 1 contract test), `pnpm e2e` (18 passed), lint/typecheck/build passed.
-- Production-like local shell: `NEXT_PUBLIC_MSW_ENABLED=true` with `next start -p 3000`; backend persistence/export worker remain future integration scope.
+- API, contract and UI cover report summary/funnel/export and admin users/roles/catalogs/templates/mailbox/audit. MSW handlers are test-only.
+- Local runtime uses the real API with `NEXT_PUBLIC_MSW_ENABLED=false`; seeded PostgreSQL data drives report projections and admin reads.
+- Verification is split into MSW contract tests and Docker/API runtime checks so a green UI test cannot hide a missing backend implementation.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -310,7 +310,7 @@ Journey/Email templates có version + preview + retire. Mailbox chỉ hiển th�
 export type MailboxSettingsView = {
   address: string;
   senderName: string;
-  adapter: 'MICROSOFT_365' | 'GOOGLE_WORKSPACE' | 'SMTP_IMAP';
+  adapter: 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
   maxAttachmentBytes: number;
   health: 'HEALTHY' | 'DEGRADED' | 'DISCONNECTED';
   lastCheckedAt: string;

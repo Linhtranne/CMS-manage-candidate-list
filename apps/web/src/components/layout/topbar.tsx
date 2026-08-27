@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Route } from 'next';
-import { LogOut } from 'lucide-react';
+import { CircleUserRound, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { apiClient } from '@/lib/api/client';
@@ -36,15 +36,15 @@ export function Topbar({ user }: { user: CurrentUser }) {
   };
 
   return (
-    <header className="flex min-h-16 items-center gap-3 border-b border-border bg-panel px-4 md:gap-4 md:px-6">
+    <header className="sticky top-[60px] z-30 flex min-h-16 items-center gap-3 border-b border-border bg-panel px-4 md:gap-4 md:px-6 lg:top-0">
       <div className="min-w-0 flex-1"><GlobalSearch user={user} /></div>
       {can(user.permissions, 'admin.read') ? <Link href={'/admin' as Route} aria-current={pathname === '/admin' || pathname.startsWith('/admin/') ? 'page' : undefined} className={cn('hidden rounded-control px-3 py-2 text-sm font-semibold text-text-muted hover:bg-surface hover:text-text md:inline-flex', (pathname === '/admin' || pathname.startsWith('/admin/')) && 'bg-[#e8f1fb] text-accent')}>{t('navigation.admin')}</Link> : null}
       <LanguageSwitcher compact />
       <NotificationMenu />
-      <div className="hidden text-right md:block">
-        <p className="text-sm font-semibold text-text">{user.displayName}</p>
-        <p className="text-xs text-text-muted">{t('common.user.internalStaff')}</p>
-      </div>
+      <Link href={'/account' as Route} aria-label={t('navigation.account')} title={t('navigation.account')} aria-current={pathname === '/account' ? 'page' : undefined} className={cn('inline-flex min-h-11 max-w-56 shrink-0 items-center gap-2 rounded-control px-2 text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent', pathname === '/account' && 'bg-[#e8f1fb] text-accent')}>
+        <CircleUserRound aria-hidden="true" size={18} strokeWidth={1.8} />
+        <span className="hidden truncate text-sm font-semibold md:inline">{user.displayName}</span>
+      </Link>
       {logoutError ? <p role="alert" className="max-w-56 text-xs font-semibold text-danger">{logoutError}</p> : null}
       <button type="button" aria-label={t('common.actions.logout')} title={t('common.actions.logout')} disabled={loggingOut} onClick={() => void logout()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-control border border-border bg-panel text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none disabled:opacity-50"><LogOut aria-hidden="true" size={18} strokeWidth={1.8} /></button>
     </header>

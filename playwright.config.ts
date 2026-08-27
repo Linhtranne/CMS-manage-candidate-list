@@ -14,6 +14,9 @@ function findLocalChromium() {
 }
 
 const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH ?? findLocalChromium();
+const webPort = Number(process.env.PLAYWRIGHT_WEB_PORT ?? 3001);
+const webHost = process.env.PLAYWRIGHT_HOST ?? '127.0.0.1';
+const baseURL = `http://${webHost}:${webPort}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -23,15 +26,18 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:3100',
+    baseURL,
     trace: 'on-first-retry',
     launchOptions: executablePath ? { executablePath } : undefined,
     ...devices['Desktop Chrome']
   },
   webServer: {
-    command: 'npm --prefix apps/web run dev -- --hostname 127.0.0.1 --port 3100',
-    url: 'http://127.0.0.1:3100/api/health',
-    reuseExistingServer: !process.env.CI,
+    command: `npm --prefix apps/web run dev -- --hostname ${webHost} --port ${webPort}`,
+    url: `${baseURL}/api/health`,
+    // Existing UI contract tests are intentionally isolated from infrastructure.
+    // Runtime/local Docker uses NEXT_PUBLIC_MSW_ENABLED=false by default.
+    env: { NEXT_PUBLIC_MSW_ENABLED: 'true' },
+    reuseExistingServer: !process.env.CI || process.env.PLAYWRIGHT_USE_EXISTING_SERVER === 'true',
     timeout: 120_000
   }
 });

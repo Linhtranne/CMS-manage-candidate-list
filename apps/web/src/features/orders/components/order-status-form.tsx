@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { JobOrder } from '@/mocks/fixtures/orders';
+import type { JobOrder } from '../services/order-types';
 import { Button } from '@/components/ui/button';
 import { closeOrderSchema } from '../schemas/order-status.schema';
 import { useUpdateOrderStatus } from '../services/order-queries';
@@ -9,12 +9,21 @@ import { useI18n } from '@/i18n/use-i18n';
 import { translateValidationIssue } from '@/i18n/validation';
 import { localizedError } from '@/i18n/errors';
 
+function toApiStatus(status: JobOrder['status']): 'DRAFT' | 'OPEN' | 'ON_HOLD' | 'FILLED' | 'CANCELLED' | 'CLOSED' {
+  if (status === 'RECRUITING') return 'OPEN';
+  if (status === 'PAUSED') return 'ON_HOLD';
+  return status;
+}
+
 const allowedTransitions: Record<JobOrder['status'], JobOrder['status'][]> = {
   DRAFT: ['DRAFT', 'RECRUITING'],
   RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'],
   PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'],
   FILLED: ['FILLED', 'CLOSED'],
-  CLOSED: ['CLOSED']
+  CLOSED: ['CLOSED'],
+  OPEN: ['OPEN', 'PAUSED', 'FILLED'],
+  ON_HOLD: ['ON_HOLD', 'OPEN', 'FILLED'],
+  CANCELLED: ['CANCELLED']
 };
 
 export function OrderStatusForm({ order, onSaved }: { order: JobOrder; onSaved: () => void }) {
@@ -37,7 +46,7 @@ export function OrderStatusForm({ order, onSaved }: { order: JobOrder; onSaved: 
       if (!result.success) { setError(translateValidationIssue(t, result.error.issues[0], 'orders.status.validation')); return; }
     }
     setError('');
-    mutation.mutate({ orderId: order.id, body: { status, reasonCode: status === 'CLOSED' ? 'TARGET_FILLED' : 'STATUS_CHANGE', version: order.version } }, {
+    mutation.mutate({ orderId: order.id, body: { status: toApiStatus(status), reasonCode: status === 'CLOSED' ? 'TARGET_FILLED' : 'STATUS_CHANGE', version: order.version } }, {
       onSuccess: onSaved,
       onError: (cause) => setError(localizedError(t, cause, t('orders.status.saveError')))
     });

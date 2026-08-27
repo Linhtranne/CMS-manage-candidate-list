@@ -53,12 +53,49 @@ pnpm --filter @cms/api test:contract
 pnpm --filter @cms/api test:e2e
 pnpm --filter @cms/api test:migration
 pnpm --filter @cms/api test:security
+pnpm --filter @cms/api test
+pnpm --filter @cms/api db:migrate:deploy
+pnpm --filter @cms/api db:migrate:status
+pnpm --filter @cms/api db:runtime-role-smoke
+pnpm --filter @cms/api db:query-plan-smoke
+pnpm --filter @cms/api release:preflight
 pnpm --filter @cms/api build
 pnpm --filter @cms/contracts generate
 pnpm --filter @cms/contracts test
+pnpm --filter @cms/web lint
+pnpm --filter @cms/web typecheck
+pnpm --filter @cms/web test:ci
+pnpm docs:validate
+IMAGE_DIGEST=sha256:<digest> pnpm --filter @cms/api release:manifest
 ```
 
-CI fail nếu command thiếu, bị skip không có approved waiver, hoặc generated OpenAPI/client diff chưa commit. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
+Production preflight also requires `DATABASE_RUNTIME_ROLE` to match the
+username in `DATABASE_URL`; the role must be a provisioned `LOGIN` runtime role
+and must not be the `cms_api` `NOLOGIN` schema owner.
+
+Production release evidence must also provide non-empty files through
+`SAST_ARTIFACT`, `DEPENDENCY_SCAN_ARTIFACT`, `SECRET_SCAN_ARTIFACT`,
+`CONTAINER_SCAN_ARTIFACT`, `SBOM_ARTIFACT` and `DAST_ARTIFACT`. The release
+manifest stores their SHA-256 checksums.
+
+CI fail nếu command thiếu, bị skip không có approved waiver, generated OpenAPI/client diff chưa commit, migration deploy lần hai/status không sạch, container health smoke fail, production compose thiếu digest-pinned API/migration/web/PostgreSQL/Redis image, image reference không khớp digest manifest, hoặc image SBOM/critical-high scan fail. Test environment tạo database/bucket/queue namespace riêng và cleanup theo exact namespace.
+
+Production manifest phải được tạo từ approval artifact đã ký, không dùng `RELEASE_APPROVED=true` như một bypass:
+
+```sh
+RELEASE_STATUS=production \
+RELEASE_SCOPE=phase-1a \
+RELEASE_APPROVED=true \
+RELEASE_APPROVALS_FILE=/secure/release/phase-1a-approvals.json \
+IMAGE_DIGEST=sha256:<api-image-digest> \
+MIGRATION_IMAGE_DIGEST=sha256:<migration-image-digest> \
+WEB_IMAGE_DIGEST=sha256:<web-image-digest> \
+POSTGRES_IMAGE_DIGEST=sha256:<postgres-image-digest> \
+REDIS_IMAGE_DIGEST=sha256:<redis-image-digest> \
+pnpm --filter @cms/api release:manifest
+```
+
+Artifact phải là JSON object bất biến có `version`, `artifact_checksum` dạng `sha256:<64-hex-digest>`, các decision đã `approved` theo `RELEASE_SCOPE` (Phase 1A: DEC-001, DEC-002, DEC-004, DEC-005, DEC-006, DEC-007) và chữ ký có identity + timestamp của Backend Tech Lead, Product Owner, QA Lead, Security Owner và Operations Owner. Script ghi checksum file vào manifest và fail-closed nếu thiếu hoặc dùng placeholder ở bất kỳ mục nào. Quy trình deploy/rollback chi tiết nằm trong [Phase 1A release runbook](../../runbooks/phase-1a-release.md) và [rollback runbook](../../runbooks/phase-1a-rollback.md).
 
 ## 4. Coverage requirements
 

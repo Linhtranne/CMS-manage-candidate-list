@@ -9,19 +9,19 @@ import { occupationLabel } from '@/i18n/catalog-options';
 
 const priorityTone = { URGENT: 'danger', HIGH: 'warning', NORMAL: 'neutral' } as const;
 const priorityKeys = { URGENT: 'work.table.priorities.urgent', HIGH: 'work.table.priorities.high', NORMAL: 'work.table.priorities.normal' } as const;
-const statusKeys = { TODO: 'work.table.statuses.todo', IN_PROGRESS: 'work.table.statuses.inProgress', WAITING_REPLY: 'work.table.statuses.waitingReply', DONE: 'work.table.statuses.done' } as const;
+const statusKeys = { TODO: 'work.table.statuses.todo', NEW: 'work.table.statuses.todo', IN_PROGRESS: 'work.table.statuses.inProgress', WAITING_REPLY: 'work.table.statuses.waitingReply', DONE: 'work.table.statuses.done', CANCELLED: 'work.table.statuses.done' } as const;
 
 function workColumns(t: Translate, formatDateTime: (value: Date | string | number, options?: Intl.DateTimeFormatOptions) => string): ColumnDef<WorkItem>[] {
   return [
-    { accessorKey: 'priority', header: t('work.table.priority'), cell: ({ getValue }) => { const value = getValue<WorkItem['priority']>(); return <StatusLabel tone={priorityTone[value]}>{t(priorityKeys[value])}</StatusLabel>; } },
+    { accessorKey: 'priority', header: t('work.table.priority'), cell: ({ getValue }) => { const value = getValue<WorkItem['priority']>(); return <StatusLabel className="min-w-[4.5rem] justify-center px-2 text-center" tone={priorityTone[value]}>{t(priorityKeys[value])}</StatusLabel>; } },
     { accessorKey: 'dueAt', header: t('work.table.dueAt'), cell: ({ row }) => <span className={new Date(row.original.dueAt).getTime() < Date.now() ? 'font-semibold text-danger' : 'text-text'}>{formatDateTime(row.original.dueAt, { dateStyle: 'short', timeStyle: 'short' })}</span> },
     { accessorKey: 'title', header: t('work.table.task'), cell: ({ row }) => <div><p className="font-semibold">{getDomainLabel(t, 'workTask', row.original.title)}</p><p className="mt-1 text-xs text-text-muted">{getDomainLabel(t, 'workSource', row.original.sourceType)}</p></div> },
-    { accessorKey: 'candidate.name', header: t('work.table.candidate'), cell: ({ row }) => <span>{row.original.candidate.code} · {row.original.candidate.name}</span> },
-    { accessorKey: 'order.code', header: t('work.table.order'), cell: ({ row }) => <span>{row.original.order.code}<br /><span className="text-xs text-text-muted">{occupationLabel(t, row.original.order.position)}</span></span> },
+    { accessorKey: 'candidate.name', header: t('work.table.candidate'), cell: ({ row }) => <span>{row.original.candidate.name}</span> },
+    { accessorKey: 'order.code', header: t('work.table.order'), cell: ({ row }) => <span>{occupationLabel(t, row.original.order.position)}</span> },
     { accessorKey: 'client.name', header: t('work.table.client'), cell: ({ row }) => row.original.client.name },
     { accessorKey: 'status', header: t('work.table.status'), cell: ({ getValue }) => t(statusKeys[getValue<WorkItem['status']>()]) },
     { accessorKey: 'assignee.name', header: t('work.table.assignee'), cell: ({ row }) => row.original.assignee.name },
-    { accessorKey: 'lastActivity', header: t('work.table.lastActivity'), cell: ({ getValue }) => <span className="text-xs text-text-muted">{getValue<string>() ?? '—'}</span> }
+    { accessorKey: 'lastActivity', header: t('work.table.lastActivity'), cell: ({ getValue }) => { const value = getValue<string>(); return <span className="text-xs text-text-muted">{value ? formatDateTime(value) : '—'}</span>; } }
   ];
 }
 

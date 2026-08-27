@@ -16,6 +16,7 @@ describe('LoginPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Đăng nhập CMS' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Đăng nhập' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Tiếp tục với Google' })).not.toBeInTheDocument();
   });
 
   it('redirects to the work queue after a successful login', async () => {
@@ -27,6 +28,17 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/work'));
+  });
+
+  it('shows an invalid-credentials message when password login is rejected', async () => {
+    const user = userEvent.setup();
+    renderWithI18n(<LoginPage />);
+
+    await user.type(screen.getByLabelText('Email công việc'), 'unknown@example.com');
+    await user.type(screen.getByLabelText('Mật khẩu'), 'wrong-pass');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Email hoặc mật khẩu không đúng.'));
   });
 
   it('renders the login experience in English', () => {

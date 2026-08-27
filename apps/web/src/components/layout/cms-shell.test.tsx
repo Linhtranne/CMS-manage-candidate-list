@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { renderWithI18n } from '@/i18n/test-utils';
-import { managerFixture, recruiterFixture } from '@/mocks/fixtures/users';
+import { configAdminFixture, managerFixture, recruiterFixture } from '@/mocks/fixtures/users';
 import { QueryProvider } from '@/providers/query-provider';
 import { CmsShell } from './cms-shell';
 
@@ -12,7 +12,8 @@ describe('CmsShell', () => {
 
     expect(screen.getByRole('link', { name: 'Việc của tôi' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Hộp thư chung' })).toBeVisible();
-    expect(screen.getAllByRole('link')).toHaveLength(8);
+    expect(screen.getByRole('link', { name: 'Tài khoản của tôi' })).toBeVisible();
+    expect(screen.getAllByRole('link')).toHaveLength(9);
     expect(screen.queryByText('Quản trị')).not.toBeInTheDocument();
   });
 
@@ -30,6 +31,15 @@ describe('CmsShell', () => {
     expect(screen.getByRole('button', { name: 'Đăng xuất' })).toBeVisible();
   });
 
+  it('keeps configuration admins out of business navigation', () => {
+    renderWithI18n(<QueryProvider><CmsShell user={configAdminFixture}><div>Nội dung quản trị</div></CmsShell></QueryProvider>);
+
+    expect(screen.getAllByRole('link', { name: 'Quản trị' }).every((link) => link.getAttribute('href') === '/admin')).toBe(true);
+    expect(screen.queryByRole('link', { name: 'Ứng viên' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Đơn tuyển' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Hộp thư chung' })).not.toBeInTheDocument();
+  });
+
   it('keeps the mobile navigation inside the viewport and closes with Escape', async () => {
     const user = userEvent.setup();
     renderWithI18n(<QueryProvider><CmsShell user={recruiterFixture}><div>Nội dung công việc</div></CmsShell></QueryProvider>);
@@ -43,7 +53,7 @@ describe('CmsShell', () => {
     expect(document.activeElement).toBe(navigation);
     const sidebars = screen.getAllByRole('complementary', { name: 'Điều hướng CMS' });
     expect(sidebars[sidebars.length - 1]).toHaveClass('cms-sidebar-mobile');
-    expect(sidebars[sidebars.length - 1]?.querySelector('button[aria-label="Đóng điều hướng"]')).toBeNull();
+    expect(sidebars[sidebars.length - 1]?.querySelector('button[aria-label="Đóng điều hướng"]')).not.toBeNull();
     expect(document.body.style.overflow).toBe('hidden');
 
     await user.keyboard('{Escape}');

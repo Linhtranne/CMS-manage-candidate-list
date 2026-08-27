@@ -13,7 +13,7 @@ export function SavedViewMenu({ resource, user, query = {}, onApply }: { resourc
   const [name, setName] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const views = useQuery({ queryKey: ['saved-views', resource], queryFn: () => listViews(resource) });
-  const canPublish = user.roles.includes('MANAGER') || user.permissions.includes('admin.read');
+  const canPublish = user.permissions.includes('saved_view.manage') && user.roles.some((role) => role === 'MANAGER' || role === 'CONFIG_ADMIN');
   const submit = async () => {
     if (!name.trim()) { setStatus('error'); return; }
     setStatus('saving');

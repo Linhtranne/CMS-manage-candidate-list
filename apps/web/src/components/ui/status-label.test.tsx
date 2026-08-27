@@ -7,5 +7,6 @@ describe('StatusLabel', () => {
     render(<StatusLabel tone="danger">Quá hạn</StatusLabel>);
 
     expect(screen.getByText('Quá hạn')).toBeVisible();
+    expect(screen.getByText('Quá hạn')).toHaveClass('shrink-0', 'whitespace-nowrap');
   });
 });

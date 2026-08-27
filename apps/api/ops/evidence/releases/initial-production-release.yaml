@@ -1,0 +1,7 @@
+status: blocked_external_evidence
+promotion: disabled
+rollback_runbook: apps/api/runbooks/release-rollback.md
+provider_smoke: not_run
+restore_evidence: not_run
+load_evidence: not_run
+approvals: []

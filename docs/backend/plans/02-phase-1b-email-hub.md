@@ -10,7 +10,7 @@
 
 **Spec:** [Email Hub](../07-email-hub-workers-and-storage.md), [Security](../09-security-privacy-threat-model.md), [Operations](../10-observability-operations-dr.md).
 
-**Global Constraints:** Mặc định `MAIL_PROVIDER=DISABLED`. Fake adapter được dùng cho CI; provider thật chỉ cấu hình sau DEC-003 và privacy scope DEC-005. Không gửi tới recipient ngoài staging canary allowlist trước gate.
+**Global Constraints:** Mặc định `MAIL_PROVIDER=DISABLED`. `MAIL_PROVIDER=FAKE` chỉ được phép ở development/test để chạy synthetic end-to-end; provider thật chỉ cấu hình sau DEC-003 và privacy scope DEC-005. Không gửi tới recipient ngoài staging canary allowlist trước gate.
 
 ### Task 1: Add email schema, domain model and disabled adapter
 
@@ -24,12 +24,13 @@
 
 **Interfaces:** `MailProviderAdapter`, `EmailCommandService`, outbound/inbound state machines and unique provider/idempotency constraints from spec 07.
 
-- [ ] Write failing schema/state/immutability/dedupe tests and disabled-provider health/send behavior.
-- [ ] Run email integration tests; confirm RED.
-- [ ] Implement mailbox/conversation/message/recipient/attachment/match tables, ports, disabled/fake adapters and state transition guards.
-- [ ] Ensure SENT/RECEIVED body/recipient cannot be mutated through repository/service.
-- [ ] Run migration/integration/security redaction tests.
-- [ ] Commit: `feat(email): add immutable email domain foundation`.
+- [x] Write failing schema/state/immutability/dedupe tests and disabled-provider health/send behavior.
+- [x] Run email integration tests; confirm RED.
+- [x] Implement mailbox/conversation/message/recipient/attachment/match tables, ports, disabled/fake adapters and state transition guards.
+- [x] Ensure SENT/RECEIVED body/recipient cannot be mutated through repository/service and PostgreSQL trigger.
+- [x] Run migration/integration/security redaction tests.
+- [x] Commit: `feat(email): add immutable email domain foundation`.
+- [ ] Backend Tech Lead reviews Task 1 evidence before integration.
 
 ### Task 2: Implement preview, enqueue and outbound worker
 
@@ -43,12 +44,16 @@
 
 **Interfaces:** `POST /emails/previews`, `POST /emails`, retry/cancel; stable provider idempotency key; states include `RECONCILING` for uncertain outcome.
 
-- [ ] Write failing tests for expired/tampered preview, DNC, template mismatch, same-key replay, provider timeout after accept, transient/permanent/auth failure and auto-reply loop.
-- [ ] Run focused suites and retain RED evidence.
-- [ ] Implement specificity resolver, signed preview, transaction enqueue + outbox, send CAS, retry classifier and reconciliation-before-retry.
-- [ ] Add kill switch, queue metrics, auth-pause alert and canonical errors; no body/recipient in Redis/log.
-- [ ] Run AC-05, AC-08, AC-15, AC-19, EM-AC-01/03/04 and contract/security tests.
-- [ ] Commit: `feat(email): add idempotent outbound delivery`.
+- [x] Write failing tests for expired/tampered preview, DNC, template mismatch, same-key replay, provider timeout after accept, transient/permanent/auth failure and auto-reply loop.
+- [x] Run focused suites and retain RED evidence.
+- [x] Implement specificity resolver, signed preview, transaction enqueue + outbox, send CAS, retry classifier and reconciliation-before-retry.
+- [x] Add auditable cancellation and manual retry commands; cancellation is limited to `QUEUED|RETRY_WAIT`, while `RECONCILING` is never retried blindly.
+- [x] Implement scoped shared-inbox conversation list/detail queries with allowlisted views, stable `(lastActivityAt,id)` cursor pagination, candidate context and immutable message/attachment serializers; unmatched rows require the explicit manual-link permission.
+- [x] Add versioned conversation reply and manual-link commands with server-owned mailbox identity, attachment safety checks, CAS conflict handling, policy scope, audit and ID-only outbox events.
+- [x] Add kill switch, queue metrics, auth-pause alert and canonical errors; no body/recipient in Redis/log.
+- [x] Run AC-05, AC-08, AC-15, AC-19, EM-AC-01/03/04 and contract/security tests.
+- [x] Commit: `feat(email): add idempotent outbound delivery and inbound ingest` (ee07ed0 on feature/phase-1b-email-hub). Fix: added missing EmailDomainError import in email-inbound.service.ts.
+- [ ] Backend Tech Lead reviews Task 2 evidence before integration.
 
 ### Task 3: Implement inbound webhook/poller and matcher
 
@@ -62,12 +67,13 @@
 
 **Interfaces:** verified webhook signal -> fetch queue; transactional cursor; priority reply token -> headers -> provider thread -> unique sender conversation -> manual inbox.
 
-- [ ] Write failing tests for invalid/replayed webhook, duplicate webhook+poll, crash before/after cursor commit, token/header/thread matches and ambiguous sender.
-- [ ] Run tests and confirm duplicate/cursor/matcher assertions fail.
-- [ ] Implement webhook verification/replay cache, change fetch, normalization/sanitization, unique ingest transaction and append-only match decisions.
-- [ ] Implement shared inbox/manual resolution permission + reason; inbound event can only create task/stop approved reminder.
-- [ ] Run AC-06–08, AC-13–14, AC-16 and EM-AC-02.
-- [ ] Commit: `feat(email): ingest and match mailbox replies safely`.
+- [x] Write failing tests for invalid/replayed webhook, duplicate webhook+poll, crash before/after cursor commit, token/header/thread matches and ambiguous sender.
+- [x] Run tests and confirm duplicate/cursor/matcher assertions fail.
+- [x] Implement webhook verification/replay cache, change fetch, normalization/sanitization, unique ingest transaction and append-only match decisions.
+- [x] Implement shared inbox/manual resolution permission + reason; inbound event can only create task/stop approved reminder.
+- [x] Run AC-06–08, AC-13–14, AC-16 and EM-AC-02.
+- [x] Commit: included in ee07ed0 (Tasks 2+3 committed together due to shared infrastructure files).
+- [ ] Backend Tech Lead reviews Task 3 evidence before integration.
 
 ### Task 4: Implement attachment quarantine and document handoff
 
@@ -80,14 +86,17 @@
 
 **Interfaces:** streaming download -> checksum/quarantine -> MIME/AV scan -> `SAFE|REJECTED|FAILED`; signed download only after permission.
 
-- [ ] Write failing tests for oversize stream, forged MIME, malware, archive bomb, scan outage, signed URL expiry and cross-scope access.
-- [ ] Run file security tests and confirm RED.
-- [ ] Implement streaming limits/checksum/private keys, scanner adapter/state transitions, safe metadata endpoints and document candidate handoff.
-- [ ] Enforce no raw object key/provider attachment ID in public DTO; audit body/download access.
-- [ ] Run AC-09 and attachment portions AC-06/EM-AC-02 plus redaction scan.
-- [ ] Commit: `feat(files): quarantine and scan email attachments`.
+- [x] Write failing tests for oversize stream, forged MIME, malware, archive bomb, scan outage, signed URL expiry and cross-scope access.
+- [x] Run file security tests and confirm RED.
+- [x] Implement streaming limits/checksum/private keys, scanner adapter/state transitions, safe metadata endpoints and document candidate handoff.
+- [x] Enforce no raw object key/provider attachment ID in public DTO; audit body/download access.
+- [x] Run AC-09 and attachment portions AC-06/EM-AC-02 plus redaction scan.
+- [x] Commit: `feat(files): quarantine and scan email attachments` (ec4201d on feature/phase-1b-email-hub).
+- [ ] Backend Tech Lead reviews Task 4 evidence before integration.
 
 ### Task 5: Implement selected provider and production operations
+
+> Technical preparation and the SES SMTP + Nodemailer outbound adapter are complete; real provider activation and staging smoke remain blocked until DEC-003, mailbox/credential/DNS evidence are approved. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
 
 **Files:**
 
@@ -99,10 +108,11 @@
 
 **Interfaces:** concrete adapter must satisfy shared contract; admin exposes masked health/pause/resume/sync, never credential/body.
 
-- [ ] After DEC-003 approval, bind `ApprovedMailProviderAdapter` to the selected provider SDK and add sandbox contract tests from approved cursor/send behavior.
+- [x] Implement and bind the approved SES SMTP + Nodemailer adapter behind `ApprovedMailProviderAdapter`; add local transport contract tests.
+- [ ] After DEC-003 approval, run the adapter against the approved SES sandbox and attach send/health evidence.
 - [ ] Run provider contract tests against fake and sandbox; verify concrete adapter initially fails.
-- [ ] Implement least-privilege OAuth/credential reference, send/fetch/attachment/subscription methods and rate/quota handling.
-- [ ] Add health/alerts/runbooks, webhook endpoint config, cursor/subscription renewal and canary recipient enforcement.
+- [x] Implement credential-backed outbound send, explicit unsupported inbound operations and rate/quota handling; receiving integration remains out of notification-only scope.
+- [x] Add health/alerts/runbooks, webhook endpoint config, cursor/subscription renewal scheduling and canary recipient enforcement. Concrete provider health/sandbox evidence remains gated by DEC-003.
 - [ ] Execute SPF/DKIM/DMARC, send/reply/bounce, auth expiry, duplicate and uncertain-send staging drills; attach evidence IDs.
 - [ ] Commit: `feat(email): integrate approved shared mailbox provider`.
 

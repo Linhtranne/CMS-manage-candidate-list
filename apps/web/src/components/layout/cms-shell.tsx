@@ -24,6 +24,26 @@ export function CmsShell({ user, children }: { user: CurrentUser; children: Reac
     if (!mobileMounted) mobileTriggerRef.current?.focus();
   }, [mobileMounted]);
 
+  useEffect(() => {
+    const handleHorizontalWheel = (event: WheelEvent) => {
+      if (event.defaultPrevented) return;
+      if (!(event.target instanceof Element)) return;
+      const tabList = event.target.closest<HTMLElement>('[role="tablist"]');
+      if (!tabList || tabList.scrollWidth <= tabList.clientWidth) return;
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+      const maxScrollLeft = tabList.scrollWidth - tabList.clientWidth;
+      const nextScrollLeft = Math.min(maxScrollLeft, Math.max(0, tabList.scrollLeft + event.deltaY));
+      if (nextScrollLeft === tabList.scrollLeft) return;
+
+      event.preventDefault();
+      tabList.scrollLeft = nextScrollLeft;
+    };
+
+    window.addEventListener('wheel', handleHorizontalWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleHorizontalWheel);
+  }, []);
+
   const openMobileNavigation = () => {
     setMobileOpen(true);
   };
@@ -62,7 +82,7 @@ export function CmsShell({ user, children }: { user: CurrentUser; children: Reac
           </div>
         ) : null}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-3 border-b border-border bg-panel px-4 py-2 lg:hidden">
+          <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-panel px-4 py-2 lg:hidden">
             <Button ref={mobileTriggerRef} variant="ghost" aria-label={t('navigation.openMobile')} title={t('navigation.openMobile')} aria-expanded={mobileOpen} aria-controls="mobile-cms-nav" className="h-11 w-11 shrink-0 px-0" onClick={openMobileNavigation}><Menu aria-hidden="true" size={20} strokeWidth={1.8} /></Button>
             <span className="text-sm font-semibold text-text">{t('common.brand.cmsName')}</span>
           </div>

@@ -10,4 +10,8 @@ describe('report domain', () => {
   it('normalizes only supported URL filters and drops blanks', () => {
     expect(normalizeReportFilters('?from=2026-08-01&to=2026-08-17&ownerId=u-1&unknown=x&clientId=')).toEqual({ from: '2026-08-01', to: '2026-08-17', ownerId: 'u-1' });
   });
+
+  it('preserves an IANA timezone supplied by the browser URL', () => {
+    expect(normalizeReportFilters('?timeZone=Asia%2FHo_Chi_Minh')).toEqual({ timeZone: 'Asia/Ho_Chi_Minh' });
+  });
 });

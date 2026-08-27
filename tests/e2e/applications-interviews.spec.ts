@@ -5,11 +5,12 @@ test('staff records interview result, decides passed and starts the supply journ
   await page.getByText('Trần Quốc Bảo').click();
   await expect(page.getByRole('dialog', { name: 'Hồ sơ ứng tuyển' })).toBeVisible();
   await page.getByRole('button', { name: 'Nhập kết quả' }).click();
-  await page.getByLabel('Kết quả').selectOption('PASS');
+  await page.getByLabel('Kết quả', { exact: true }).selectOption('PASS');
   await page.getByLabel('Nhận xét phỏng vấn').fill('Đạt chuyên môn và giao tiếp.');
   await page.getByRole('button', { name: 'Lưu kết quả' }).click();
   await expect(page.getByRole('button', { name: 'Quyết định' })).toBeVisible();
   await page.getByRole('button', { name: 'Quyết định' }).click();
+  await page.getByLabel('Lý do kết thúc').fill('Đạt yêu cầu sau phỏng vấn');
   await page.getByRole('button', { name: 'Xác nhận trúng tuyển' }).click();
   await expect(page.getByRole('button', { name: 'Khởi tạo lộ trình cung ứng' })).toBeVisible();
   await page.getByRole('button', { name: 'Khởi tạo lộ trình cung ứng' }).click();

@@ -14,7 +14,7 @@ risk: high
 
 ## 1. Gate
 
-Không implement domain controller/service trước khi `packages/contracts/openapi/cms.yaml` đạt toàn bộ mục trong tài liệu này. OpenAPI hiện tại phục vụ frontend/MSW và chưa phải production contract.
+Không implement domain controller/service trước khi `packages/contracts/openapi/cms.yaml` đạt toàn bộ mục trong tài liệu này. Trước Phase 0, OpenAPI chỉ phục vụ frontend/MSW; sau Task 1, file này là production contract canonical để backend sinh types và controller interfaces.
 
 ## 2. Canonical conventions
 
@@ -31,6 +31,12 @@ Không implement domain controller/service trước khi `packages/contracts/open
 | Error | `{ error: { code, messageKey, params?, fieldErrors?, currentVersion? }, requestId }` |
 | Localization | API trả code/key/params; không trả câu tiếng Việt làm contract |
 | Unknown fields | DTO dùng whitelist + forbid non-whitelisted cho command |
+
+### Generated type boundary
+
+`packages/contracts/src/generated/schema.d.ts` là production contract. Backend và worker phải import `canonicalComponents`, `canonicalPaths` (hoặc import trực tiếp generated schema); không dùng compatibility aliases.
+
+Web hiện có lớp chuyển tiếp tại `apps/web/src/lib/api/client.ts`: unwrap envelope/page/error về shape cũ để MSW/UI đang migrate không bị gãy. Alias `components`/`paths` trong package chỉ dành cho web compatibility và sẽ được loại bỏ sau khi feature consumers chuyển hẳn sang envelope canonical.
 
 ## 3. Security scheme
 
@@ -58,21 +64,18 @@ security:
 
 ## 4. Auth endpoint changes
 
-Loại khỏi production contract:
-
-- `POST /auth/login` với email/password.
-
-Thay bằng:
+Luồng đăng nhập chính của CMS là email/password cho tài khoản nhân viên nội bộ đã được provision. Mật khẩu chỉ được lưu dưới dạng scrypt hash; endpoint không trả session token trong JSON mà set opaque session và CSRF cookies.
 
 | Method | Path | Behavior |
 |---|---|---|
+| POST | `/auth/login` | Validate email/password, yêu cầu user `ACTIVE`, tạo session, set `cms_sid`/`cms_csrf`; credential sai trả `401 INVALID_CREDENTIALS` |
 | GET | `/auth/oidc/start?returnTo=` | Validate returnTo allowlist, tạo state/nonce/PKCE và redirect IdP |
-| GET | `/auth/oidc/callback` | Verify state/nonce/code, provision/update internal user, tạo session, redirect |
+| GET | `/auth/oidc/callback` | Verify state/nonce/code, resolve an existing active internal identity link, tạo session, set cookies và redirect browser về `APP_ORIGIN` theo return path đã ký |
 | GET | `/auth/session` | Trả user, roles, permissions, scopes và expiry |
 | POST | `/auth/logout` | Revoke session, clear cookie, audit |
 | GET | `/auth/csrf` | Trả CSRF token gắn session |
 
-Tài khoản `LOCKED`/`DISABLED` không tạo session. User chưa được mời hoặc không có role active nhận `403 USER_NOT_PROVISIONED`.
+Tài khoản `LOCKED`/`DISABLED` không tạo session. User chưa được invite/link hoặc không còn active bị fail-closed; OIDC callback không tự provision user, role hay scope.
 
 ## 5. Canonical enums
 
@@ -266,7 +269,7 @@ Test hiện chỉ kiểm năm path literal phải được thay bằng kiểm tr
 
 ## 12. Alignment exit criteria
 
-- Không còn `/auth/login` password contract.
+- `/auth/login` password contract, OpenAPI generated client và UI login cùng dùng một schema.
 - Không còn enum Candidate/JobOrder cũ.
 - Mọi list có cursor/page contract.
 - Mọi mutation có auth, CSRF, permission và documented errors.

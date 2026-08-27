@@ -32,6 +32,7 @@ function newInterview(body: CreateInterviewRequest, application: Application): I
     id: `interview-${application.id}-${application.interviews.length + 1}`,
     round: application.interviews.length + 1,
     scheduledAt: body.scheduledAt,
+    scheduledEndAt: body.scheduledEndAt,
     timeZone: body.timeZone,
     mode: body.mode,
     meetingUrl: body.meetingUrl ?? null,
@@ -92,7 +93,7 @@ export const applicationsHandlers = [
     if (validation) return problem('VALIDATION_ERROR', validation, 422);
     const previousScheduledAt = item.scheduledAt;
     const now = new Date().toISOString();
-    Object.assign(item, { scheduledAt: body.scheduledAt, timeZone: body.timeZone, mode: body.mode, meetingUrl: body.meetingUrl ?? null, location: body.location ?? null, version: item.version + 1, updatedAt: now, history: [...item.history, { id: `event-reschedule-${item.id}-${item.version}`, type: 'RESCHEDULED' as const, occurredAt: now, actor, summary: 'Đổi lịch phỏng vấn.', previousScheduledAt, reason: body.reason }] });
+    Object.assign(item, { scheduledAt: body.scheduledAt, scheduledEndAt: body.scheduledEndAt, timeZone: body.timeZone, mode: body.mode, meetingUrl: body.meetingUrl ?? null, location: body.location ?? null, version: item.version + 1, updatedAt: now, history: [...item.history, { id: `event-reschedule-${item.id}-${item.version}`, type: 'RESCHEDULED' as const, occurredAt: now, actor, summary: 'Đổi lịch phỏng vấn.', previousScheduledAt, reason: body.reason }] });
     application.version += 1;
     application.lastActivityAt = now;
     return HttpResponse.json(item);

@@ -19,7 +19,7 @@
 | RQ-12 | Quy mô trung bình | Đã chốt ở mức mục tiêu thiết kế | Modular monolith và sizing theo workload tại [03](./03-kien-truc-va-stack.md), [08](./08-van-hanh-ubuntu.md) | Load profile tại [09](./09-kiem-thu-nghiem-thu.md); chưa phải capacity cam kết |
 | RQ-13 | Chạy trên Ubuntu Server | Đã chốt | Docker Compose topology/hardening/backup tại [08](./08-van-hanh-ubuntu.md), ADR-008 | Smoke, restore drill và release gate tại [08](./08-van-hanh-ubuntu.md), [09](./09-kiem-thu-nghiem-thu.md) |
 | RQ-14 | Stack Next.js/NestJS/PostgreSQL/Redis/MinIO | Đã chốt | [03](./03-kien-truc-va-stack.md) | Build/integration/deployment gates khi triển khai |
-| RQ-15 | Tài liệu nhiều file Markdown và một HTML trình bày | Đã chốt | `PRODUCT.md`, README, bộ `docs/` gồm các chương UI/UX và file HTML độc lập | Git allowlist, scan liên kết Markdown, kiểm tra font/tài nguyên nhúng và browser QA tại mục 6 |
+| RQ-15 | Tài liệu nhiều file Markdown và một HTML hướng dẫn tự chứa | Đã chốt | `PRODUCT.md`, README, bộ `docs/` gồm các chương UI/UX và file HTML độc lập | Git allowlist, scan liên kết Markdown, kiểm tra ảnh/tài nguyên nhúng và browser QA tại mục 6 |
 | RQ-16 | Phạm vi tuyển dụng đa ngành; IT không phải ngành duy nhất | Đã chốt | Danh mục có version, CandidateOccupationProfile, JobOrder và snapshot tại [01](./01-yeu-cau-nghiep-vu.md), [04](./04-mo-hinh-du-lieu.md), ADR-011 tại [14](./14-quyet-dinh-kien-truc.md) | AC-22–AC-24; API catalog/profile tại [13](./13-hop-dong-chuc-nang.md) |
 | RQ-17 | Bảo vệ dữ liệu và chia sẻ hồ sơ sang Nhật có kiểm soát | Phải chốt trước go-live | Privacy notice có version, mục đích/phạm vi/người nhận và approval gate tại [06](./06-phan-quyen-bao-mat.md) | AC-27 tại [09](./09-kiem-thu-nghiem-thu.md) |
 | RQ-18 | Hạn chế ký hiệu/icon; chữ là nguồn truyền đạt nghiệp vụ chính | Đã chốt | [UX-01](./ui-ux/01-khung-cms.md), [UX-07](./ui-ux/07-he-thong-giao-dien-va-chat-luong.md) | AC-29, AC-30 tại [09](./09-kiem-thu-nghiem-thu.md) |
@@ -82,8 +82,8 @@ Gói bàn giao không phụ thuộc script bị ẩn hoặc file ngoài phạm v
 
 - allowlist Git chỉ cho phép `.gitignore`, `README.md`, `PRODUCT.md`, Markdown trong cây `docs/` và đúng file `presentation/candidate-cms-presentation.html`;
 - đủ bộ tài liệu `00`–`15`, không có liên kết Markdown tương đối bị gãy và không còn tham chiếu đến artifact đã loại bỏ;
-- mọi font/tài nguyên nhúng trong HTML giải mã hợp lệ; HTML không cần mạng khi trình chiếu;
-- JavaScript parse được, đủ 15 slide/điều khiển, điều hướng bàn phím/nút hoạt động, không overflow ở viewport trình chiếu và không có console error nghiêm trọng;
+- mọi ảnh/tài nguyên nhúng trong HTML giải mã hợp lệ; HTML không cần mạng khi mở hướng dẫn;
+- HTML hướng dẫn hiển thị đầy đủ nội dung, ảnh, bảng và liên kết; không phụ thuộc JavaScript, không overflow ngang ở viewport đọc và không có tài nguyên runtime bên ngoài;
 - kết quả QA phải được chạy lại sau mọi thay đổi thay vì coi nội dung mục này là bằng chứng vĩnh viễn.
 
 Kết quả chạy lại ngày **2026-08-14** cho baseline hiện tại:
@@ -94,7 +94,7 @@ Kết quả chạy lại ngày **2026-08-14** cho baseline hiện tại:
 | Tài liệu | Đạt — đủ `00`–`15`, tám chương UI/UX, roadmap và tám implementation plan; 0 link tương đối gãy, 0 lỗi UTF-8/NFC |
 | Implementation plan | Đạt — 8 plan, 39 task, 195 bước checkbox; đủ header/spec/global constraints/interface/test/commit; 0 lỗi cấu trúc, 0 placeholder cấm và 0 đường dẫn PowerShell chưa quote |
 | HTML tự chứa | Đạt — không có URL tài nguyên runtime bên ngoài; 4/4 font WOFF2 giải mã đúng header `wOF2`; JavaScript parse thành công |
-| Browser 1366×768 | Đạt — 15 slide, font 400/800 hiển thị tiếng Việt, không slide nào overflow, Next/chấm/Home/End hoạt động, mỗi thời điểm đúng một slide hiển thị và console không có lỗi |
+| Browser 1366×768 | Đạt — HTML hướng dẫn mở độc lập, 13/13 ảnh tự chứa hiển thị, nội dung đọc được theo chiều dọc, không phụ thuộc điều khiển slide và không có tài nguyên runtime bên ngoài |
 
 ## 7. Bằng chứng QA gói backend production ngày 2026-08-20
 

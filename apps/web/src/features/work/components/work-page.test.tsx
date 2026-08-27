@@ -25,4 +25,11 @@ describe('WorkPage', () => {
     expect(await screen.findByRole('heading', { name: 'My work' })).toBeVisible();
     expect(await screen.findByRole('columnheader', { name: 'Due' })).toBeVisible();
   });
+
+  it('keeps priority labels readable when the table is constrained', async () => {
+    renderPage();
+
+    const urgent = await screen.findByText('Khẩn cấp');
+    expect(urgent).toHaveClass('min-w-[4.5rem]', 'justify-center', 'px-2', 'whitespace-nowrap');
+  });
 });

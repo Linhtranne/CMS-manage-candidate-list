@@ -1,0 +1,101 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: CMS production release manifest
+type: object
+additionalProperties: false
+required:
+  - release
+  - scope
+  - status
+  - commit
+  - image_digest
+  - openapi_checksum
+  - migration_head
+  - decisions
+  - test_runs
+  - approvals
+  - activation_flags
+  - security_artifacts
+properties:
+  release:
+    type: string
+    minLength: 1
+  scope:
+    enum: [phase-1a, phase-1b, full]
+  status:
+    enum: [rehearsal, candidate, production]
+  commit:
+    type: string
+    pattern: '^[0-9a-f]{7,64}$'
+  worktree_dirty:
+    type: boolean
+  image_digest:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  migration_image_digest:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  web_image_digest:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  postgres_image_digest:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  redis_image_digest:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  openapi_checksum:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  approval_artifact_checksum:
+    type: string
+    pattern: '^sha256:[0-9a-f]{64}$'
+  migration_head:
+    type: string
+    minLength: 1
+  decisions:
+    type: array
+    items:
+      type: string
+      pattern: '^DEC-[0-9]{3}$'
+  test_runs:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [suite, command, result]
+      properties:
+        suite: { type: string, minLength: 1 }
+        command: { type: string, minLength: 1 }
+        result: { enum: [passed, blocked, failed] }
+        artifact: { type: string }
+  approvals:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [role, status]
+      properties:
+        role: { type: string, minLength: 1 }
+        status: { enum: [pending, approved, rejected] }
+        identity: { type: string }
+        at: { type: string, format: date-time }
+  activation_flags:
+    type: object
+    additionalProperties: false
+    required: [production_seed, documents, bulk_export, purge, break_glass]
+    properties:
+      production_seed: { type: boolean }
+      documents: { type: boolean }
+      bulk_export: { type: boolean }
+      purge: { type: boolean }
+      break_glass: { type: boolean }
+  security_artifacts:
+    type: object
+    additionalProperties:
+      type: object
+      additionalProperties: false
+      required: [checksum]
+      properties:
+        checksum:
+          type: string
+          pattern: '^sha256:[0-9a-f]{64}$'

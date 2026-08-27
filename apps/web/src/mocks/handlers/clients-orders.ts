@@ -60,7 +60,11 @@ export const clientsOrdersHandlers = [
     const url = new URL(request.url);
     const query = (url.searchParams.get('query') ?? '').toLowerCase();
     const industry = url.searchParams.get('industry');
-    const status = url.searchParams.get('status');
+    const requestedStatus = url.searchParams.get('status');
+    // The API contract uses OPEN/ON_HOLD while the local UI fixtures keep
+    // their user-facing RECRUITING/PAUSED labels. Mirror the API translation
+    // here so local MSW behaves like the real endpoint.
+    const status = requestedStatus === 'OPEN' ? 'RECRUITING' : requestedStatus === 'ON_HOLD' ? 'PAUSED' : requestedStatus;
     const items = orderFixtures.filter((order) => (!query || `${order.code} ${order.position} ${order.client.name}`.toLowerCase().includes(query)) && (!industry || order.industryLabel === industry) && (!status || order.status === status));
     return HttpResponse.json({ items });
   }),
@@ -101,8 +105,8 @@ export const clientsOrdersHandlers = [
     if (!order) return HttpResponse.json({ code: 'NOT_FOUND', message: 'Không tìm thấy đơn tuyển' }, { status: 404 });
     const body = (await request.json()) as OrderStatusUpdate;
     if (body.version !== order.version) return HttpResponse.json({ code: 'VERSION_CONFLICT', message: 'Đơn tuyển vừa được cập nhật, hãy tải lại.' }, { status: 409 });
-    const allowed: Record<JobOrder['status'], JobOrder['status'][]> = { DRAFT: ['DRAFT', 'RECRUITING'], RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'], PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'], FILLED: ['FILLED', 'CLOSED'], CLOSED: ['CLOSED'] };
-    if (!allowed[order.status].includes(body.status)) return HttpResponse.json({ code: 'INVALID_TRANSITION', message: 'Trạng thái không hợp lệ theo lộ trình DRAFT → RECRUITING → PAUSED → FILLED → CLOSED.' }, { status: 422 });
+    const allowed: Record<JobOrder['status'], JobOrder['status'][]> = { DRAFT: ['DRAFT', 'RECRUITING'], RECRUITING: ['RECRUITING', 'PAUSED', 'FILLED'], PAUSED: ['PAUSED', 'RECRUITING', 'FILLED'], FILLED: ['FILLED', 'CLOSED'], CLOSED: ['CLOSED'], OPEN: ['OPEN', 'PAUSED', 'FILLED'], ON_HOLD: ['ON_HOLD', 'OPEN', 'FILLED'], CANCELLED: ['CANCELLED'] };
+    if (!allowed[order.status].includes(body.status)) return HttpResponse.json({ code: 'INVALID_TRANSITION', message: 'Trạng thái đơn tuyển không hợp lệ. Hãy đi qua các bước tuần tự.' }, { status: 422 });
     order.status = body.status;
     order.version += 1;
     if (body.status === 'FILLED') order.health = 'FILLED';

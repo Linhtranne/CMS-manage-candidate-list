@@ -6,6 +6,7 @@ import { apiClient } from '@/lib/api/client';
 
 type SendEmailRequest = components['schemas']['SendEmailRequest'];
 type LinkConversationRequest = components['schemas']['LinkConversationRequest'];
+export type MailboxEmailTemplate = components['schemas']['MailboxEmailTemplate'];
 type MailView = 'all' | 'needs-action' | 'unmatched' | 'sent' | 'received' | 'waiting-candidate' | 'waiting-internal' | 'completed' | 'failed';
 
 export function useConversations({ query = '', view = 'all', journeyId }: { query?: string; view?: string; journeyId?: string }) {
@@ -15,6 +16,17 @@ export function useConversations({ query = '', view = 'all', journeyId }: { quer
 
 export function useConversation(conversationId?: string) {
   return useQuery({ queryKey: ['mailbox-conversation', conversationId], queryFn: async () => { const response = await apiClient.GET('/mailbox/conversations/{id}', { params: { path: { id: conversationId ?? '' } } }); if (response.error) throw new Error(response.error.message); return response.data; }, enabled: Boolean(conversationId) });
+}
+
+export function useMailTemplates() {
+  return useQuery({
+    queryKey: ['mailbox-email-templates'],
+    queryFn: async () => {
+      const response = await apiClient.GET('/mailbox/templates');
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+  });
 }
 
 export function useSendEmail() {

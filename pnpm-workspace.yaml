@@ -1,8 +1,17 @@
 packages:
   - apps/*
   - packages/*
+overrides:
+  'router@2.2.0>path-to-regexp': 8.4.2
 allowBuilds:
-  msw: set this to true or false
+  '@nestjs/core': true
+  '@prisma/engines': true
+  esbuild: set this to true or false
+  msgpackr-extract: true
+  msw: true
+  prisma: true
+  protobufjs: true
+  unrs-resolver: set this to true or false
 minimumReleaseAgeExclude:
   - '@hookform/resolvers@5.8.0'
   - '@next/env@16.3.1'

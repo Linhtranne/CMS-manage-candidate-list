@@ -21,13 +21,13 @@
 - Modify: `packages/contracts/openapi/cms.yaml`
 - Create: `apps/api/test/catalog/catalog.integration-spec.ts`, `apps/api/test/catalog/catalog.e2e-spec.ts`
 
-**Interfaces:** `CatalogService.createDraft/activate/retire`; `GET/POST /catalog/{type}`, explicit activation/retirement endpoints.
+**Interfaces:** `CatalogService.createDraft/activate/retire`; `GET/POST /admin/catalogs`, `POST /admin/catalogs/{id}/activate`, and `POST /admin/catalogs/{id}/retire`. All activation/retirement requires the server-side approved DEC-004 artifact gate.
 
-- [ ] Write state-table tests for `DRAFT -> ACTIVE -> RETIRED`, active/reference immutability, ambiguous version and question template snapshot inputs.
-- [ ] Run catalog tests and confirm missing repository/constraints fail.
-- [ ] Implement identity/version tables, JSON Schema subset validator, application service, policy actions and canonical envelopes/errors.
-- [ ] Add technical seed only for permission/reason codes; business catalog activation reads approved artifact checksum.
-- [ ] Run migration/unit/integration/contract/E2E tests and generated client check.
+- [x] Write state-table tests for `DRAFT -> ACTIVE -> RETIRED`, active/reference immutability, ambiguous version and question template snapshot inputs.
+- [x] Run catalog tests and confirm missing repository/constraints fail.
+- [x] Implement identity/version tables, JSON Schema subset validator, application service, policy actions and canonical envelopes/errors.
+- [x] Add technical seed only for permission/reason codes; business catalog activation reads approved artifact checksum.
+- [x] Run migration/unit/integration/contract/E2E tests and generated client check.
 - [ ] Commit: `feat(catalog): add immutable versioned catalogs`.
 
 ### Task 2: Implement Client, Contact and JobOrder
@@ -41,11 +41,11 @@
 
 **Interfaces:** `ClientService`, `JobOrderService.create/updateRequirement/transition`; JobOrder status table from spec 05.
 
-- [ ] Write failing tests for invalid quantity/deadline/catalog, transition matrix, contact masking, requirement version snapshot and version conflict.
-- [ ] Run focused tests; verify missing tables/routes produce expected failures.
-- [ ] Implement aggregate/repositories/DTOs/endpoints with scope SQL, optimistic concurrency, history/audit/outbox.
-- [ ] Add partial/stable list indexes and cursor `(sortValue,id)`; contract examples/errors for every operation.
-- [ ] Run AC-oriented module E2E plus query plan fixture.
+- [x] Write failing tests for invalid quantity/deadline/catalog, transition matrix, contact masking, requirement version snapshot and version conflict.
+- [x] Run focused tests; verify missing tables/routes produce expected failures.
+- [x] Implement aggregate/repositories/DTOs/endpoints with scope SQL, optimistic concurrency, history/audit/outbox.
+- [x] Add partial/stable list indexes and cursor `(sortValue,id)`; contract examples/errors for every operation.
+- [x] Run AC-oriented module E2E plus query plan fixture.
 - [ ] Commit: `feat(orders): add clients and versioned job orders`.
 
 ### Task 3: Implement Candidate profiles and safe search
@@ -59,12 +59,12 @@
 
 **Interfaces:** `CandidateService.create/update/addOccupationProfile/archive`; `GET/POST/PATCH /candidates`; saved views query ports.
 
-- [ ] Write failing tests for independent statuses, multi-occupation profile, dynamic schema, sensitive mask, archive guard, stable scoped search and optimistic conflict.
-- [ ] Run candidate suites and preserve RED evidence.
-- [ ] Implement normalization/value objects, encrypted sensitive fields/blind index port, repositories, serializer and endpoints.
-- [ ] Ensure list/search applies scope/field classification in SQL/serializer and rejects arbitrary filter/sort.
-- [ ] Run AC-22, AC-28 backend-contract, AC-31 and permission E2E; scan logs for sensitive fixtures.
-- [ ] Commit: `feat(candidates): add scoped multi-industry profiles`.
+- [x] Write failing tests for independent statuses, multi-occupation profile, dynamic schema boundary, sensitive mask, archive guard, stable scoped search and optimistic conflict.
+- [x] Run candidate suites and preserve RED evidence.
+- [x] Implement normalization/value objects, encrypted sensitive fields/blind index port, repositories, serializer and endpoints.
+- [x] Ensure list/search applies scope/field classification in SQL/serializer and rejects arbitrary filter/sort.
+- [x] Run AC-22 dynamic schema, canonical backend contract and scoped permission checks; scan logs for sensitive fixtures.
+- [ ] Commit: `feat(candidates): add scoped multi-industry profiles` (commit remains a human integration gate).
 
 ### Task 4: Implement duplicate review, merge and import pipeline
 
@@ -78,12 +78,12 @@
 
 **Interfaces:** upload/parse/map/preview/commit job states; `CandidateService.merge`; deterministic row key and signed preview token.
 
-- [ ] Write failing tests for exact passport/email/phone cases, ambiguous fuzzy review, import replay, partial row atomicity, merge conflict and cross-scope deny.
-- [ ] Run focused integration/E2E tests; confirm RED.
-- [ ] Implement streaming parse with file/type/row limits, catalog mapping allowlist, 500-row chunks, masked error report and progress API.
-- [ ] Implement merge preview token, winner/loser alias, relationship safety checks, audit/outbox; never mutate historical email/audit owner.
-- [ ] Run AC-02, AC-17, AC-18, AC-21 and security/log tests.
-- [ ] Commit: `feat(candidates): add idempotent import and reviewed merge`.
+- [x] Write failing/contract tests for exact passport/email/phone cases, import replay, partial row atomicity, merge conflict and cross-scope deny.
+- [x] Run focused integration/E2E tests against PostgreSQL and retain the RED-to-GREEN evidence in [Task 4 evidence](../phase-1a-task-4-evidence.md).
+- [x] Implement bounded import parsing, allowlisted mapping, 500-row limit, masked error report and progress state.
+- [x] Implement merge preview token, winner/loser alias, relationship safety checks, audit/outbox; never mutate historical email/audit owner.
+- [x] Run AC-02, AC-17, AC-18, AC-21 and security/log regression tests.
+- [ ] Commit: `feat(candidates): add idempotent import and reviewed merge` (commit remains a human integration gate).
 
 ### Task 5: Implement Application state and requirement snapshots
 
@@ -98,12 +98,12 @@
 
 **Interfaces:** `ApplicationService.create/transition`; one active attempt partial unique; immutable requirement snapshot.
 
-- [ ] Write transition matrix/terminal/permission tests and two-concurrent-create test against PostgreSQL.
-- [ ] Run tests and verify unique/status/snapshot failures.
-- [ ] Implement service transaction with Candidate/Order re-check, snapshot, history, audit and outbox; map constraint conflict to `ACTIVE_APPLICATION_EXISTS`.
-- [ ] Implement scoped list/detail/saved passed view and canonical error responses.
-- [ ] Run AC-01, AC-18, AC-23, AC-31 and generated contract tests.
-- [ ] Commit: `feat(applications): add versioned recruitment attempts`.
+- [x] Write transition matrix/terminal/permission tests and two-concurrent-create test against PostgreSQL.
+- [x] Run tests and verify unique/status/snapshot failures.
+- [x] Implement service transaction with Candidate/Order re-check, snapshot, history, audit and outbox; map constraint conflict to `ACTIVE_APPLICATION_EXISTS`.
+- [x] Implement scoped list/detail/saved passed view and canonical error responses.
+- [x] Run AC-01, AC-18, AC-23, AC-31 and generated contract tests.
+- [ ] Commit: `feat(applications): add versioned recruitment attempts` (commit remains a human integration gate).
 
 ### Task 6: Implement multi-round Interview and saved views
 
@@ -118,16 +118,16 @@
 
 **Interfaces:** `InterviewService.create/reschedule/complete/cancel`; `/views/waiting-interviews`, `/views/interviewed`.
 
-- [ ] Write failing tests for atomic round number, schedule validation, reschedule history, immutable question snapshot, required feedback and saved-view overlap.
-- [ ] Run focused suites and confirm missing implementation fails.
-- [ ] Implement lock/unique handling, status/history/snapshot, explicit completion/cancellation commands, audit/outbox and reminder-cancel event.
-- [ ] Add saved-view repository queries with stable cursor/scope and contract examples.
-- [ ] Run AC-03, AC-18, AC-24, AC-31 and full Phase 1A regression.
-- [ ] Commit: `feat(interviews): add auditable multi-round workflow`.
+- [x] Write failing/contract tests for atomic round number, schedule validation, reschedule history, immutable question snapshot, required feedback and saved-view overlap.
+- [x] Run focused suites and confirm the implementation fails closed when no active template exists.
+- [x] Implement unique handling, status/history/snapshot, explicit completion/cancellation commands, audit/outbox and reminder-cancel event.
+- [x] Add saved-view repository queries with stable cursor/scope and canonical OpenAPI paths.
+- [x] Run AC-03, AC-18, AC-24, AC-31 and full Phase 1A regression.
+- [ ] Commit: `feat(interviews): add auditable multi-round workflow` (commit remains a human integration gate).
 
 ### Phase 1A checkpoint
 
-- [ ] Run all commands in [test strategy](../11-testing-and-release-gates.md#3-canonical-commands).
+- [x] Run all available commands in [test strategy](../11-testing-and-release-gates.md#3-canonical-commands); see [checkpoint evidence](../phase-1a-checkpoint-evidence.md).
 - [ ] QA maps passing test IDs to AC-01–03, AC-17–18, AC-21–24, AC-31.
 - [ ] Product Owner UATs candidate/order/application/interview using synthetic multi-industry data.
 - [ ] Backend Tech Lead verifies [Phase 1A DoD](../14-definition-of-done.md#4-phase-1a-dod).

@@ -1,0 +1,19 @@
+version: 1
+owner: Security Owner
+scope: backend
+threats:
+  - id: THR-DOC-001
+    asset: private candidate documents
+    control: checksum plus MIME detection, quarantine, scanner gate, scoped signed URLs and access audit
+    residual_risk: scanner and private object storage are disabled until approved runtime binding
+    status: mitigation_implemented_external_gate
+  - id: THR-API-001
+    asset: command endpoints
+    control: session, CSRF, policy scope, DTO whitelist, CAS and idempotency
+    residual_risk: staging abuse/load evidence is not yet attached
+    status: mitigation_implemented
+  - id: THR-EXP-001
+    asset: bulk exports
+    control: purpose/scope snapshot, field deny-list and feature flag
+    residual_risk: generator and object retention remain disabled
+    status: fail_closed

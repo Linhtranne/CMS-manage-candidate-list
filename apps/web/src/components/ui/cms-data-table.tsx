@@ -30,7 +30,7 @@ export function CmsDataTable<TData>({
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel(), getRowId });
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={onRetry} />;
-  if (!data.length) return <EmptyState title={emptyTitle ?? t('common.states.emptyTitle')} description={t('common.states.emptyDescription')} />;
+  if (!data.length) return <EmptyState title={emptyTitle ?? t('common.states.emptyTitle')} />;
 
   return (
     <div className="cms-content-enter overflow-x-auto rounded-lg border border-border bg-panel">

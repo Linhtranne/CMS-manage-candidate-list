@@ -130,6 +130,7 @@ Production release cần đồng thời:
 | Cấu hình | Giá trị an toàn trước approval |
 |---|---|
 | `MAIL_PROVIDER` | `DISABLED` |
+| `DOCUMENTS_ENABLED` | `false` |
 | `PURGE_ENABLED` | `false` |
 | `BULK_EXPORT_ENABLED` | `false` |
 | `BREAK_GLASS_ENABLED` | `false` |

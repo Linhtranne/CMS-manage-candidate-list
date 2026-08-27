@@ -1,0 +1,12 @@
+groups:
+  - name: cms-backend
+    rules:
+      - alert: CmsApiHighErrorRate
+        expr: rate(http_server_errors_total[5m]) / rate(http_server_requests_total[5m]) > 0.01
+        for: 10m
+      - alert: CmsOutboxLag
+        expr: outbox_pending_age_seconds > 300
+        for: 10m
+      - alert: CmsProviderDisabledCall
+        expr: increase(provider_disabled_total[5m]) > 0
+        for: 1m

@@ -23,6 +23,12 @@ export async function fetchWorkSummary(view = 'actionable') {
   return response.data.summary;
 }
 
+export async function fetchWorkAssignees() {
+  const response = await apiClient.GET('/tasks/assignees');
+  if (response.error) throw new Error(response.error.message);
+  return response.data;
+}
+
 export async function fetchWorkItem(id: string) {
   const response = await apiClient.GET('/work-items/{id}', { params: { path: { id } } });
   if (response.error) throw new Error(response.error.message);
@@ -35,6 +41,10 @@ export function useWorkItems(params: WorkListParams = {}) {
 
 export function useWorkSummary(view = 'actionable') {
   return useQuery({ queryKey: workKeys.summary(view), queryFn: () => fetchWorkSummary(view) });
+}
+
+export function useWorkAssignees(enabled = true) {
+  return useQuery({ queryKey: ['work-assignees'], queryFn: fetchWorkAssignees, enabled });
 }
 
 export function useWorkItem(id?: string) {

@@ -26,7 +26,7 @@ function filtersFrom(url: URL): ReportFilters {
     orderId: url.searchParams.get('orderId'),
     industryId: url.searchParams.get('industryId'),
     sourceId: url.searchParams.get('sourceId'),
-    timeZone: 'Asia/Ho_Chi_Minh'
+    timeZone: url.searchParams.get('timeZone') ?? 'Asia/Ho_Chi_Minh'
   };
 }
 

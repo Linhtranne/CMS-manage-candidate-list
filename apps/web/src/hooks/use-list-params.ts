@@ -28,6 +28,7 @@ export function useListParams({ defaultView }: { defaultView: string }) {
 
   useEffect(() => {
     const syncFromUrl = () => setParams(readParams(defaultView));
+    syncFromUrl();
     window.addEventListener('popstate', syncFromUrl);
     return () => window.removeEventListener('popstate', syncFromUrl);
   }, [defaultView]);

@@ -7,7 +7,10 @@ describe('emailStatusLabel', () => {
     ['QUEUED', 'Đang chờ gửi'],
     ['SENT', 'Đã gửi'],
     ['BOUNCED', 'Bị trả lại'],
-    ['RECEIVED', 'Đã nhận']
+    ['RECEIVED', 'Đã nhận'],
+    ['DELIVERED', 'Đã chuyển đến'],
+    ['RETRY_WAIT', 'Đang chờ thử lại'],
+    ['CANCELLED', 'Đã hủy']
   ])('maps %s to explicit Vietnamese text', (status, label) => {
     expect(emailStatusLabel(status as never)).toBe(label);
   });

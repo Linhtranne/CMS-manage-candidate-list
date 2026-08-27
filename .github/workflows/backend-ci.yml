@@ -1,0 +1,172 @@
+name: backend-ci
+
+on:
+  push:
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+      - 'packages/contracts/**'
+      - 'docs/backend/**'
+      - 'docker-compose*.yml'
+      - '.env.example'
+      - '.github/workflows/backend-ci.yml'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+      - 'packages/contracts/**'
+      - 'docs/backend/**'
+      - 'docker-compose*.yml'
+      - '.env.example'
+      - '.github/workflows/backend-ci.yml'
+      - 'pnpm-lock.yaml'
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: cms
+          POSTGRES_PASSWORD: cms
+          POSTGRES_DB: cms_candidate_supply
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U cms -d cms_candidate_supply"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://cms:cms@localhost:5432/cms_candidate_supply
+      TEST_DATABASE_URL: postgresql://cms:cms@localhost:5432/cms_candidate_supply
+      REDIS_URL: redis://localhost:6379
+      QUEUE_ENABLED: 'false'
+      OTEL_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.15.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm docs:validate
+      - run: pnpm --filter @cms/contracts generate
+      - run: git diff --exit-code -- packages/contracts/src/generated/schema.d.ts packages/contracts/openapi/cms.yaml
+      - run: pnpm --filter @cms/api db:migrate:deploy
+      - run: pnpm --filter @cms/api db:migrate:deploy
+      - run: pnpm --filter @cms/api db:migrate:status
+      - run: pnpm --filter @cms/api db:query-plan-smoke
+      - run: pnpm --filter @cms/api lint
+      - run: pnpm --filter @cms/api typecheck
+      - run: pnpm --filter @cms/api test:unit
+      - run: pnpm --filter @cms/api test:integration
+      - run: pnpm --filter @cms/api test:contract
+      - run: pnpm --filter @cms/api test:e2e
+      - run: pnpm --filter @cms/api test:migration
+      - run: pnpm --filter @cms/api test:security
+      - name: Run complete API regression suite
+        run: pnpm --filter @cms/api test
+      - run: pnpm --filter @cms/web lint
+      - run: pnpm --filter @cms/web typecheck
+      - run: pnpm --filter @cms/web test:ci
+      - run: pnpm --filter @cms/api build
+      - run: docker build -f apps/api/Dockerfile -t cms-api:ci .
+      - name: Build migration image
+        run: docker build --target builder -f apps/api/Dockerfile -t cms-api-migrate:ci .
+      - name: Build web image
+        run: docker build -f apps/web/Dockerfile -t cms-web:ci .
+      - name: Start API image for container smoke
+        run: >-
+          docker run -d --name cms-api-ci -p 3317:3000
+          --add-host=host.docker.internal:host-gateway
+          -e NODE_ENV=test
+          -e APP_VERSION=ci-${{ github.sha }}
+          -e APP_ORIGIN=http://127.0.0.1:3317
+          -e DATABASE_URL=postgresql://cms:cms@host.docker.internal:5432/cms_candidate_supply
+          -e REDIS_URL=redis://host.docker.internal:6379
+          -e QUEUE_ENABLED=false
+          -e ENCRYPTION_KEY=12345678901234567890123456789012
+          -e SESSION_SECRET=12345678901234567890123456789012
+          cms-api:ci
+      - run: pnpm --filter @cms/api smoke:container -- http://127.0.0.1:3317/api/v1/health/live
+      - name: Remove API image smoke container
+        if: always()
+        run: docker rm -f cms-api-ci
+      - name: Start web image for container smoke
+        run: >-
+          docker run -d --name cms-web-ci -p 3318:3000
+          -e NODE_ENV=production
+          -e NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3317/api/v1
+          -e NEXT_PUBLIC_MSW_ENABLED=false
+          cms-web:ci
+      - run: pnpm --filter @cms/api smoke:container -- http://127.0.0.1:3318/
+      - name: Remove web image smoke container
+        if: always()
+        run: docker rm -f cms-web-ci
+      - name: Generate image SBOM
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          image: cms-api:ci
+          artifact-name: cms-api-sbom.spdx.json
+          output-format: spdx-json
+      - name: Generate migration image SBOM
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          image: cms-api-migrate:ci
+          artifact-name: cms-api-migrate-sbom.spdx.json
+          output-format: spdx-json
+      - name: Generate web image SBOM
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          image: cms-web:ci
+          artifact-name: cms-web-sbom.spdx.json
+          output-format: spdx-json
+      - name: Create candidate release manifest
+        run: |
+          API_DIGEST=$(docker image inspect cms-api:ci --format '{{if .RepoDigests}}{{index .RepoDigests 0}}{{else}}{{.Id}}{{end}}' | sed 's/^[^@]*@//')
+          MIGRATION_DIGEST=$(docker image inspect cms-api-migrate:ci --format '{{if .RepoDigests}}{{index .RepoDigests 0}}{{else}}{{.Id}}{{end}}' | sed 's/^[^@]*@//')
+          WEB_DIGEST=$(docker image inspect cms-web:ci --format '{{if .RepoDigests}}{{index .RepoDigests 0}}{{else}}{{.Id}}{{end}}' | sed 's/^[^@]*@//')
+          RELEASE_STATUS=candidate RELEASE_SCOPE=phase-1a IMAGE_DIGEST="$API_DIGEST" MIGRATION_IMAGE_DIGEST="$MIGRATION_DIGEST" WEB_IMAGE_DIGEST="$WEB_DIGEST" RELEASE_VERSION="ci-${GITHUB_SHA}" RELEASE_MANIFEST_OUTPUT=artifacts/release-manifest.json pnpm --filter @cms/api release:manifest
+      - name: Upload release manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-api-release-manifest
+          path: artifacts/release-manifest.json
+      - name: Scan image for critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: cms-api:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+      - name: Scan migration image for critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: cms-api-migrate:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+      - name: Scan web image for critical vulnerabilities
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: cms-web:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+      - run: pnpm --filter @cms/contracts test

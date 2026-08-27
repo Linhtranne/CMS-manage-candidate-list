@@ -82,7 +82,7 @@ for (const file of markdownFiles) {
   }
   for (const match of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
     const target = match[1].split("#")[0];
-    if (!target || /^(?:https?:|mailto:)/i.test(target)) continue;
+    if (!target || /^(?:https?:|mailto:|data:)/i.test(target)) continue;
     const resolvedTarget = resolve(dirname(file), decodeURIComponent(target));
     if (!existsSync(resolvedTarget)) {
       missingLinks.push(`${relative(projectRoot, file)} -> ${target}`);

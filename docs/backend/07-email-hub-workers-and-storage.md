@@ -2,7 +2,7 @@
 title: Email Hub Workers and Storage Specification
 status: ready_for_human_approval
 version: 1.0.0
-updated_at: 2026-08-20
+updated_at: 2026-08-27
 owner: Backend Tech Lead
 reviewers:
   - Security Owner
@@ -18,9 +18,10 @@ risk: critical
 
 ## 1. Release posture
 
-Baseline dùng đúng một shared mailbox. Provider, địa chỉ mailbox, tenant/DNS owner và credential flow đang `blocked_by_external_decision`; cho đến khi DEC-003 approved, `MAIL_PROVIDER=DISABLED` và mọi send/poll/webhook trả `MAIL_PROVIDER_DISABLED` hoặc health `not_configured`.
+Baseline dùng đúng một sender identity của Amazon SES. Adapter outbound SES SMTP + Nodemailer đã được triển khai và bind dưới contract `SMTP_IMAP`; việc bật gửi thật vẫn fail-closed cho tới khi DEC-003, verified identity/DNS, credential và sandbox evidence hợp lệ.
+Khi các điều kiện này chưa đạt, runtime giữ `MAIL_PROVIDER=DISABLED` (hoặc `FAKE` trong development/test) và không gửi Internet.
 
-Email Hub lưu trao đổi hai chiều có audit; không phải marketing automation. Candidate không có tài khoản/portal.
+Email Hub hiện chỉ gửi thông báo trạng thái một chiều có audit; inbound/reply/polling bị tắt theo DEC-003. Đây không phải marketing automation và candidate không có tài khoản/portal.
 
 ## 2. Adapter contracts
 
@@ -31,9 +32,9 @@ interface MailProviderAdapter {
   readonly provider: 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
   validateConnection(): Promise<ProviderHealth>;
   send(input: ProviderSendRequest, idempotencyKey: string): Promise<ProviderSendResult>;
-  fetchChanges(cursor: MailCursor | null, limit: number): Promise<ProviderChangePage>;
-  fetchMessage(providerMessageId: string): Promise<ProviderMessage>;
-  fetchAttachment(providerMessageId: string, attachmentId: string): Promise<NodeJS.ReadableStream>;
+  fetchChanges(cursor: MailCursor | null, limit: number): Promise<ProviderChangePage>; // unsupported for outbound-only SES SMTP
+  fetchMessage(providerMessageId: string): Promise<ProviderMessage>; // unsupported for outbound-only SES SMTP
+  fetchAttachment(providerMessageId: string, attachmentId: string): Promise<NodeJS.ReadableStream>; // unsupported for outbound-only SES SMTP
   renewSubscription?(subscriptionId: string): Promise<ProviderSubscription>;
 }
 
@@ -186,11 +187,11 @@ Không log token, raw MIME hoặc signed URL. Credential reference lưu trong DB
 
 ## 13. Endpoints và errors
 
-- `POST /emails/previews`, `POST /emails`, `POST /emails/{id}/retry`, `POST /emails/{id}/cancellation`.
-- `GET /conversations`, `GET /conversations/{id}`, `GET /shared-inbox`.
+- `POST /emails/previews`, `POST /emails`, `POST /email-messages/{id}/retry-attempts`, `POST /email-messages/{id}/cancellations`.
+- `GET /mailbox/conversations`, `GET /mailbox/conversations/{id}`; the legacy message view remains `GET /conversations/{id}/messages`.
 - `POST /emails/{id}/match-resolution`.
 - `POST /webhooks/mail/{provider}` không dùng session auth nhưng bắt buộc provider verification.
-- `GET /admin/mailbox/health`, `POST /admin/mailbox/{pause|resume|sync}`.
+- `GET /mailboxes/{id}/health`, `POST /mailboxes/{id}/{pause|resume|sync}`.
 
 Errors: `MAIL_PROVIDER_DISABLED`, `MAILBOX_UNHEALTHY`, `EMAIL_PREVIEW_EXPIRED`, `DO_NOT_CONTACT`, `EMAIL_TEMPLATE_NOT_APPLICABLE`, `EMAIL_TEMPLATE_AMBIGUOUS`, `EMAIL_SEND_UNCERTAIN`, `EMAIL_ALREADY_TERMINAL`, `EMAIL_MATCH_AMBIGUOUS`, `ATTACHMENT_NOT_SAFE`, `RATE_LIMITED`.
 

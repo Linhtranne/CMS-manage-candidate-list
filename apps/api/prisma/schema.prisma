@@ -1,0 +1,1236 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Team {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(80)
+  name      String   @db.VarChar(160)
+  status    String   @default("ACTIVE") @db.VarChar(32)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  version   Int      @default(1)
+
+  users User[] @relation("TeamUsers")
+  clients Client[] @relation("ClientTeam")
+  jobOrders JobOrder[] @relation("JobOrderTeam")
+  candidates Candidate[] @relation("CandidateTeam")
+  candidateImports CandidateImportBatch[] @relation("ImportTeam")
+  applications Application[] @relation("ApplicationTeam")
+  savedViews SavedView[] @relation("SavedViewTeam")
+
+  @@map("teams")
+}
+
+model User {
+  id           String         @id @default(uuid()) @db.Uuid
+  displayName  String         @map("display_name") @db.VarChar(160)
+  email        String         @unique @db.VarChar(320)
+  passwordHash String?        @map("password_hash") @db.VarChar(255)
+  status       String         @default("INVITED") @db.VarChar(32)
+  teamId       String?        @map("team_id") @db.Uuid
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  version      Int            @default(1)
+
+  team         Team?          @relation("TeamUsers", fields: [teamId], references: [id])
+  identityLinks IdentityLink[]
+  sessions     Session[]
+  userRoles    UserRole[]
+  auditEvents  AuditEvent[]   @relation("AuditActor")
+  ownedClients Client[] @relation("ClientOwner")
+  ownedOrders JobOrder[] @relation("JobOrderOwner")
+  ownedCandidates Candidate[] @relation("CandidateOwner")
+  orderStatusHistory JobOrderStatusHistory[] @relation("JobOrderStatusActor")
+  ownedApplications Application[] @relation("ApplicationOwner")
+  applicationHistory ApplicationStatusHistory[] @relation("ApplicationHistoryActor")
+  interviewHistory InterviewHistory[] @relation("InterviewHistoryActor")
+  interviewParticipants InterviewParticipant[]
+  ownedInterviews Interview[] @relation("InterviewOwner")
+  importBatches CandidateImportBatch[] @relation("ImportOwner")
+  duplicateResolutions CandidateDuplicateCase[] @relation("DuplicateResolver")
+  mergeActions CandidateMergeAlias[] @relation("MergeActor")
+  emailMatchDecisions EmailMatchDecision[] @relation("EmailMatchResolver")
+  savedViews SavedView[] @relation("SavedViewOwner")
+  entityNotes EntityNote[] @relation("EntityNoteAuthor")
+  notifications Notification[] @relation("NotificationRecipient")
+
+  @@index([teamId])
+  @@map("users")
+}
+
+model IdentityLink {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  issuer    String   @db.VarChar(500)
+  subject   String   @db.VarChar(500)
+  email     String?  @db.VarChar(320)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([issuer, subject])
+  @@index([userId])
+  @@map("identity_links")
+}
+
+model Role {
+  id          String       @id @default(uuid()) @db.Uuid
+  code        String       @unique @db.VarChar(80)
+  description String?      @db.VarChar(240)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  permissions RolePermission[]
+  userRoles   UserRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String       @id @default(uuid()) @db.Uuid
+  code        String       @unique @db.VarChar(120)
+  description String?      @db.VarChar(240)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  scope     String   @default("TEAM") @db.VarChar(32)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId, scope])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model EntityNote {
+  id           String   @id @default(uuid()) @db.Uuid
+  entityType   String   @map("entity_type") @db.VarChar(64)
+  entityId     String   @map("entity_id") @db.Uuid
+  content      String   @db.VarChar(5000)
+  authorUserId String   @map("author_user_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  author User @relation("EntityNoteAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt, id])
+  @@index([authorUserId, createdAt])
+  @@map("entity_notes")
+}
+
+model Session {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  sessionHash      String    @unique @map("session_hash") @db.VarChar(128)
+  csrfHash         String    @map("csrf_hash") @db.VarChar(128)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastSeenAt       DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  version          Int       @default(1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auditEvents AuditEvent[] @relation("AuditSession")
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt, revokedAt])
+  @@map("sessions")
+}
+
+model SavedView {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  teamId     String?  @map("team_id") @db.Uuid
+  resource   String   @db.VarChar(80)
+  name       String   @db.VarChar(160)
+  query      Json
+  visibility String   @db.VarChar(16)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner User  @relation("SavedViewOwner", fields: [userId], references: [id], onDelete: Cascade)
+  team  Team? @relation("SavedViewTeam", fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, resource, name])
+  @@index([userId, resource, visibility])
+  @@index([teamId, resource, visibility])
+  @@map("saved_views")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  kind      String    @db.VarChar(64)
+  severity  String    @default("INFO") @db.VarChar(16)
+  params    Json      @default("{}")
+  href      String?   @db.VarChar(500)
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  dedupeKey String    @unique @map("dedupe_key") @db.VarChar(320)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt, id])
+  @@index([userId, createdAt, id])
+  @@map("notifications")
+}
+
+model AuditEvent {
+  id            String    @id @default(uuid()) @db.Uuid
+  occurredAt    DateTime  @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  actorUserId   String?   @map("actor_user_id") @db.Uuid
+  sessionId     String?   @map("session_id") @db.Uuid
+  action        String    @db.VarChar(120)
+  entityType    String    @map("entity_type") @db.VarChar(80)
+  entityId      String?   @map("entity_id") @db.VarChar(120)
+  correlationId String    @map("correlation_id") @db.VarChar(120)
+  diffJson      Json      @default("{}") @map("diff_json")
+  metadataJson  Json      @default("{}") @map("metadata_json")
+
+  actorUser User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  session   Session? @relation("AuditSession", fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([occurredAt])
+  @@index([actorUserId, occurredAt])
+  @@index([entityType, entityId, occurredAt])
+  @@map("audit_events")
+}
+
+model OutboxEvent {
+  id              String    @id @default(uuid()) @db.Uuid
+  eventType       String    @map("event_type") @db.VarChar(120)
+  aggregateType   String    @map("aggregate_type") @db.VarChar(80)
+  aggregateId     String    @map("aggregate_id") @db.VarChar(120)
+  idempotencyKey  String    @unique @map("idempotency_key") @db.VarChar(240)
+  schemaVersion   Int       @default(1) @map("schema_version")
+  payload        Json
+  state          String    @default("PENDING") @db.VarChar(32)
+  availableAt    DateTime  @default(now()) @map("available_at") @db.Timestamptz(6)
+  attempts       Int       @default(0)
+  lockedAt       DateTime? @map("locked_at") @db.Timestamptz(6)
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz(6)
+  lastError      String?   @map("last_error") @db.VarChar(1000)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([state, availableAt, createdAt], map: "outbox_events_pending_idx")
+  @@map("outbox_events")
+}
+
+model JobAttempt {
+  id             String    @id @default(uuid()) @db.Uuid
+  outboxEventId  String?   @map("outbox_event_id") @db.Uuid
+  queueName      String    @map("queue_name") @db.VarChar(120)
+  jobKey         String    @map("job_key") @db.VarChar(240)
+  state          String    @default("QUEUED") @db.VarChar(32)
+  attempt        Int       @default(0)
+  maxAttempts    Int       @default(5) @map("max_attempts")
+  availableAt    DateTime  @default(now()) @map("available_at") @db.Timestamptz(6)
+  startedAt      DateTime? @map("started_at") @db.Timestamptz(6)
+  finishedAt     DateTime? @map("finished_at") @db.Timestamptz(6)
+  lastError      String?   @map("last_error") @db.VarChar(1000)
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([state, availableAt, createdAt], map: "job_attempts_retry_idx")
+  @@index([outboxEventId])
+  @@map("job_attempts")
+}
+
+model IdempotencyRecord {
+  id           String    @id @default(uuid()) @db.Uuid
+  scopeKey     String    @unique @map("scope_key") @db.VarChar(320)
+  requestHash  String    @map("request_hash") @db.VarChar(128)
+  state        String    @default("IN_PROGRESS") @db.VarChar(32)
+  statusCode   Int       @default(200) @map("status_code")
+  responseJson Json?     @map("response_json")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([state, expiresAt], map: "idempotency_records_expiry_idx")
+  @@map("idempotency_records")
+}
+
+model OidcLoginState {
+  id        String    @id @default(uuid()) @db.Uuid
+  stateHash String    @unique @map("state_hash") @db.VarChar(128)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([expiresAt, usedAt], map: "oidc_login_states_expiry_idx")
+  @@map("oidc_login_states")
+}
+
+model CatalogItem {
+  id        String          @id @default(uuid()) @db.Uuid
+  type      String          @db.VarChar(32)
+  code      String          @db.VarChar(80)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  versions CatalogVersion[]
+
+  @@unique([type, code])
+  @@map("catalog_items")
+}
+
+model CatalogVersion {
+  id         String      @id @default(uuid()) @db.Uuid
+  itemId     String      @map("item_id") @db.Uuid
+  version    Int
+  status     String      @default("DRAFT") @db.VarChar(32)
+  labelVi    String      @map("label_vi") @db.VarChar(240)
+  payload    Json        @default("{}")
+  usageCount Int         @default(0) @map("usage_count")
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  item CatalogItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  orderRequirements JobOrderRequirementVersion[]
+  jobOrdersUsingCatalog JobOrder[]
+
+  @@unique([itemId, version])
+  @@index([itemId, status])
+  @@map("catalog_versions")
+}
+
+model InterviewQuestionTemplate {
+  id        String                              @id @default(uuid()) @db.Uuid
+  code      String                              @unique @db.VarChar(80)
+  name      String                              @db.VarChar(160)
+  createdAt DateTime                            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime                            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  versions InterviewQuestionTemplateVersion[]
+
+  @@map("interview_question_templates")
+}
+
+model InterviewQuestionTemplateVersion {
+  id         String                   @id @default(uuid()) @db.Uuid
+  templateId String                   @map("template_id") @db.Uuid
+  version    Int
+  status     String                   @default("DRAFT") @db.VarChar(32)
+  questions  Json
+  createdAt  DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  template InterviewQuestionTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+  @@unique([templateId, version])
+  @@index([templateId, status])
+  @@map("interview_question_template_versions")
+}
+
+model Client {
+  id               String          @id @default(uuid()) @db.Uuid
+  code             String          @unique @db.VarChar(80)
+  name             String          @db.VarChar(240)
+  organizationType String          @map("organization_type") @db.VarChar(120)
+  industryLabels   Json            @default("[]") @map("industry_labels")
+  region           String          @db.VarChar(160)
+  ownerId          String          @map("owner_id") @db.Uuid
+  teamId           String?         @map("team_id") @db.Uuid
+  status           String          @default("PROSPECT") @db.VarChar(32)
+  notes            String?         @db.VarChar(2000)
+  version          Int             @default(1)
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner      User                     @relation("ClientOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  team       Team?                    @relation("ClientTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  contact    ClientContact?
+  jobOrders  JobOrder[]
+
+  @@index([status, updatedAt, id])
+  @@index([teamId, status, updatedAt, id])
+  @@map("clients")
+}
+
+model ClientContact {
+  id        String   @id @default(uuid()) @db.Uuid
+  clientId  String   @unique @map("client_id") @db.Uuid
+  name      String   @db.VarChar(160)
+  email     String?  @db.VarChar(320)
+  phone     String?  @db.VarChar(40)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@map("client_contacts")
+}
+
+model JobOrder {
+  id                         String                         @id @default(uuid()) @db.Uuid
+  code                       String                         @unique @db.VarChar(80)
+  position                   String                         @db.VarChar(240)
+  clientId                   String                         @map("client_id") @db.Uuid
+  industryLabel              String                         @map("industry_label") @db.VarChar(160)
+  occupation                 String                         @db.VarChar(160)
+  location                   String                         @db.VarChar(160)
+  target                     Int
+  deadline                   DateTime                       @db.Timestamptz(6)
+  ownerId                    String                         @map("owner_id") @db.Uuid
+  teamId                     String?                        @map("team_id") @db.Uuid
+  status                     String                         @default("DRAFT") @db.VarChar(32)
+  requirementVersion         Int                            @default(1) @map("requirement_version")
+  requirementCatalogVersionId String                       @map("requirement_catalog_version_id") @db.Uuid
+  requirementSnapshot        Json                           @map("requirement_snapshot")
+  activeApplications         Int                            @default(0) @map("active_applications")
+  passedApplications         Int                            @default(0) @map("passed_applications")
+  suppliedApplications       Int                            @default(0) @map("supplied_applications")
+  version                    Int                            @default(1)
+  createdAt                  DateTime                       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime                       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  client              Client                         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  owner               User                           @relation("JobOrderOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  team                Team?                          @relation("JobOrderTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  requirementCatalog  CatalogVersion                 @relation(fields: [requirementCatalogVersionId], references: [id], onDelete: Restrict)
+  requirements        JobOrderRequirementVersion[]
+  statusHistory       JobOrderStatusHistory[]
+  applications        Application[]
+
+  @@index([status, deadline, id])
+  @@index([clientId, status, deadline, id])
+  @@index([teamId, status, deadline, id])
+  @@map("job_orders")
+}
+
+model JobOrderRequirementVersion {
+  id                 String   @id @default(uuid()) @db.Uuid
+  jobOrderId         String   @map("job_order_id") @db.Uuid
+  version            Int
+  catalogVersionId   String   @map("catalog_version_id") @db.Uuid
+  snapshot           Json
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  jobOrder       JobOrder       @relation(fields: [jobOrderId], references: [id], onDelete: Restrict)
+  catalogVersion CatalogVersion @relation(fields: [catalogVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([jobOrderId, version])
+  @@index([jobOrderId, createdAt, id])
+  @@map("job_order_requirement_versions")
+}
+
+model JobOrderStatusHistory {
+  id         String   @id @default(uuid()) @db.Uuid
+  jobOrderId String   @map("job_order_id") @db.Uuid
+  fromStatus String   @map("from_status") @db.VarChar(32)
+  toStatus   String   @map("to_status") @db.VarChar(32)
+  actorUserId String  @map("actor_user_id") @db.Uuid
+  reason     String?  @db.VarChar(1000)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  jobOrder JobOrder @relation(fields: [jobOrderId], references: [id], onDelete: Restrict)
+  actor    User     @relation("JobOrderStatusActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([jobOrderId, createdAt, id])
+  @@map("job_order_status_history")
+}
+
+model Candidate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  code                  String   @unique @db.VarChar(80)
+  name                  String   @db.VarChar(240)
+  normalizedName        String   @map("normalized_name") @db.VarChar(240)
+  industryLabels        Json     @map("industry_labels")
+  occupation            String   @db.VarChar(160)
+  japaneseLevel         String   @map("japanese_level") @db.VarChar(40)
+  emailCiphertext       String?  @map("email_ciphertext") @db.Text
+  emailBlindIndex       String?  @map("email_blind_index") @db.VarChar(64)
+  phoneCiphertext       String?  @map("phone_ciphertext") @db.Text
+  phoneBlindIndex       String?  @map("phone_blind_index") @db.VarChar(64)
+  addressCiphertext     String?  @map("address_ciphertext") @db.Text
+  passportCiphertext    String?  @map("passport_ciphertext") @db.Text
+  passportBlindIndex    String?  @map("passport_blind_index") @db.VarChar(64)
+  source                String   @db.VarChar(120)
+  recordStatus          String   @default("ACTIVE") @map("record_status") @db.VarChar(32)
+  readinessStatus       String   @default("POTENTIAL") @map("readiness_status") @db.VarChar(32)
+  contactabilityStatus  String   @default("CONTACTABLE") @map("contactability_status") @db.VarChar(40)
+  ownerId               String   @map("owner_id") @db.Uuid
+  teamId                String?  @map("team_id") @db.Uuid
+  version               Int      @default(1)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner    User                    @relation("CandidateOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  team     Team?                   @relation("CandidateTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  profiles CandidateOccupationProfile[]
+  applications Application[]
+  importsAsCreated CandidateImportRow[] @relation("ImportedCandidate")
+  duplicateSources CandidateDuplicateCase[] @relation("DuplicateSource")
+  duplicateTargets CandidateDuplicateCase[] @relation("DuplicateTarget")
+  mergeAliasesAsWinner CandidateMergeAlias[] @relation("MergeWinner")
+  mergeAliasesAsLoser CandidateMergeAlias[] @relation("MergeLoser")
+  emailConversations EmailConversation[]
+  emailMatchDecisions EmailMatchDecision[] @relation("EmailMatchCandidate")
+
+  @@index([normalizedName])
+  @@index([emailBlindIndex])
+  @@index([phoneBlindIndex])
+  @@index([passportBlindIndex])
+  @@index([teamId, readinessStatus, updatedAt, id])
+  @@index([ownerId, recordStatus, updatedAt, id])
+  @@map("candidates")
+}
+
+model CandidateOccupationProfile {
+  id              String   @id @default(uuid()) @db.Uuid
+  candidateId     String   @map("candidate_id") @db.Uuid
+  industryLabel   String   @map("industry_label") @db.VarChar(160)
+  occupation      String   @db.VarChar(160)
+  yearsExperience Float    @map("years_experience")
+  skills          Json
+  desiredLocation String?  @map("desired_location") @db.VarChar(160)
+  attributes      Json     @default("{}")
+  schemaVersionId String?  @map("schema_version_id") @db.VarChar(120)
+  status          String   @default("PRIMARY") @db.VarChar(32)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+
+  @@unique([candidateId, industryLabel, occupation])
+  @@index([candidateId, createdAt, id])
+  @@index([occupation, status])
+  @@map("candidate_occupation_profiles")
+}
+
+model CandidateImportBatch {
+  id              String   @id @default(uuid()) @db.Uuid
+  ownerId         String   @map("owner_id") @db.Uuid
+  teamId          String?  @map("team_id") @db.Uuid
+  fileName        String   @map("file_name") @db.VarChar(240)
+  checksum        String   @db.VarChar(128)
+  status          String   @default("UPLOADED") @db.VarChar(32)
+  mappingVersion  String   @default("v1") @map("mapping_version") @db.VarChar(40)
+  previewTokenHash String? @map("preview_token_hash") @db.VarChar(128)
+  previewExpiresAt DateTime? @map("preview_expires_at") @db.Timestamptz(6)
+  totalRows       Int      @default(0) @map("total_rows")
+  validRows       Int      @default(0) @map("valid_rows")
+  invalidRows     Int      @default(0) @map("invalid_rows")
+  duplicateRows   Int      @default(0) @map("duplicate_rows")
+  createdCandidateIds Json @default("[]") @map("created_candidate_ids")
+  errors          Json     @default("[]")
+  version         Int      @default(1)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner User @relation("ImportOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  team Team? @relation("ImportTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  rows CandidateImportRow[]
+
+  @@index([ownerId, createdAt, id])
+  @@index([teamId, createdAt, id])
+  @@map("candidate_import_batches")
+}
+
+model CandidateImportRow {
+  id               String   @id @default(uuid()) @db.Uuid
+  batchId          String   @map("batch_id") @db.Uuid
+  rowNumber        Int      @map("row_number")
+  normalizedHash   String   @map("normalized_hash") @db.VarChar(128)
+  idempotencyKey   String   @unique @map("idempotency_key") @db.VarChar(240)
+  rawJson          Json     @map("raw_json")
+  state            String   @default("PENDING") @db.VarChar(32)
+  errorCode        String?  @map("error_code") @db.VarChar(120)
+  candidateId      String?  @map("candidate_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch CandidateImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  candidate Candidate? @relation("ImportedCandidate", fields: [candidateId], references: [id], onDelete: SetNull)
+
+  @@unique([batchId, rowNumber])
+  @@index([batchId, state, rowNumber])
+  @@map("candidate_import_rows")
+}
+
+model CandidateDuplicateCase {
+  id               String   @id @default(uuid()) @db.Uuid
+  sourceCandidateId String  @map("source_candidate_id") @db.Uuid
+  targetCandidateId String? @map("target_candidate_id") @db.Uuid
+  kind             String   @db.VarChar(32)
+  state            String   @default("OPEN") @db.VarChar(32)
+  signals          Json     @default("{}")
+  resolutionReason String?  @map("resolution_reason") @db.VarChar(1000)
+  resolvedById     String?  @map("resolved_by_id") @db.Uuid
+  resolvedAt       DateTime? @map("resolved_at") @db.Timestamptz(6)
+  version          Int      @default(1)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sourceCandidate Candidate @relation("DuplicateSource", fields: [sourceCandidateId], references: [id], onDelete: Restrict)
+  targetCandidate Candidate? @relation("DuplicateTarget", fields: [targetCandidateId], references: [id], onDelete: Restrict)
+  resolvedBy User? @relation("DuplicateResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([sourceCandidateId, state, createdAt])
+  @@index([targetCandidateId, state, createdAt])
+  @@map("candidate_duplicate_cases")
+}
+
+model CandidateMergeAlias {
+  id               String   @id @default(uuid()) @db.Uuid
+  winnerCandidateId String  @map("winner_candidate_id") @db.Uuid
+  loserCandidateId String   @unique @map("loser_candidate_id") @db.Uuid
+  reason           String   @db.VarChar(1000)
+  mergedById       String   @map("merged_by_id") @db.Uuid
+  mergedAt         DateTime @default(now()) @map("merged_at") @db.Timestamptz(6)
+
+  winner Candidate @relation("MergeWinner", fields: [winnerCandidateId], references: [id], onDelete: Restrict)
+  loser Candidate @relation("MergeLoser", fields: [loserCandidateId], references: [id], onDelete: Restrict)
+  mergedBy User @relation("MergeActor", fields: [mergedById], references: [id], onDelete: Restrict)
+
+  @@index([winnerCandidateId, mergedAt])
+  @@map("candidate_merge_aliases")
+}
+
+model Application {
+  id                 String   @id @default(uuid()) @db.Uuid
+  candidateId        String   @map("candidate_id") @db.Uuid
+  jobOrderId         String   @map("job_order_id") @db.Uuid
+  ownerId            String   @map("owner_id") @db.Uuid
+  teamId             String?  @map("team_id") @db.Uuid
+  status             String   @default("MATCHED") @db.VarChar(40)
+  source             String   @db.VarChar(40)
+  requirementSnapshot Json    @map("requirement_snapshot")
+  profileSnapshot   Json     @map("profile_snapshot")
+  appliedAt         DateTime @default(now()) @map("applied_at") @db.Timestamptz(6)
+  lastActivityAt    DateTime @default(now()) @map("last_activity_at") @db.Timestamptz(6)
+  dueAt             DateTime? @map("due_at") @db.Timestamptz(6)
+  decisionReason    String?  @map("decision_reason") @db.VarChar(1000)
+  version           Int      @default(1)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Restrict)
+  jobOrder JobOrder @relation(fields: [jobOrderId], references: [id], onDelete: Restrict)
+  owner User @relation("ApplicationOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  team Team? @relation("ApplicationTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  interviews Interview[]
+  history ApplicationStatusHistory[]
+  emailConversations EmailConversation[]
+
+  @@index([candidateId, status, createdAt])
+  @@index([jobOrderId, status, createdAt])
+  @@index([teamId, status, updatedAt, id])
+  @@map("applications")
+}
+
+model ApplicationStatusHistory {
+  id          String   @id @default(uuid()) @db.Uuid
+  applicationId String @map("application_id") @db.Uuid
+  fromStatus  String   @map("from_status") @db.VarChar(40)
+  toStatus    String   @map("to_status") @db.VarChar(40)
+  actorUserId String   @map("actor_user_id") @db.Uuid
+  reason      String?  @db.VarChar(1000)
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  actor User @relation("ApplicationHistoryActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([applicationId, createdAt, id])
+  @@map("application_status_history")
+}
+
+model Interview {
+  id             String   @id @default(uuid()) @db.Uuid
+  applicationId  String   @map("application_id") @db.Uuid
+  ownerId        String   @map("owner_id") @db.Uuid
+  roundNo        Int      @map("round_no")
+  scheduledAt    DateTime @map("scheduled_at") @db.Timestamptz(6)
+  scheduledEndAt DateTime @map("scheduled_end_at") @db.Timestamptz(6)
+  timeZone       String   @map("time_zone") @db.VarChar(80)
+  mode           String   @db.VarChar(32)
+  meetingUrl     String?  @map("meeting_url") @db.VarChar(1000)
+  location       String?  @db.VarChar(240)
+  scheduleStatus String   @default("SCHEDULED") @map("schedule_status") @db.VarChar(32)
+  result         String?  @db.VarChar(32)
+  feedback       String?  @db.VarChar(5000)
+  strengths      Json     @default("[]")
+  concerns       Json     @default("[]")
+  nextStep       String?  @map("next_step") @db.VarChar(1000)
+  questionSnapshot Json   @map("question_snapshot")
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  owner User @relation("InterviewOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  participants InterviewParticipant[]
+  history InterviewHistory[]
+
+  @@unique([applicationId, roundNo])
+  @@index([scheduleStatus, scheduledAt, scheduledEndAt])
+  @@index([applicationId, scheduledAt, id])
+  @@map("interviews")
+}
+
+model InterviewParticipant {
+  id          String @id @default(uuid()) @db.Uuid
+  interviewId String @map("interview_id") @db.Uuid
+  userId      String @map("user_id") @db.Uuid
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([interviewId, userId])
+  @@index([userId, interviewId])
+  @@map("interview_participants")
+}
+
+model InterviewHistory {
+  id               String   @id @default(uuid()) @db.Uuid
+  interviewId      String   @map("interview_id") @db.Uuid
+  actorUserId      String   @map("actor_user_id") @db.Uuid
+  action           String   @db.VarChar(40)
+  fromStatus       String?  @map("from_status") @db.VarChar(32)
+  toStatus         String?  @map("to_status") @db.VarChar(32)
+  previousScheduledAt DateTime? @map("previous_scheduled_at") @db.Timestamptz(6)
+  previousScheduledEndAt DateTime? @map("previous_scheduled_end_at") @db.Timestamptz(6)
+  reason           String?  @db.VarChar(1000)
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Restrict)
+  actor User @relation("InterviewHistoryActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([interviewId, createdAt, id])
+  @@map("interview_history")
+}
+
+model Mailbox {
+  id                 String    @id @default(uuid()) @db.Uuid
+  address            String    @unique @db.VarChar(320)
+  displayName        String    @map("display_name") @db.VarChar(160)
+  provider           String    @default("DISABLED") @db.VarChar(32)
+  status             String    @default("NOT_CONFIGURED") @db.VarChar(32)
+  providerAccountRef String?   @map("provider_account_ref") @db.VarChar(240)
+  providerSubscriptionId String? @map("provider_subscription_id") @db.VarChar(500)
+  providerSubscriptionExpiresAt DateTime? @map("provider_subscription_expires_at") @db.Timestamptz(6)
+  lastSubscriptionRenewedAt DateTime? @map("last_subscription_renewed_at") @db.Timestamptz(6)
+  syncCursor         String?   @map("sync_cursor") @db.Text
+  syncCursorIssuedAt DateTime? @map("sync_cursor_issued_at") @db.Timestamptz(6)
+  lastSyncAt         DateTime? @map("last_sync_at") @db.Timestamptz(6)
+  lastSendAt         DateTime? @map("last_send_at") @db.Timestamptz(6)
+  version            Int       @default(1)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  conversations EmailConversation[]
+  messages      EmailMessage[]
+  webhookNotifications EmailWebhookNotification[]
+
+  @@index([status, lastSyncAt])
+  @@map("mailboxes")
+}
+
+model EmailConversation {
+  id               String    @id @default(uuid()) @db.Uuid
+  mailboxId        String    @map("mailbox_id") @db.Uuid
+  candidateId      String?   @map("candidate_id") @db.Uuid
+  applicationId    String?   @map("application_id") @db.Uuid
+  journeyId        String?   @map("journey_id") @db.Uuid
+  subject          String    @db.VarChar(998)
+  snippet          String    @db.VarChar(500)
+  status           String    @default("NEEDS_ACTION") @db.VarChar(32)
+  lastActivityAt   DateTime  @map("last_activity_at") @db.Timestamptz(6)
+  messageCount     Int       @default(0) @map("message_count")
+  hasUnreadInbound Boolean   @default(false) @map("has_unread_inbound")
+  version          Int       @default(1)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  mailbox     Mailbox       @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+  candidate   Candidate?    @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  application Application?  @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  messages    EmailMessage[]
+
+  @@index([mailboxId, status, lastActivityAt, id])
+  @@index([candidateId, lastActivityAt, id])
+  @@index([applicationId, lastActivityAt, id])
+  @@map("email_conversations")
+}
+
+model EmailMessage {
+  id                 String    @id @default(uuid()) @db.Uuid
+  mailboxId          String    @map("mailbox_id") @db.Uuid
+  conversationId     String    @map("conversation_id") @db.Uuid
+  direction          String    @db.VarChar(16)
+  status             String    @default("DRAFT") @db.VarChar(32)
+  providerMessageId  String?   @map("provider_message_id") @db.VarChar(500)
+  providerThreadId   String?   @map("provider_thread_id") @db.VarChar(500)
+  internetMessageId String?   @map("internet_message_id") @db.VarChar(998)
+  inReplyTo         String?   @map("in_reply_to") @db.VarChar(998)
+  referencesJson    Json?     @map("references_json")
+  idempotencyKey     String?   @map("idempotency_key") @db.VarChar(240)
+  fromAddress        String    @map("from_address") @db.VarChar(320)
+  subject            String    @db.VarChar(998)
+  bodyText           String    @map("body_text") @db.Text
+  sanitizedHtml      String?   @map("sanitized_html") @db.Text
+  sentOrReceivedAt   DateTime  @map("sent_or_received_at") @db.Timestamptz(6)
+  immutable          Boolean   @default(true)
+  version            Int       @default(1)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  mailbox       Mailbox              @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+  conversation EmailConversation    @relation(fields: [conversationId], references: [id], onDelete: Restrict)
+  recipients   EmailRecipient[]
+  attachments  EmailAttachment[]
+  matchDecisions EmailMatchDecision[]
+
+  @@unique([mailboxId, providerMessageId])
+  @@unique([mailboxId, idempotencyKey])
+  @@index([conversationId, sentOrReceivedAt, id])
+  @@index([status, sentOrReceivedAt, id])
+  @@map("email_messages")
+}
+
+model EmailWebhookNotification {
+  id                String   @id @default(uuid()) @db.Uuid
+  provider          String   @db.VarChar(32)
+  mailboxId         String   @map("mailbox_id") @db.Uuid
+  notificationId    String   @map("notification_id") @db.VarChar(500)
+  providerMessageId String   @map("provider_message_id") @db.VarChar(500)
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  mailbox Mailbox @relation(fields: [mailboxId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, mailboxId, notificationId])
+  @@index([expiresAt, createdAt])
+  @@map("email_webhook_notifications")
+}
+
+model EmailRecipient {
+  id        String   @id @default(uuid()) @db.Uuid
+  messageId String   @map("message_id") @db.Uuid
+  kind      String   @db.VarChar(8)
+  address   String   @db.VarChar(320)
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  message EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+
+  @@unique([messageId, kind, address])
+  @@index([messageId, kind, position])
+  @@map("email_recipients")
+}
+
+model EmailAttachment {
+  id                    String   @id @default(uuid()) @db.Uuid
+  messageId             String   @map("message_id") @db.Uuid
+  providerAttachmentId  String?  @map("provider_attachment_id") @db.VarChar(500)
+  fileName              String   @map("file_name") @db.VarChar(240)
+  contentType           String   @map("content_type") @db.VarChar(160)
+  detectedContentType   String?  @map("detected_content_type") @db.VarChar(160)
+  sizeBytes             BigInt   @map("size_bytes")
+  checksum              String?  @db.VarChar(128)
+  objectKey             String   @map("object_key") @db.VarChar(500)
+  status                String   @default("DISCOVERED") @db.VarChar(32)
+  scanReason            String?  @map("scan_reason") @db.VarChar(240)
+  quarantinedAt         DateTime? @map("quarantined_at") @db.Timestamptz(6)
+  scannedAt             DateTime? @map("scanned_at") @db.Timestamptz(6)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  message EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+
+  @@index([messageId, status])
+  @@index([status, createdAt, id])
+  @@map("email_attachments")
+}
+
+model EmailMatchDecision {
+  id            String    @id @default(uuid()) @db.Uuid
+  messageId     String    @map("message_id") @db.Uuid
+  state         String    @default("PENDING") @db.VarChar(32)
+  candidateId   String?   @map("candidate_id") @db.Uuid
+  reason        String?   @db.VarChar(1000)
+  resolvedById  String?   @map("resolved_by_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  message    EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  candidate  Candidate?    @relation("EmailMatchCandidate", fields: [candidateId], references: [id], onDelete: SetNull)
+  resolvedBy User?         @relation("EmailMatchResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([messageId, createdAt, id])
+  @@index([state, createdAt, id])
+  @@map("email_match_decisions")
+}
+
+model SupplyJourneyTemplate {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(80)
+  name      String   @db.VarChar(160)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  versions SupplyJourneyTemplateVersion[]
+
+  @@map("supply_journey_templates")
+}
+
+model SupplyJourneyTemplateVersion {
+  id                    String   @id @default(uuid()) @db.Uuid
+  templateId            String   @map("template_id") @db.Uuid
+  version               Int
+  status                String   @default("DRAFT") @db.VarChar(32)
+  residenceContext      String   @map("residence_context") @db.VarChar(32)
+  visaRouteVersionId    String?  @map("visa_route_version_id") @db.Uuid
+  caseType              String   @map("case_type") @db.VarChar(32)
+  sectorVersionId       String?  @map("sector_version_id") @db.Uuid
+  occupationVersionId   String?  @map("occupation_version_id") @db.Uuid
+  applicability          Json?
+  checksum              String   @db.VarChar(71)
+  effectiveFrom         DateTime? @map("effective_from") @db.Timestamptz(6)
+  effectiveTo           DateTime? @map("effective_to") @db.Timestamptz(6)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  template  SupplyJourneyTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  milestones JourneyMilestoneTemplate[]
+
+  @@unique([templateId, version])
+  @@index([templateId, status])
+  @@index([residenceContext, caseType, status])
+  @@map("supply_journey_template_versions")
+}
+
+model JourneyMilestoneTemplate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  templateVersionId     String   @map("template_version_id") @db.Uuid
+  code                  String   @db.VarChar(80)
+  name                  String   @db.VarChar(240)
+  sequence              Int
+  parallel              Boolean  @default(false)
+  dependencyCodes       Json     @default("[]") @map("dependency_codes")
+  applicability         Json?
+  dueSlaDays            Int?     @map("due_sla_days")
+  ownerRule             Json     @map("owner_rule")
+  checklistSchema       Json     @map("checklist_schema")
+  evidenceRequirements  Json     @default("[]") @map("evidence_requirements")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  templateVersion SupplyJourneyTemplateVersion @relation(fields: [templateVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([templateVersionId, code])
+  @@unique([templateVersionId, sequence])
+  @@index([templateVersionId, sequence])
+  @@map("journey_milestone_templates")
+}
+
+model TaskRuleVersion {
+  id                  String   @id @default(uuid()) @db.Uuid
+  code                String   @db.VarChar(120)
+  version             Int
+  status              String   @default("DRAFT") @db.VarChar(32)
+  eventType           String   @map("event_type") @db.VarChar(120)
+  action              String   @db.VarChar(40)
+  titleTemplate       String   @map("title_template") @db.VarChar(240)
+  dueAfterHours       Int?     @map("due_after_hours")
+  referenceEntityType String   @map("reference_entity_type") @db.VarChar(80)
+  businessSlot        String   @map("business_slot") @db.VarChar(120)
+  conditions          Json     @default("{}")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([code, version])
+  @@index([eventType, status])
+  @@map("task_rule_versions")
+}
+
+model Task {
+  id                String   @id @default(uuid()) @db.Uuid
+  title             String   @db.VarChar(240)
+  description       String?  @db.VarChar(2000)
+  status            String   @default("NEW") @db.VarChar(32)
+  assigneeUserId    String   @map("assignee_user_id") @db.Uuid
+  teamId            String?  @map("team_id") @db.Uuid
+  waitingOn         String?  @map("waiting_on") @db.VarChar(32)
+  dueAt             DateTime? @map("due_at") @db.Timestamptz(6)
+  noDueDateReason   String?  @map("no_due_date_reason") @db.VarChar(500)
+  ruleCode          String?  @map("rule_code") @db.VarChar(120)
+  sourceEventId     String?  @map("source_event_id") @db.Uuid
+  dedupeKey         String?  @unique @map("dedupe_key") @db.VarChar(320)
+  referenceEntityType String @map("reference_entity_type") @db.VarChar(80)
+  referenceEntityId String   @map("reference_entity_id") @db.VarChar(120)
+  version           Int      @default(1)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([assigneeUserId, status, dueAt, id])
+  @@index([teamId, status, dueAt, id])
+  @@index([referenceEntityType, referenceEntityId, status])
+  @@map("tasks")
+}
+
+model ReportProjectionWatermark {
+  id             String   @id @default(uuid()) @db.Uuid
+  projectionKey  String   @unique @map("projection_key") @db.VarChar(160)
+  watermarkAt    DateTime @map("watermark_at") @db.Timestamptz(6)
+  refreshedAt    DateTime @map("refreshed_at") @db.Timestamptz(6)
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("report_projection_watermarks")
+}
+
+model ReportProjectionRow {
+  id               String   @id @default(uuid()) @db.Uuid
+  reportCode       String   @map("report_code") @db.VarChar(80)
+  scopeKey         String   @map("scope_key") @db.VarChar(320)
+  dimensionKey     String   @map("dimension_key") @db.VarChar(500)
+  asOf             DateTime @map("as_of") @db.Timestamptz(6)
+  payload          Json
+  sourceWatermark  DateTime @map("source_watermark") @db.Timestamptz(6)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([reportCode, scopeKey, dimensionKey, asOf])
+  @@index([reportCode, scopeKey, asOf])
+  @@map("report_projection_rows")
+}
+
+model ReportExportJob {
+  id             String   @id @default(uuid()) @db.Uuid
+  reportCode     String   @map("report_code") @db.VarChar(80)
+  format         String   @db.VarChar(16)
+  requesterId    String   @map("requester_id") @db.Uuid
+  purpose        String   @db.VarChar(500)
+  scopeSnapshot  Json     @map("scope_snapshot")
+  includedFields Json     @map("included_fields")
+  status         String   @default("QUEUED") @db.VarChar(32)
+  objectKey      String?  @map("object_key") @db.VarChar(500)
+  expiresAt      DateTime? @map("expires_at") @db.Timestamptz(6)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  @@index([requesterId, status, createdAt])
+  @@map("report_export_jobs")
+}
+
+model SupplyJourney {
+  id                String   @id @default(uuid()) @db.Uuid
+  candidateId       String   @map("candidate_id") @db.Uuid
+  applicationId     String   @map("application_id") @db.Uuid
+  templateVersionId String   @map("template_version_id") @db.Uuid
+  templateChecksum  String   @map("template_checksum") @db.VarChar(71)
+  ownerUserId       String   @map("owner_user_id") @db.Uuid
+  teamId            String?  @map("team_id") @db.Uuid
+  status            String   @default("ACTIVE") @db.VarChar(32)
+  contextSnapshot   Json     @map("context_snapshot")
+  startedAt         DateTime @map("started_at") @db.Timestamptz(6)
+  completedAt       DateTime? @map("completed_at") @db.Timestamptz(6)
+  cancelReason      String?  @map("cancel_reason") @db.VarChar(1000)
+  idempotencyKey    String   @unique @map("idempotency_key") @db.VarChar(320)
+  version           Int      @default(1)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  milestones JourneyMilestone[]
+  history    JourneyMilestoneHistory[]
+
+  @@index([candidateId, status, updatedAt, id])
+  @@index([ownerUserId, status, updatedAt, id])
+  @@index([teamId, status, updatedAt, id])
+  @@map("supply_journeys")
+}
+
+model JourneyMilestone {
+  id                   String   @id @default(uuid()) @db.Uuid
+  journeyId            String   @map("journey_id") @db.Uuid
+  templateMilestoneId  String?  @map("template_milestone_id") @db.Uuid
+  code                 String   @db.VarChar(80)
+  name                 String   @db.VarChar(240)
+  sequence             Int
+  status               String   @default("NOT_STARTED") @db.VarChar(32)
+  dependencyCodes      Json     @default("[]") @map("dependency_codes")
+  ownerUserId          String   @map("owner_user_id") @db.Uuid
+  dueAt                DateTime? @map("due_at") @db.Timestamptz(6)
+  completedAt          DateTime? @map("completed_at") @db.Timestamptz(6)
+  blockerParty         String?  @map("blocker_party") @db.VarChar(32)
+  blockerReason        String?  @map("blocker_reason") @db.VarChar(1000)
+  expectedResolution   String?  @map("expected_resolution") @db.VarChar(1000)
+  waivedBy             String?  @map("waived_by") @db.Uuid
+  waiveReason          String?  @map("waive_reason") @db.VarChar(1000)
+  waivedAt             DateTime? @map("waived_at") @db.Timestamptz(6)
+  notApplicableReason  String?  @map("not_applicable_reason") @db.VarChar(1000)
+  checklistData        Json     @default("{}") @map("checklist_data")
+  evidenceRequirement  Json     @default("[]") @map("evidence_requirement")
+  attemptNo            Int      @default(1) @map("attempt_no")
+  version              Int      @default(1)
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  journey SupplyJourney @relation(fields: [journeyId], references: [id], onDelete: Restrict)
+
+  @@unique([journeyId, code])
+  @@index([journeyId, sequence])
+  @@index([ownerUserId, status, dueAt, id])
+  @@map("journey_milestones")
+}
+
+model JourneyMilestoneHistory {
+  id          String   @id @default(uuid()) @db.Uuid
+  journeyId   String   @map("journey_id") @db.Uuid
+  milestoneId String?  @map("milestone_id") @db.Uuid
+  fromStatus  String?  @map("from_status") @db.VarChar(32)
+  toStatus    String   @map("to_status") @db.VarChar(32)
+  actorUserId String   @map("actor_user_id") @db.Uuid
+  reason      String?  @db.VarChar(1000)
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  journey SupplyJourney @relation(fields: [journeyId], references: [id], onDelete: Restrict)
+
+  @@index([journeyId, createdAt, id])
+  @@index([milestoneId, createdAt, id])
+  @@map("journey_milestone_history")
+}
+
+model JourneyMilestoneAttempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  milestoneId String   @map("milestone_id") @db.Uuid
+  attemptNo   Int      @map("attempt_no")
+  status      String   @default("OPEN") @db.VarChar(32)
+  reason      String   @db.VarChar(1000)
+  openedBy    String   @map("opened_by") @db.Uuid
+  openedAt    DateTime @default(now()) @map("opened_at") @db.Timestamptz(6)
+  closedAt    DateTime? @map("closed_at") @db.Timestamptz(6)
+  result      Json?
+
+  @@unique([milestoneId, attemptNo])
+  @@index([milestoneId, status, attemptNo])
+  @@map("journey_milestone_attempts")
+}
+
+model Document {
+  id             String   @id @default(uuid()) @db.Uuid
+  candidateId    String   @map("candidate_id") @db.Uuid
+  ownerUserId    String   @map("owner_user_id") @db.Uuid
+  teamId         String?  @map("team_id") @db.Uuid
+  title          String   @db.VarChar(240)
+  category       String   @db.VarChar(80)
+  status         String   @default("QUARANTINED") @db.VarChar(32)
+  latestVersionNo Int     @default(1) @map("latest_version_no")
+  legalHold      Boolean  @default(false) @map("legal_hold")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  versions       DocumentVersion[]
+  links          DocumentLink[]
+  accessAudits   DocumentAccessAudit[]
+  @@index([candidateId, status, updatedAt, id])
+  @@index([ownerUserId, status, updatedAt, id])
+  @@index([teamId, status, updatedAt, id])
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  documentId    String   @map("document_id") @db.Uuid
+  versionNo     Int      @map("version_no")
+  objectKey     String   @map("object_key") @db.VarChar(500)
+  sizeBytes     BigInt   @map("size_bytes")
+  checksum      String   @db.VarChar(128)
+  claimedMime   String   @map("claimed_mime") @db.VarChar(120)
+  detectedMime  String?  @map("detected_mime") @db.VarChar(120)
+  status        String   @default("QUARANTINED") @db.VarChar(32)
+  rejectionReason String? @map("rejection_reason") @db.VarChar(500)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  @@unique([documentId, versionNo])
+  @@index([documentId, status, versionNo])
+  @@map("document_versions")
+}
+
+model DocumentLink {
+  id          String   @id @default(uuid()) @db.Uuid
+  documentId  String   @map("document_id") @db.Uuid
+  candidateId String   @map("candidate_id") @db.Uuid
+  journeyId   String?  @map("journey_id") @db.Uuid
+  milestoneId String?  @map("milestone_id") @db.Uuid
+  linkedBy    String   @map("linked_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  @@unique([documentId, candidateId, journeyId, milestoneId])
+  @@index([candidateId, journeyId, milestoneId])
+  @@map("document_links")
+}
+
+model DocumentAccessAudit {
+  id         String   @id @default(uuid()) @db.Uuid
+  documentId String   @map("document_id") @db.Uuid
+  versionNo  Int      @map("version_no")
+  actorUserId String  @map("actor_user_id") @db.Uuid
+  action     String   @db.VarChar(40)
+  requestId  String?  @map("request_id") @db.VarChar(120)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  @@index([documentId, createdAt, id])
+  @@map("document_access_audits")
+}
+
+model RetentionPolicy {
+  id           String   @id @default(uuid()) @db.Uuid
+  code         String   @unique @db.VarChar(80)
+  version      Int
+  status       String   @default("DRAFT") @db.VarChar(32)
+  retentionDays Int     @map("retention_days")
+  appliesTo    Json     @map("applies_to")
+  createdBy    String   @map("created_by") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  @@unique([code, version])
+  @@map("retention_policies")
+}
+
+model LegalHold {
+  id           String   @id @default(uuid()) @db.Uuid
+  entityType   String   @map("entity_type") @db.VarChar(80)
+  entityId     String   @map("entity_id") @db.VarChar(120)
+  reason       String   @db.VarChar(1000)
+  status       String   @default("ACTIVE") @db.VarChar(24)
+  placedBy     String   @map("placed_by") @db.Uuid
+  releasedBy   String?  @map("released_by") @db.Uuid
+  releasedAt   DateTime? @map("released_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([entityType, entityId, status])
+  @@map("legal_holds")
+}

@@ -1,0 +1,3 @@
+version: 1
+accepted_risks: []
+policy: A high or critical finding requires a named owner, expiry and approval before release; no temporary acceptance is recorded in this worktree.

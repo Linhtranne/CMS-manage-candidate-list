@@ -82,12 +82,14 @@ WHERE status IN ('ACTIVE', 'ON_HOLD');
 - Template version snapshot bất biến.
 - `COMPLETED` yêu cầu `completed_at`; `CANCELLED` yêu cầu reason.
 
-### Email/outbox
+### Command/idempotency/outbox
 
+- Unique `idempotency_records.scope_key`; same key + same request hash replays the stored canonical result, while a different hash returns `IDEMPOTENCY_CONFLICT`.
+- In-progress records are bounded by expiry; failed commands can be retried with the same hash without executing two successful commands.
 - Unique `(provider, mailbox_id, provider_message_id)` khi provider ID tồn tại.
 - Unique `outbox_events.idempotency_key`.
 - Email message đã `SENT/RECEIVED` không update body/recipient; correction là event/message mới.
-- Outbox payload có `schema_version`, aggregate ID và correlation ID; không chứa credential.
+- Outbox payload có `schema_version`, aggregate ID và correlation ID; sensitive keys/credential/PII bị loại khỏi payload trước khi persist.
 
 ## 4. Candidate sensitive fields
 
@@ -188,7 +190,12 @@ Production dùng `CREATE INDEX CONCURRENTLY` ngoài transaction. Migration runne
 - Prisma schema mô tả model/relationship cơ bản.
 - `migration.sql` chứa raw SQL cho partial index, check, trigger và permission.
 - Mỗi migration có `README.md` cạnh migration khi risk high, gồm precheck, expected duration, lock risk, verify, rollback/forward-fix.
-- `prisma migrate dev` chỉ local; staging/production dùng `prisma migrate deploy` từ immutable image.
+- Foundation hiện tại nằm ở `apps/api/prisma/schema.prisma` và migration `20260820000100_foundation`; Prisma client dùng `@prisma/adapter-pg`.
+- Command platform migration `20260820000200_command_platform` bổ sung durable idempotency records; audit/outbox writes dùng chung transaction callback với aggregate.
+- Identity access migration `20260820000300_identity_access` bổ sung `oidc_login_states` để consume OIDC state exactly once; chỉ lưu hash/expiry/used timestamp, không lưu raw token.
+- Staging/production dùng `pnpm --filter @cms/api db:migrate:deploy`, một wrapper kiểm tra `DATABASE_URL` rồi mới gọi `prisma migrate deploy` từ immutable image.
+- Production API/worker/scheduler phải dùng một database `LOGIN` runtime role riêng (được khai báo qua `DATABASE_RUNTIME_ROLE`) với quyền tối thiểu; `cms_api` là role schema `NOLOGIN` và không được đặt trong username của `DATABASE_URL`.
+- API/worker/scheduler không tự chạy migration khi boot; migration là release step riêng và không in connection string.
 - Không chạy `db push` trên shared/prod environment.
 
 ## 12. Seed policy

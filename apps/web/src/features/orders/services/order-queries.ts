@@ -4,20 +4,35 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { components } from '@cms/contracts';
 import { apiClient } from '@/lib/api/client';
 
+type WebJobOrder = components['schemas']['JobOrder'];
+
+export function toApiOrderStatus(status?: string) {
+  return status === 'RECRUITING' ? 'OPEN' : status === 'PAUSED' ? 'ON_HOLD' : status;
+}
+
+function normalizeOrder(order: WebJobOrder): WebJobOrder {
+  const status = order.status === 'OPEN'
+    ? 'RECRUITING'
+    : order.status === 'ON_HOLD'
+      ? 'PAUSED'
+      : order.status;
+  return status === order.status ? order : { ...order, status };
+}
+
 export async function fetchOrders(params: { query?: string; status?: string; industry?: string } = {}) {
-  const response = await apiClient.GET('/orders', { params: { query: params } });
+  const response = await apiClient.GET('/orders', { params: { query: { ...params, ...(params.status ? { status: toApiOrderStatus(params.status) } : {}) } } });
   if (response.error) throw new Error(response.error.message);
-  return response.data;
+  return { ...response.data, items: response.data.items.map(normalizeOrder) };
 }
 
 export async function fetchOrder(id: string) {
   const response = await apiClient.GET('/orders/{id}', { params: { path: { id } } });
   if (response.error) throw new Error(response.error.message);
-  return response.data;
+  return normalizeOrder(response.data);
 }
 
 export async function searchCandidatesForOrder(params: { orderId: string; query?: string; industry?: string; occupation?: string; skill?: string; japaneseLevel?: string; readiness?: string; hasActiveJourney?: string }) {
-  const response = await apiClient.GET('/candidates/search-for-order', { params: { query: params } });
+  const response = await apiClient.GET('/candidates/search-for-order', { params: { query: { orderId: params.orderId, query: params.query, industrySectorId: params.industry, occupationId: params.occupation, skill: params.skill, japaneseLevel: params.japaneseLevel, readinessStatus: params.readiness, hasActiveJourney: params.hasActiveJourney } } });
   if (response.error) throw new Error(response.error.message);
   return response.data;
 }
@@ -82,6 +97,36 @@ export function useUpdateOrderStatus() {
       void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       void queryClient.invalidateQueries({ queryKey: ['orders'] });
     }
+  });
+}
+
+export function useUpdateOrderRequirements() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, body }: { orderId: string; body: components['schemas']['OrderRequirementUpdate'] }) => {
+      const response = await apiClient.PATCH('/orders/{id}/requirements', { params: { path: { id: orderId } }, body });
+      if (response.error) throw new Error(response.error.message);
+      return normalizeOrder(response.data);
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}
+
+export function useUpdateOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, body }: { orderId: string; body: components['schemas']['OrderUpdateRequest'] }) => {
+      const response = await apiClient.PATCH('/orders/{id}', { params: { path: { id: orderId } }, body });
+      if (response.error) throw new Error(response.error.message);
+      return normalizeOrder(response.data);
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 }
 

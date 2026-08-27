@@ -1,0 +1,48 @@
+{
+  "status": "local_container_smoke_passed",
+  "date": "2026-08-24",
+  "services": {
+    "api": "healthy",
+    "postgres": "healthy",
+    "redis": "healthy"
+  },
+  "migration": {
+    "status": "up_to_date",
+    "applied": [
+      "20260820030100_journey_templates",
+      "20260820030200_supply_journeys",
+      "20260820030400_documents",
+      "20260820040100_tasks_rules",
+      "20260820040200_report_projections",
+      "20260820040300_report_exports",
+      "20260820040400_admin_retention"
+    ]
+  },
+  "health": {
+    "live_http": 200,
+    "ready_http": 200,
+    "database": "ok",
+    "queue": "ok"
+  },
+  "database_role": {
+    "local_runtime_username": "cms_owner",
+    "production_runtime_role_smoke": "not_run_local_compose",
+    "cms_api_login": false,
+    "phase_2_4_delete_privilege": false,
+    "phase_2_4_select_insert_update": true
+  },
+  "activation_gates": {
+    "production_seed": false,
+    "documents": false,
+    "bulk_export": false,
+    "purge": false,
+    "break_glass": false
+  },
+  "external_gates": {
+    "object_storage": "disabled",
+    "malware_scanner": "disabled",
+    "bulk_export": "disabled",
+    "purge": "disabled",
+    "real_provider": "disabled"
+  }
+}
