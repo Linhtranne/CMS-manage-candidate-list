@@ -65,7 +65,6 @@ export function CatalogsPage() {
         <div>
           <p className="text-sm font-medium text-accent">{t('admin.catalogs.eyebrow')}</p>
           <h1 className="mt-1 text-2xl font-bold text-text">{t('admin.catalogs.title')}</h1>
-          <p className="mt-2 text-sm text-text-muted">{t('admin.catalogs.description')}</p>
         </div>
         <Button variant="primary" onClick={() => setOpen(true)}>
           {t('admin.catalogs.add')}
@@ -126,7 +125,7 @@ export function CatalogsPage() {
                 <td colSpan={6} className="p-4">
                   <EmptyState
                     title={t('admin.catalogs.empty')}
-                    description={t('admin.catalogs.emptyDescription')}
+
                     action={
                       <Button variant="primary" onClick={() => setOpen(true)}>
                         {t('admin.catalogs.add')}
@@ -142,7 +141,6 @@ export function CatalogsPage() {
       <Modal
         open={open}
         title={t('admin.catalogs.addTitle')}
-        description={t('admin.catalogs.addDescription')}
         onClose={() => setOpen(false)}
         size="sm"
         footer={
@@ -200,7 +198,6 @@ export function CatalogsPage() {
       <Modal
         open={Boolean(retireTarget)}
         title={t('admin.catalogs.retireTitle')}
-        description={t('admin.catalogs.retireDescription')}
         onClose={() => setRetireTarget(undefined)}
         size="sm"
         footer={

@@ -75,6 +75,20 @@ export function useUpdateCandidate() {
   });
 }
 
+export function useAddOccupationProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, body }: { id: string; body: components['schemas']['CandidateOccupationProfileRequest'] }) => {
+      const response = await apiClient.POST('/candidates/{id}/occupation-profiles', { params: { path: { id } }, body });
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['candidate', variables.id] });
+    },
+  });
+}
+
 export function useImportCandidates() {
   const queryClient = useQueryClient();
   return useMutation({

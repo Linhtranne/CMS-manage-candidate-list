@@ -50,6 +50,22 @@ describe('API provider contract', () => {
     await request(app.getHttpServer()).post('/api/v1/mailbox/conversations/conversation-1/link').send({ candidateId: '00000000-0000-0000-0000-000000000001', version: 1 }).expect(401);
   });
 
+  it('registers saved views behind session and CSRF policy', async () => {
+    await request(app.getHttpServer()).get('/api/v1/saved-views?resource=applications').expect(401);
+    await request(app.getHttpServer()).post('/api/v1/saved-views').send({
+      resource: 'applications',
+      name: 'My screening queue',
+      query: { view: 'screening' },
+      visibility: 'PRIVATE',
+    }).expect(401);
+    await request(app.getHttpServer()).patch('/api/v1/saved-views/00000000-0000-0000-0000-000000000001').send({
+      resource: 'applications',
+      name: 'My screening queue',
+      query: { view: 'screening' },
+      visibility: 'PRIVATE',
+    }).expect(401);
+  });
+
   it('registers the contract-aligned legacy email commands behind session and CSRF policy', async () => {
     await request(app.getHttpServer()).post('/api/v1/email-previews').send({ mailboxId: '00000000-0000-0000-0000-000000000001', from: 'ops@example.test', recipients: [{ kind: 'TO', address: 'candidate@example.test' }], subject: 'Preview', bodyText: 'Body' }).expect(401);
     await request(app.getHttpServer()).get('/api/v1/conversations/conversation-1/messages').expect(401);

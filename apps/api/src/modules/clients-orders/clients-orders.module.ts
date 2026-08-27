@@ -17,7 +17,7 @@ function effects(audit: AuditWriter, outbox: OutboxRepository) {
       await audit.append(transaction as Prisma.TransactionClient, { action: input.action, entityType: 'ClientOrJobOrder', entityId: input.entityId, actorUserId: input.actorUserId, correlationId: input.correlationId });
     },
     outbox: async (transaction: unknown, input: { eventType: string; aggregateId: string; correlationId: string }) => {
-      await outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'ClientOrJobOrder', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}`, correlationId: input.correlationId, payload: { aggregateId: input.aggregateId } });
+      await outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'ClientOrJobOrder', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`, correlationId: input.correlationId, payload: { aggregateId: input.aggregateId } });
     },
   };
 }

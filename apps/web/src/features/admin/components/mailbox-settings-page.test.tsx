@@ -8,7 +8,7 @@ describe('MailboxSettingsPage', () => {
   it('never renders a saved mailbox credential', async () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     renderWithI18n(<QueryClientProvider client={client}><MailboxSettingsPage /></QueryClientProvider>, 'en');
-    expect(await screen.findByText('ungvien@company.vn')).toBeVisible();
+    expect(await screen.findByText('noreply@company.vn')).toBeVisible();
     expect(screen.queryByDisplayValue(/secret|token/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Credential:/)).toBeVisible();
   });

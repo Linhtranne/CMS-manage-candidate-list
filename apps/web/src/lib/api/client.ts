@@ -58,7 +58,11 @@ const apiOrigin =
     : window.location.origin;
 
 const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
-const apiBaseUrl = (configuredApiBaseUrl || `${apiOrigin}/api/v1`).replace(/\/$/, '');
+const localApiBaseUrl = 'http://localhost:3100/api/v1';
+const fallbackApiBaseUrl = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ? localApiBaseUrl
+  : `${apiOrigin}/api/v1`;
+export const apiBaseUrl = (configuredApiBaseUrl || fallbackApiBaseUrl).replace(/\/$/, '');
 
 function readCsrfToken() {
   if (typeof document === 'undefined') return undefined;

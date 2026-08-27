@@ -21,7 +21,7 @@ export class ClientsController {
 
   @Get(':id')
   @RequirePermission('client.view')
-  async get(@Param('id') id: string) { return serializeClient(await this.clients.get(id)); }
+  async get(@Param('id') id: string) { return serializeClient(await this.clients.get(id, { revealContact: true })); }
 
   @Post()
   @UseGuards(CsrfGuard)
@@ -29,7 +29,7 @@ export class ClientsController {
   create(@Body() body: CreateClientDto, @Req() request: AuthenticatedRequest) {
     return this.clients.create({
       name: body.name, organizationType: body.organizationType, industryLabels: body.industryLabels, region: body.region, ownerId: request.auth!.userId, teamId: request.auth!.teamId,
-      contact: body.contactName ? { name: body.contactName, ...(body.contactEmail ? { email: body.contactEmail } : {}), ...(body.contactPhone ? { phone: body.contactPhone } : {}) } : null,
+      contact: body.contactName || body.contactEmail || body.contactPhone ? { name: body.contactName ?? '', ...(body.contactEmail ? { email: body.contactEmail } : {}), ...(body.contactPhone ? { phone: body.contactPhone } : {}) } : null,
       notes: body.notes,
     }, this.context(request)).then(serializeClient);
   }
@@ -38,7 +38,19 @@ export class ClientsController {
   @UseGuards(CsrfGuard)
   @RequirePermission('client.update')
   update(@Param('id') id: string, @Body() body: UpdateClientDto, @Req() request: AuthenticatedRequest) {
-    return this.clients.update(id, body, body.version, this.context(request)).then(serializeClient);
+    return this.clients.update(id, {
+      name: body.name,
+      organizationType: body.organizationType,
+      industryLabels: body.industryLabels,
+      region: body.region,
+      ownerId: body.ownerId,
+      teamId: body.teamId,
+      contact: body.contactName || body.contactEmail || body.contactPhone
+        ? { name: body.contactName ?? '', ...(body.contactEmail ? { email: body.contactEmail } : {}), ...(body.contactPhone ? { phone: body.contactPhone } : {}) }
+        : null,
+      notes: body.notes,
+      status: body.status,
+    }, body.version, this.context(request)).then(serializeClient);
   }
 
   private context(request: AuthenticatedRequest) {
@@ -51,6 +63,8 @@ function serializeClient(client: Awaited<ReturnType<ClientService['get']>>) {
   return {
     id: client.id, code: client.code, name: client.name, organizationType: client.organizationType, industryLabels: client.industryLabels,
     owner: { id: client.ownerId, name: client.ownerName ?? client.ownerId }, activeOrders: client.activeOrders, target: client.target, passed: client.passed,
-    lastActivity: client.lastActivity.toISOString(), status: client.status, region: client.region, ...(client.contact ? { contactName: client.contact.name } : {}), notes: client.notes, version: client.version,
+    lastActivity: client.lastActivity.toISOString(), status: client.status, region: client.region,
+    contactName: client.contact?.name ?? null, contactEmail: client.contact?.email ?? null, contactPhone: client.contact?.phone ?? null,
+    notes: client.notes, version: client.version,
   };
 }

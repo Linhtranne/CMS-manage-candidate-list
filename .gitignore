@@ -11,6 +11,9 @@ test-results/
 .env
 .env.*
 !.env.example
+.local-secrets/
+tmp/
+output/
 *.log
 *.pem
 *.key

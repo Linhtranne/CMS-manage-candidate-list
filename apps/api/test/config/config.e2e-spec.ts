@@ -110,13 +110,27 @@ describe('runtime configuration', () => {
 
     expect(config.mail.provider).toBe('DISABLED');
     expect(config.mail.enabled).toBe(false);
+    expect(config.mail.smtp).toMatchObject({ endpoint: null, port: 587, secure: false, username: null, password: null });
   });
 
   it('allows the synthetic fake provider only in local test environments', () => {
     const config = loadConfig(productionEnv({ NODE_ENV: 'test', MAIL_PROVIDER: 'FAKE' }));
 
-    expect(config.mail).toMatchObject({ provider: 'FAKE', enabled: true, approved: true, operationalPolicy: { maxAttempts: 3 } });
+    expect(config.mail).toMatchObject({ provider: 'FAKE', mode: 'NOTIFICATION_ONLY', senderAddress: null, enabled: true, approved: true, operationalPolicy: { maxAttempts: 3 } });
     expect(() => loadConfig(productionEnv({ MAIL_PROVIDER: 'FAKE' }))).toThrow(/MAIL_PROVIDER/);
+  });
+
+  it('supports one-way notification mode with an explicit sender address', () => {
+    const config = loadConfig(productionEnv({
+      NODE_ENV: 'test',
+      MAIL_PROVIDER: 'FAKE',
+      MAIL_MODE: 'NOTIFICATION_ONLY',
+      MAIL_SENDER_ADDRESS: 'noreply@company.vn',
+    }));
+
+    expect(config.mail).toMatchObject({ mode: 'NOTIFICATION_ONLY', senderAddress: 'noreply@company.vn' });
+    expect(() => loadConfig(productionEnv({ NODE_ENV: 'test', MAIL_PROVIDER: 'FAKE', MAIL_MODE: 'unknown' }))).toThrow(/MAIL_MODE/);
+    expect(() => loadConfig(productionEnv({ NODE_ENV: 'test', MAIL_PROVIDER: 'FAKE', MAIL_SENDER_ADDRESS: 'not-an-email' }))).toThrow(/MAIL_SENDER_ADDRESS/);
   });
 
   it('enables a mail provider only with a scoped DEC-003 approval', () => {
@@ -134,6 +148,51 @@ describe('runtime configuration', () => {
     try {
       const config = loadConfig(productionEnv({ MAIL_PROVIDER: 'MICROSOFT_GRAPH', MAIL_PROVIDER_APPROVAL_RECORD_FILE: file }));
       expect(config.mail).toMatchObject({ provider: 'MICROSOFT_GRAPH', enabled: true, approved: true, operationalPolicy: { ratePerMinute: 60, burst: 10, maxConcurrency: 5, maxAttempts: 8, retryWindowSeconds: 86400 } });
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('requires SES SMTP settings when an approved SMTP_IMAP provider is enabled', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'cms-dec-003-smtp-'));
+    const file = join(directory, 'dec-003.json');
+    const secretFile = join(directory, 'smtp-password');
+    writeFileSync(secretFile, 'smtp-password\n');
+    writeFileSync(file, JSON.stringify({
+      id: 'DEC-003', status: 'approved', version: '1.0.0', scope: 'staging-and-production', provider: 'SMTP_IMAP', artifact_checksum: `sha256:${'e'.repeat(64)}`,
+      sandbox_endpoint: 'https://sandbox.example.com', canary_recipients: ['qa@example.com'],
+      operational_policy: { rate_per_minute: 60, burst: 10, max_concurrency: 5, max_attempts: 8, retry_window_seconds: 86400 },
+      approvals: [
+        { role: 'Security Owner', identity: 'security@example.com', at: '2026-08-20T10:00:00Z' },
+        { role: 'Business Owner', identity: 'business@example.com', at: '2026-08-20T10:01:00Z' },
+      ],
+    }));
+    try {
+      expect(() => loadConfig(productionEnv({ MAIL_PROVIDER: 'SMTP_IMAP', MAIL_PROVIDER_APPROVAL_RECORD_FILE: file }))).toThrow(/SES_SMTP_ENDPOINT|SES_SMTP_USERNAME|SES_SMTP_PASSWORD/);
+      const config = loadConfig(productionEnv({
+        MAIL_PROVIDER: 'SMTP_IMAP',
+        MAIL_PROVIDER_APPROVAL_RECORD_FILE: file,
+        SES_SMTP_ENDPOINT: 'email-smtp.ap-southeast-2.amazonaws.com',
+        SES_SMTP_PORT: '587',
+        SES_SMTP_SECURE: 'false',
+        SES_SMTP_USERNAME: 'smtp-user',
+        SES_SMTP_PASSWORD_FILE: secretFile,
+      }));
+      expect(config.mail).toMatchObject({ provider: 'SMTP_IMAP', enabled: true, smtp: { endpoint: 'email-smtp.ap-southeast-2.amazonaws.com', port: 587, secure: false, username: 'smtp-user', password: 'smtp-password' } });
+      try {
+        loadConfig(productionEnv({
+          MAIL_PROVIDER: 'SMTP_IMAP',
+          MAIL_PROVIDER_APPROVAL_RECORD_FILE: file,
+          SES_SMTP_ENDPOINT: 'email-smtp.ap-southeast-2.amazonaws.com',
+          SES_SMTP_USERNAME: 'smtp-user',
+          SES_SMTP_PASSWORD: 'raw-password',
+          SES_SMTP_PASSWORD_FILE: secretFile,
+        }));
+        throw new Error('expected raw SMTP password rejection');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ConfigValidationError);
+        expect((error as ConfigValidationError).issues.some((item) => item.message.includes('raw SMTP passwords'))).toBe(true);
+      }
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }

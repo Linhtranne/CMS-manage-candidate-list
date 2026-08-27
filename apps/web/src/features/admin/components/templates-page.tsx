@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { useI18n } from '@/i18n/use-i18n';
-import { useAdminTemplates, useCreateAdminTemplate, useRetireAdminTemplate } from '../services/admin-queries';
+import {
+  useAdminTemplates,
+  useCreateAdminTemplate,
+  useRetireAdminTemplate,
+} from '../services/admin-queries';
 import { ErrorState } from '@/components/ui/error-state';
 import { LoadingState } from '@/components/ui/loading-state';
 import { StatusLabel } from '@/components/ui/status-label';
@@ -27,9 +31,260 @@ export function TemplatesPage() {
   const [milestones, setMilestones] = useState('');
   const [error, setError] = useState('');
   const [retireTarget, setRetireTarget] = useState<{ id: string; name: string; version: string }>();
-  const submit = () => { if (!name.trim() || !previewText.trim()) { setError(t('adminExtra.templates.requiredName')); return; } if (type === 'EMAIL' && (!subject.trim() || !body.trim())) { setError(t('adminExtra.templates.requiredEmail')); return; } if (type === 'JOURNEY' && !milestones.trim()) { setError(t('adminExtra.templates.requiredJourney')); return; } setError(''); create.mutate({ type, name: name.trim(), previewText: previewText.trim(), subject: subject.trim(), body: body.trim() || previewText.trim(), variables: variables.split(',').map((item) => item.trim()).filter(Boolean), milestones: milestones.split('\n').map((item) => item.trim()).filter(Boolean) }, { onSuccess: () => { setOpen(false); setName(''); setPreviewText(''); setSubject(''); setBody(''); setMilestones(''); }, onError: (cause) => setError(localizedError(t, cause, t('adminExtra.templates.loadError'))) }); };
+  const submit = () => {
+    if (!name.trim() || !previewText.trim()) {
+      setError(t('adminExtra.templates.requiredName'));
+      return;
+    }
+    if (type === 'EMAIL' && (!subject.trim() || !body.trim())) {
+      setError(t('adminExtra.templates.requiredEmail'));
+      return;
+    }
+    if (type === 'JOURNEY' && !milestones.trim()) {
+      setError(t('adminExtra.templates.requiredJourney'));
+      return;
+    }
+    setError('');
+    create.mutate(
+      {
+        type,
+        name: name.trim(),
+        previewText: previewText.trim(),
+        subject: subject.trim(),
+        body: body.trim() || previewText.trim(),
+        variables: variables
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
+        milestones: milestones
+          .split('\n')
+          .map((item) => item.trim())
+          .filter(Boolean),
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setName('');
+          setPreviewText('');
+          setSubject('');
+          setBody('');
+          setMilestones('');
+        },
+        onError: (cause) => setError(localizedError(t, cause, t('adminExtra.templates.loadError'))),
+      },
+    );
+  };
   if (query.isPending) return <LoadingState label={t('adminExtra.templates.loading')} />;
-  if (query.error) return <ErrorState message={t('adminExtra.templates.loadError')} onRetry={() => void query.refetch()} />;
+  if (query.error)
+    return (
+      <ErrorState
+        message={t('adminExtra.templates.loadError')}
+        onRetry={() => void query.refetch()}
+      />
+    );
   const templates = query.data?.items ?? [];
-  return <div className="space-y-6"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-medium text-accent">{t('adminExtra.templates.eyebrow')}</p><h1 className="mt-1 text-2xl font-bold text-text">{t('adminExtra.templates.title')}</h1><p className="mt-2 text-sm text-text-muted">{t('adminExtra.templates.description')}</p></div><Button variant="primary" onClick={() => setOpen(true)}>{t('adminExtra.templates.create')}</Button></div><div className="grid gap-4 lg:grid-cols-2">{templates.length ? templates.map((item) => <article key={item.id} className="rounded-lg border border-border bg-panel p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wide text-accent">{getDomainLabel(t, 'templateType', item.type)} · {item.version}</p><h2 className="mt-1 font-bold text-text">{item.name}</h2></div><StatusLabel tone={item.status === 'ACTIVE' ? 'success' : 'neutral'}>{getDomainLabel(t, 'templateStatus', item.status)}</StatusLabel></div><p className="mt-3 text-sm text-text-muted">{item.previewText}</p>{item.type === 'EMAIL' && item.subject ? <p className="mt-2 text-xs text-text-muted">{t('adminExtra.templates.subject')}: {item.subject}</p> : null}{item.type === 'JOURNEY' && item.milestones?.length ? <p className="mt-2 text-xs text-text-muted">{item.milestones.length} · {item.milestones.map((milestone) => getDomainLabel(t, 'milestoneName', milestone)).join(' · ')}</p> : null}<div className="mt-4 flex items-center justify-between text-xs text-text-muted"><span>{t('adminExtra.templates.usedBy', { count: item.usedByCount })}</span>{item.status === 'ACTIVE' ? <button type="button" className="font-semibold text-danger underline" onClick={() => setRetireTarget({ id: item.id, name: item.name, version: item.version })}>{t('adminExtra.templates.retire')}</button> : null}</div></article>) : <EmptyState title={t('adminExtra.templates.empty')} description={t('adminExtra.templates.emptyDescription')} action={<Button variant="primary" onClick={() => setOpen(true)}>{t('adminExtra.templates.create')}</Button>} />}</div><Modal open={open} title={t('adminExtra.templates.createTitle')} description={t('adminExtra.templates.createDescription')} onClose={() => setOpen(false)} size="md" footer={<><Button onClick={() => setOpen(false)}>{t('adminExtra.templates.cancel')}</Button><Button variant="primary" disabled={create.isPending} onClick={submit}>{t('adminExtra.templates.createDraft')}</Button></>}><div className="space-y-4">{error ? <p role="alert" className="text-sm font-semibold text-danger">{error}</p> : null}<label className="block text-sm font-semibold text-text">{t('adminExtra.templates.type')}<select aria-label={t('adminExtra.templates.typeAria')} name="loai-template" value={type} onChange={(event) => setType(event.target.value as typeof type)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"><option value="JOURNEY">{t('adminExtra.templates.journey')}</option><option value="EMAIL">{t('adminExtra.templates.email')}</option></select></label><label className="block text-sm font-semibold text-text">{t('adminExtra.templates.name')}<input aria-label={t('adminExtra.templates.nameAria')} name="ten-template" value={name} onChange={(event) => setName(event.target.value)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal" /></label><label className="block text-sm font-semibold text-text">{t('adminExtra.templates.preview')}<textarea aria-label={t('adminExtra.templates.previewAria')} name="noi-dung-xem-truoc" value={previewText} onChange={(event) => setPreviewText(event.target.value)} className="mt-1 min-h-20 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal" /></label><label className="block text-sm font-semibold text-text">{type === 'EMAIL' ? t('adminExtra.templates.subject') : t('adminExtra.templates.notes')}<input aria-label={type === 'EMAIL' ? t('adminExtra.templates.subjectAria') : t('adminExtra.templates.notesAria')} name="template-subject" value={subject} onChange={(event) => setSubject(event.target.value)} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 py-3 font-normal" /></label><label className="block text-sm font-semibold text-text">{type === 'EMAIL' ? t('adminExtra.templates.body') : t('adminExtra.templates.milestones')}<textarea aria-label={type === 'EMAIL' ? t('adminExtra.templates.bodyAria') : t('adminExtra.templates.milestonesAria')} name="template-body" value={type === 'EMAIL' ? body : milestones} onChange={(event) => type === 'EMAIL' ? setBody(event.target.value) : setMilestones(event.target.value)} placeholder={type === 'EMAIL' ? t('adminExtra.templates.emailPlaceholder') : t('adminExtra.templates.journeyPlaceholder')} className="mt-1 min-h-28 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal" /></label><label className="block text-sm font-semibold text-text">{t('adminExtra.templates.variables')}<input aria-label={t('adminExtra.templates.variablesAria')} name="bien-template" value={variables} onChange={(event) => setVariables(event.target.value)} placeholder={t('adminExtra.templates.variablesPlaceholder')} className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal" /></label></div></Modal><Modal open={Boolean(retireTarget)} title={t('adminExtra.templates.retireTitle')} description={t('adminExtra.templates.retireDescription')} onClose={() => setRetireTarget(undefined)} size="sm" footer={<><Button onClick={() => setRetireTarget(undefined)}>{t('adminExtra.templates.cancel')}</Button><Button variant="primary" disabled={retire.isPending} onClick={() => { if (!retireTarget) return; retire.mutate({ id: retireTarget.id, body: { version: Number(retireTarget.version.replace('v', '')) } }, { onSuccess: () => setRetireTarget(undefined) }); }}>{t('adminExtra.templates.confirmRetire')}</Button></>}><p className="text-sm text-text">{retireTarget?.name}</p></Modal></div>;
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-accent">{t('adminExtra.templates.eyebrow')}</p>
+          <h1 className="mt-1 text-2xl font-bold text-text">{t('adminExtra.templates.title')}</h1>
+        </div>
+        <Button variant="primary" onClick={() => setOpen(true)}>
+          {t('adminExtra.templates.create')}
+        </Button>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {templates.length ? (
+          templates.map((item) => (
+            <article key={item.id} className="rounded-lg border border-border bg-panel p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-accent">
+                    {getDomainLabel(t, 'templateType', item.type)} · {item.version}
+                  </p>
+                  <h2 className="mt-1 font-bold text-text">{item.name}</h2>
+                </div>
+                <StatusLabel tone={item.status === 'ACTIVE' ? 'success' : 'neutral'}>
+                  {getDomainLabel(t, 'templateStatus', item.status)}
+                </StatusLabel>
+              </div>
+              <p className="mt-3 text-sm text-text-muted">{item.previewText}</p>
+              {item.type === 'EMAIL' && item.subject ? (
+                <p className="mt-2 text-xs text-text-muted">
+                  {t('adminExtra.templates.subject')}: {item.subject}
+                </p>
+              ) : null}
+              {item.type === 'JOURNEY' && item.milestones?.length ? (
+                <p className="mt-2 text-xs text-text-muted">
+                  {item.milestones.length} ·{' '}
+                  {item.milestones
+                    .map((milestone) => getDomainLabel(t, 'milestoneName', milestone))
+                    .join(' · ')}
+                </p>
+              ) : null}
+              <div className="mt-4 flex items-center justify-between text-xs text-text-muted">
+                <span>{t('adminExtra.templates.usedBy', { count: item.usedByCount })}</span>
+                {item.status === 'ACTIVE' ? (
+                  <button
+                    type="button"
+                    className="font-semibold text-danger underline"
+                    onClick={() =>
+                      setRetireTarget({ id: item.id, name: item.name, version: item.version })
+                    }
+                  >
+                    {t('adminExtra.templates.retire')}
+                  </button>
+                ) : null}
+              </div>
+            </article>
+          ))
+        ) : (
+          <EmptyState
+            title={t('adminExtra.templates.empty')}
+
+            action={
+              <Button variant="primary" onClick={() => setOpen(true)}>
+                {t('adminExtra.templates.create')}
+              </Button>
+            }
+          />
+        )}
+      </div>
+      <Modal
+        open={open}
+        title={t('adminExtra.templates.createTitle')}
+        onClose={() => setOpen(false)}
+        size="md"
+        footer={
+          <>
+            <Button onClick={() => setOpen(false)}>{t('adminExtra.templates.cancel')}</Button>
+            <Button variant="primary" disabled={create.isPending} onClick={submit}>
+              {t('adminExtra.templates.createDraft')}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {error ? (
+            <p role="alert" className="text-sm font-semibold text-danger">
+              {error}
+            </p>
+          ) : null}
+          <label className="block text-sm font-semibold text-text">
+            {t('adminExtra.templates.type')}
+            <select
+              aria-label={t('adminExtra.templates.typeAria')}
+              name="loai-template"
+              value={type}
+              onChange={(event) => setType(event.target.value as typeof type)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"
+            >
+              <option value="JOURNEY">{t('adminExtra.templates.journey')}</option>
+              <option value="EMAIL">{t('adminExtra.templates.email')}</option>
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {t('adminExtra.templates.name')}
+            <input
+              aria-label={t('adminExtra.templates.nameAria')}
+              name="ten-template"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {t('adminExtra.templates.preview')}
+            <textarea
+              aria-label={t('adminExtra.templates.previewAria')}
+              name="noi-dung-xem-truoc"
+              value={previewText}
+              onChange={(event) => setPreviewText(event.target.value)}
+              className="mt-1 min-h-20 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {type === 'EMAIL' ? t('adminExtra.templates.subject') : t('adminExtra.templates.notes')}
+            <input
+              aria-label={
+                type === 'EMAIL'
+                  ? t('adminExtra.templates.subjectAria')
+                  : t('adminExtra.templates.notesAria')
+              }
+              name="template-subject"
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 py-3 font-normal"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {type === 'EMAIL'
+              ? t('adminExtra.templates.body')
+              : t('adminExtra.templates.milestones')}
+            <textarea
+              aria-label={
+                type === 'EMAIL'
+                  ? t('adminExtra.templates.bodyAria')
+                  : t('adminExtra.templates.milestonesAria')
+              }
+              name="template-body"
+              value={type === 'EMAIL' ? body : milestones}
+              onChange={(event) =>
+                type === 'EMAIL' ? setBody(event.target.value) : setMilestones(event.target.value)
+              }
+              placeholder={
+                type === 'EMAIL'
+                  ? t('adminExtra.templates.emailPlaceholder')
+                  : t('adminExtra.templates.journeyPlaceholder')
+              }
+              className="mt-1 min-h-28 w-full rounded-control border border-border bg-panel px-3 py-2 font-normal"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-text">
+            {t('adminExtra.templates.variables')}
+            <input
+              aria-label={t('adminExtra.templates.variablesAria')}
+              name="bien-template"
+              value={variables}
+              onChange={(event) => setVariables(event.target.value)}
+              placeholder={t('adminExtra.templates.variablesPlaceholder')}
+              className="mt-1 min-h-10 w-full rounded-control border border-border bg-panel px-3 font-normal"
+            />
+          </label>
+        </div>
+      </Modal>
+      <Modal
+        open={Boolean(retireTarget)}
+        title={t('adminExtra.templates.retireTitle')}
+        onClose={() => setRetireTarget(undefined)}
+        size="sm"
+        footer={
+          <>
+            <Button onClick={() => setRetireTarget(undefined)}>
+              {t('adminExtra.templates.cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={retire.isPending}
+              onClick={() => {
+                if (!retireTarget) return;
+                retire.mutate(
+                  {
+                    id: retireTarget.id,
+                    body: { version: Number(retireTarget.version.replace('v', '')) },
+                  },
+                  { onSuccess: () => setRetireTarget(undefined) },
+                );
+              }}
+            >
+              {t('adminExtra.templates.confirmRetire')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-text">{retireTarget?.name}</p>
+      </Modal>
+    </div>
+  );
 }

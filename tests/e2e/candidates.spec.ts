@@ -8,18 +8,24 @@ test('staff reviews candidate views and opens the candidate drawer', async ({ pa
   await expect(row).toBeVisible();
   await row.click();
   await expect(page.getByRole('dialog', { name: 'Hồ sơ ứng viên' })).toBeVisible();
-  await expect(page.getByText('Mở hồ sơ đầy đủ')).toBeVisible();
+  await expect(page.getByText('Mở hồ sơ đầy đủ')).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'Hồ sơ ứng viên' }).getByRole('tab', { name: 'Ứng tuyển', exact: true })).toBeVisible();
 });
 
-test('staff opens full candidate profile and switches to applications', async ({ page }) => {
+test('staff uses the candidate detail drawer and switches to applications', async ({ page }) => {
   await page.goto('/candidates?view=potential');
   await page.getByRole('row', { name: /UV-0009.*Phạm Thu Hà/ }).click();
-  await page.getByRole('link', { name: 'Mở hồ sơ đầy đủ' }).click();
-  await expect(page).toHaveURL(/\/candidates\/candidate-09$/);
-  await expect(page.getByRole('heading', { name: 'Phạm Thu Hà' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Hồ sơ ứng viên' })).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Lộ trình cung ứng' })).toBeVisible();
-  await page.getByRole('tab', { name: 'Ứng tuyển' }).click();
+  await page.getByRole('dialog', { name: 'Hồ sơ ứng viên' }).getByRole('tab', { name: 'Ứng tuyển', exact: true }).click();
   await expect(page.getByText('Chưa có đơn ứng tuyển')).toBeVisible();
+});
+
+test('legacy candidate profile URLs open the detail drawer', async ({ page }) => {
+  await page.goto('/candidates/candidate-09');
+  await expect(page).toHaveURL(/\/candidates\?selectedId=candidate-09$/);
+  await expect(page.getByRole('dialog', { name: 'Hồ sơ ứng viên' })).toBeVisible();
+  await expect(page.getByText('Mở hồ sơ đầy đủ')).toHaveCount(0);
 });
 
 test('staff switches candidate saved view to active applications', async ({ page }) => {

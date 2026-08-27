@@ -92,7 +92,14 @@ export class CandidateService {
     }
     const updated = await this.repository.withTransaction(async (repository, transaction) => {
       const result = await repository.update(id, expectedVersion, {
-        ...value,
+        name: value.name,
+        industryLabels: value.industryLabels,
+        occupation: value.occupation,
+        japaneseLevel: value.japaneseLevel,
+        source: value.source,
+        readinessStatus: value.readinessStatus,
+        contactabilityStatus: value.contactabilityStatus,
+        recordStatus: value.recordStatus,
         normalizedName: value.name.normalize('NFKC').toLocaleLowerCase(),
         emailCiphertext: encryptCandidateValue(value.email, this.secret),
         emailBlindIndex: value.email ? candidateBlindIndex(value.email, this.secret) : null,

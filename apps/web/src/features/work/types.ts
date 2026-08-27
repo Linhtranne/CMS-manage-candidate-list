@@ -7,5 +7,6 @@ export type WorkListParams = {
   sort?: string;
   query?: string;
   cursor?: string;
+  candidateId?: string;
 };
 

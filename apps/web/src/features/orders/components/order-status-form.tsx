@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { JobOrder } from '@/mocks/fixtures/orders';
+import type { JobOrder } from '../services/order-types';
 import { Button } from '@/components/ui/button';
 import { closeOrderSchema } from '../schemas/order-status.schema';
 import { useUpdateOrderStatus } from '../services/order-queries';

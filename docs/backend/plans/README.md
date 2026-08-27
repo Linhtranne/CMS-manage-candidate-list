@@ -2,7 +2,7 @@
 title: Backend Implementation Plans
 status: ready_for_human_approval
 version: 1.0.0
-updated_at: 2026-08-20
+updated_at: 2026-08-27
 owner: Backend Tech Lead
 risk: high
 ---
@@ -36,7 +36,7 @@ Phase 1A và phần adapter-fake của 1B có thể phát triển song song sau 
 - Phase 1B Task 2 technical implementation: **complete**; signed preview, idempotent enqueue/outbox, CAS outbound worker and reconciliation evidence are in [Task 2 evidence](../phase-1b-task-2-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
 - Phase 1B Task 3 technical implementation: **complete**; verified webhook replay protection, ID-only fetch queue, transactional inbound ingest/cursor, deterministic matcher and manual match resolution evidence are in [Task 3 evidence](../phase-1b-task-3-evidence.md). Real provider remains disabled pending DEC-003/DEC-005.
 - Phase 1B Task 4 technical implementation: **complete**; streaming attachment quarantine, checksum/MIME/scan state machine, ID-only document handoff and authorized signed-download evidence are in [Task 4 evidence](../phase-1b-task-4-evidence.md). Real object storage/scanner remain disabled until their production approvals exist.
-- Phase 1B Task 5 technical preparation: **complete; provider binding blocked by DEC-003**; approval-gated provider wrapper, mailbox operations, subscription renewal lifecycle, runbooks and smoke gate are in [Task 5 evidence](../phase-1b-task-5-evidence.md). No concrete provider or real staging mail is claimed.
+- Phase 1B Task 5 technical preparation: **complete; external activation blocked by DEC-003**; approval-gated wrapper, SES SMTP + Nodemailer adapter, mailbox operations, subscription renewal lifecycle, runbooks and smoke gate are in [Task 5 evidence](../phase-1b-task-5-evidence.md). No real staging mail is claimed.
 - Phase 1B checkpoint: **blocked by DEC-003/DEC-005**; see [checkpoint evidence](../phase-1b-checkpoint-evidence.md). Local regressions and disposable DB/Redis/API container smoke are green; no real provider, object-storage/scanner binding or production promotion is claimed.
 - Phase 2 technical implementation: **complete; activation/UAT remains gated**; journey start, milestone transitions/attempts, document quarantine/link/access audit and lifecycle completion are in [Phase 2–4 evidence](../phase-2-4-implementation-evidence.md). DEC-004/005, real storage/scanner and named UAT remain closed.
 - Phase 3–4 technical foundation: **implemented; production checkpoint remains blocked**; tasks/rules, canonical report projections/query guards, fail-closed exports, scoped audit and retention/legal-hold controls are in [Phase 2–4 evidence](../phase-2-4-implementation-evidence.md). Security/performance/DR/restore/provider/release evidence is still external work.

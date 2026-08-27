@@ -5,10 +5,141 @@ import { useClients } from '@/features/clients/services/client-queries';
 import { useOrders } from '@/features/orders/services/order-queries';
 import { useI18n } from '@/i18n/use-i18n';
 
-export function ReportFilterBar({ filters, onChange, onExport }: { filters: ReportFilters; onChange: (filters: ReportFilters) => void; onExport: () => void }) {
+export function ReportFilterBar({
+  filters,
+  onChange,
+  onExport,
+}: {
+  filters: ReportFilters;
+  onChange: (filters: ReportFilters) => void;
+  onExport: () => void;
+}) {
   const { t } = useI18n();
   const clients = useClients();
   const orders = useOrders();
-  const set = (key: keyof ReportFilters, value: string) => onChange({ ...filters, [key]: value || undefined });
-  return <section className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-panel p-4"><label className="text-sm font-semibold text-text">{t('reports.filters.from')}<input aria-label={t('reports.filters.fromAria')} name="report-from" type="date" value={filters.from ?? ''} onChange={(event) => set('from', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal" /></label><label className="text-sm font-semibold text-text">{t('reports.filters.to')}<input aria-label={t('reports.filters.toAria')} name="report-to" type="date" value={filters.to ?? ''} onChange={(event) => set('to', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal" /></label><label className="text-sm font-semibold text-text">{t('reports.filters.team')}<select aria-label={t('reports.filters.teamAria')} name="report-team" value={filters.teamId ?? ''} onChange={(event) => set('teamId', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"><option value="">{t('reports.filters.allTeams')}</option><option value="team-recruiting">{t('reports.filters.recruiting')}</option><option value="team-coordination">{t('reports.filters.coordination')}</option><option value="team-business">{t('reports.filters.business')}</option></select></label><label className="text-sm font-semibold text-text">{t('reports.filters.owner')}<input aria-label={t('reports.filters.ownerAria')} name="report-owner" value={filters.ownerId ?? ''} onChange={(event) => set('ownerId', event.target.value)} placeholder={t('reports.filters.ownerPlaceholder')} className="mt-1 block min-h-10 w-36 rounded-control border border-border bg-panel px-3 font-normal" /></label><label className="text-sm font-semibold text-text">{t('reports.filters.client')}<select aria-label={t('reports.filters.clientAria')} name="report-client" value={filters.clientId ?? ''} onChange={(event) => set('clientId', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"><option value="">{t('reports.filters.allClients')}</option>{clients.data?.items.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}</select></label><label className="text-sm font-semibold text-text">{t('reports.filters.order')}<select aria-label={t('reports.filters.orderAria')} name="report-order" value={filters.orderId ?? ''} onChange={(event) => set('orderId', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"><option value="">{t('reports.filters.allOrders')}</option>{orders.data?.items.map((order) => <option key={order.id} value={order.id}>{order.code}</option>)}</select></label><label className="text-sm font-semibold text-text">{t('reports.filters.industry')}<select aria-label={t('reports.filters.industryAria')} name="report-industry" value={filters.industryId ?? ''} onChange={(event) => set('industryId', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"><option value="">{t('reports.filters.allIndustries')}</option><option value="IT">{t('reports.filters.it')}</option><option value="CARE">{t('reports.filters.care')}</option><option value="LOGISTICS">{t('reports.filters.logistics')}</option></select></label><label className="text-sm font-semibold text-text">{t('reports.filters.source')}<select aria-label={t('reports.filters.sourceAria')} name="report-source" value={filters.sourceId ?? ''} onChange={(event) => set('sourceId', event.target.value)} className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"><option value="">{t('reports.filters.allSources')}</option><option value="REFERRAL">{t('reports.filters.referral')}</option><option value="MANUAL_MATCH">{t('reports.filters.manual')}</option><option value="IMPORT">{t('reports.filters.import')}</option></select></label><button type="button" className="min-h-10 rounded-control border border-border bg-panel px-4 text-sm font-semibold text-text hover:bg-surface" onClick={onExport}>{t('reports.filters.export')}</button><span className="ml-auto text-xs text-text-muted">{t('reports.filters.hint')}</span></section>;
+  const set = (key: keyof ReportFilters, value: string) =>
+    onChange({ ...filters, [key]: value || undefined });
+  return (
+    <section className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-panel p-4">
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.from')}
+        <input
+          aria-label={t('reports.filters.fromAria')}
+          name="report-from"
+          type="date"
+          value={filters.from ?? ''}
+          onChange={(event) => set('from', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        />
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.to')}
+        <input
+          aria-label={t('reports.filters.toAria')}
+          name="report-to"
+          type="date"
+          value={filters.to ?? ''}
+          onChange={(event) => set('to', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        />
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.team')}
+        <select
+          aria-label={t('reports.filters.teamAria')}
+          name="report-team"
+          value={filters.teamId ?? ''}
+          onChange={(event) => set('teamId', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        >
+          <option value="">{t('reports.filters.allTeams')}</option>
+          <option value="team-recruiting">{t('reports.filters.recruiting')}</option>
+          <option value="team-coordination">{t('reports.filters.coordination')}</option>
+          <option value="team-business">{t('reports.filters.business')}</option>
+        </select>
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.owner')}
+        <input
+          aria-label={t('reports.filters.ownerAria')}
+          name="report-owner"
+          value={filters.ownerId ?? ''}
+          onChange={(event) => set('ownerId', event.target.value)}
+          placeholder={t('reports.filters.ownerPlaceholder')}
+          className="mt-1 block min-h-10 w-36 rounded-control border border-border bg-panel px-3 font-normal"
+        />
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.client')}
+        <select
+          aria-label={t('reports.filters.clientAria')}
+          name="report-client"
+          value={filters.clientId ?? ''}
+          onChange={(event) => set('clientId', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        >
+          <option value="">{t('reports.filters.allClients')}</option>
+          {clients.data?.items.map((client) => (
+            <option key={client.id} value={client.id}>
+              {client.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.order')}
+        <select
+          aria-label={t('reports.filters.orderAria')}
+          name="report-order"
+          value={filters.orderId ?? ''}
+          onChange={(event) => set('orderId', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        >
+          <option value="">{t('reports.filters.allOrders')}</option>
+          {orders.data?.items.map((order) => (
+            <option key={order.id} value={order.id}>
+              {order.code}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.industry')}
+        <select
+          aria-label={t('reports.filters.industryAria')}
+          name="report-industry"
+          value={filters.industryId ?? ''}
+          onChange={(event) => set('industryId', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        >
+          <option value="">{t('reports.filters.allIndustries')}</option>
+          <option value="IT">{t('reports.filters.it')}</option>
+          <option value="CARE">{t('reports.filters.care')}</option>
+          <option value="LOGISTICS">{t('reports.filters.logistics')}</option>
+        </select>
+      </label>
+      <label className="text-sm font-semibold text-text">
+        {t('reports.filters.source')}
+        <select
+          aria-label={t('reports.filters.sourceAria')}
+          name="report-source"
+          value={filters.sourceId ?? ''}
+          onChange={(event) => set('sourceId', event.target.value)}
+          className="mt-1 block min-h-10 rounded-control border border-border bg-panel px-3 font-normal"
+        >
+          <option value="">{t('reports.filters.allSources')}</option>
+          <option value="REFERRAL">{t('reports.filters.referral')}</option>
+          <option value="MANUAL_MATCH">{t('reports.filters.manual')}</option>
+          <option value="IMPORT">{t('reports.filters.import')}</option>
+        </select>
+      </label>
+      <button
+        type="button"
+        className="min-h-10 rounded-control border border-border bg-panel px-4 text-sm font-semibold text-text hover:bg-surface"
+        onClick={onExport}
+      >
+        {t('reports.filters.export')}
+      </button>
+    </section>
+  );
 }

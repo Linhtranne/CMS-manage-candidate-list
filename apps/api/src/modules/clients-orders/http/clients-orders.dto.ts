@@ -36,6 +36,21 @@ export class CreateOrderDto {
   @IsArray() @IsString({ each: true }) criteria!: string[];
 }
 
+export class UpdateOrderDto {
+  @IsString() @MinLength(2) @MaxLength(240) position!: string;
+  @IsString() @MinLength(2) @MaxLength(160) industryLabel!: string;
+  @IsString() @MinLength(2) @MaxLength(160) occupation!: string;
+  @IsString() @MinLength(2) @MaxLength(160) location!: string;
+  @IsInt() @Min(1) target!: number;
+  @IsDateString() deadline!: string;
+  @IsUUID() occupationCatalogVersionId!: string;
+  @IsOptional() @IsString() @MaxLength(160) salary?: string;
+  @IsOptional() @IsString() @MaxLength(120) contractType?: string;
+  @IsOptional() @IsString() @MaxLength(40) japaneseLevel?: string;
+  @IsArray() @IsString({ each: true }) criteria!: string[];
+  @IsInt() @Min(1) version!: number;
+}
+
 export class UpdateOrderRequirementDto {
   @IsInt() @Min(1) version!: number;
   @IsUUID() occupationCatalogVersionId!: string;

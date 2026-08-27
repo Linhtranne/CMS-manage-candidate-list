@@ -17,7 +17,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateCurrentUser"];
         trace?: never;
     };
     "/search": {
@@ -84,6 +84,54 @@ export interface paths {
         patch: operations["updateSavedView"];
         trace?: never;
     };
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["markAllNotificationsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["markNotificationRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/work-items": {
         parameters: {
             query?: never;
@@ -94,6 +142,22 @@ export interface paths {
         get: operations["listWorkItems"];
         put?: never;
         post: operations["createWorkItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTaskAssignees"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -193,7 +257,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateOrder"];
         trace?: never;
     };
     "/orders/{id}/status": {
@@ -644,6 +708,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mailbox/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMailboxEmailTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/mailbox/conversations/{id}/attachments/{attachmentId}/download": {
         parameters: {
             query?: never;
@@ -702,6 +782,22 @@ export interface paths {
         get: operations["listTasks"];
         put?: never;
         post: operations["createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEntityNotes"];
+        put?: never;
+        post: operations["createEntityNote"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2028,8 +2124,17 @@ export interface components {
             /** Format: uuid */
             id: string;
             displayName: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "LOCKED" | "DISABLED" | "INVITED";
             roles: string[];
             permissions: string[];
+        };
+        UpdateCurrentUserRequest: {
+            displayName?: string;
+            currentPassword?: string;
+            newPassword?: string;
         };
         ApiProblem: {
             error: components["schemas"]["ApiError"];
@@ -2064,6 +2169,22 @@ export interface components {
         SavedView: components["schemas"]["SaveViewRequest"] & {
             /** Format: uuid */
             id: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "INTERVIEW_SCHEDULED" | "MAIL_NEEDS_ACTION" | "JOURNEY_AT_RISK" | "TASK_ASSIGNED" | "APPLICATION_DECISION";
+            /** @enum {string} */
+            severity: "INFO" | "WARNING" | "DANGER";
+            params: {
+                [key: string]: unknown;
+            };
+            href: string | null;
+            /** Format: date-time */
+            readAt: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -2132,6 +2253,11 @@ export interface components {
             /** @enum {string} */
             waitingOn?: "NONE" | "CANDIDATE" | "CLIENT_PARTNER" | "INTERNAL" | "SYSTEM";
         };
+        TaskAssignee: {
+            id: string;
+            displayName: string;
+            email: string;
+        };
         Client: {
             id: string;
             code: string;
@@ -2147,8 +2273,11 @@ export interface components {
             /** @enum {string} */
             status: "PROSPECT" | "ACTIVE" | "PAUSED" | "INACTIVE";
             region: string;
-            contactName?: string;
-            notes?: string;
+            contactName?: string | null;
+            /** Format: email */
+            contactEmail?: string | null;
+            contactPhone?: string | null;
+            notes?: string | null;
             version: number;
         };
         CreateWorkItemRequest: {
@@ -2169,6 +2298,9 @@ export interface components {
             region: string;
             ownerId: string;
             contactName?: string | null;
+            /** Format: email */
+            contactEmail?: string | null;
+            contactPhone?: string | null;
             notes?: string | null;
         };
         ClientUpdateRequest: components["schemas"]["CreateClientRequest"] & {
@@ -2207,6 +2339,8 @@ export interface components {
             contractType?: string;
             japaneseLevel?: string;
             criteria?: string[];
+            /** Format: uuid */
+            occupationCatalogVersionId?: string;
         };
         CreateOrderRequest: {
             position: string;
@@ -2224,6 +2358,22 @@ export interface components {
             contractType?: string;
             japaneseLevel?: string;
             criteria?: string[];
+        };
+        OrderUpdateRequest: {
+            position: string;
+            industryLabel: string;
+            occupation: string;
+            location: string;
+            target: number;
+            /** Format: date-time */
+            deadline: string;
+            /** Format: uuid */
+            occupationCatalogVersionId: string;
+            salary?: string;
+            contractType?: string;
+            japaneseLevel?: string;
+            criteria: string[];
+            version: number;
         };
         OrdersResponse: {
             items: components["schemas"]["JobOrder"][];
@@ -2334,6 +2484,7 @@ export interface components {
             /** Format: email */
             email: string | null;
             phone: string | null;
+            passportNumber?: string | null;
             address: string | null;
             occupationProfiles: components["schemas"]["CandidateOccupationProfile"][];
             applications: components["schemas"]["Application"][];
@@ -2683,7 +2834,7 @@ export interface components {
             lastActivityAt: string;
             /** @enum {string} */
             status: "NEEDS_ACTION" | "MATCHED" | "UNMATCHED" | "SENT" | "RECEIVED" | "CLOSED";
-            candidate: components["schemas"]["CandidateRef"];
+            candidate: components["schemas"]["CandidateRef"] | null;
             applicationId: string | null;
             journeyId: string | null;
             messageCount: number;
@@ -3029,6 +3180,17 @@ export interface components {
         AdminTemplatesResponse: {
             items: components["schemas"]["AdminTemplate"][];
         };
+        MailboxEmailTemplate: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            subject: string;
+            body: string;
+            variables: string[];
+        };
+        MailboxTemplatesResponse: {
+            items: components["schemas"]["MailboxEmailTemplate"][];
+        };
         MailboxSettingsView: {
             /** Format: email */
             address: string;
@@ -3132,6 +3294,14 @@ export interface components {
         SavedViewsResponse: {
             items: components["schemas"]["SavedView"][];
         };
+        NotificationsResponse: {
+            items: components["schemas"]["Notification"][];
+            unreadCount: number;
+            nextCursor: string | null;
+        };
+        NotificationReadAll: {
+            updatedCount: number;
+        };
         HealthStatus: {
             /** @enum {string} */
             status: "ok" | "degraded" | "not_configured";
@@ -3174,6 +3344,18 @@ export interface components {
         };
         ApiSavedViewEnvelope: {
             data: components["schemas"]["SavedView"];
+            requestId: string;
+        };
+        ApiNotificationsResponseEnvelope: {
+            data: components["schemas"]["NotificationsResponse"];
+            requestId: string;
+        };
+        ApiNotificationEnvelope: {
+            data: components["schemas"]["Notification"];
+            requestId: string;
+        };
+        ApiNotificationReadAllEnvelope: {
+            data: components["schemas"]["NotificationReadAll"];
             requestId: string;
         };
         ApiWorkItemEnvelope: {
@@ -3346,6 +3528,11 @@ export interface components {
             page: components["schemas"]["ApiPage"];
             requestId: string;
         };
+        ApiMailboxTemplatesResponseEnvelope: {
+            data: components["schemas"]["MailboxTemplatesResponse"];
+            page: components["schemas"]["ApiPage"];
+            requestId: string;
+        };
         ApiAdminTemplateEnvelope: {
             data: components["schemas"]["AdminTemplate"];
             requestId: string;
@@ -3365,6 +3552,34 @@ export interface components {
         };
         GenericCommand: {
             [key: string]: unknown;
+        };
+        EntityNote: {
+            /** Format: uuid */
+            id: string;
+            entityType: string;
+            /** Format: uuid */
+            entityId: string;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+            author: components["schemas"]["PersonRef"];
+        };
+        NotesResponse: {
+            items: components["schemas"]["EntityNote"][];
+        };
+        ApiNotesResponseEnvelope: {
+            data: components["schemas"]["NotesResponse"];
+            requestId: string;
+        };
+        ApiEntityNoteEnvelope: {
+            data: components["schemas"]["EntityNote"];
+            requestId: string;
+        };
+        CreateEntityNoteRequest: {
+            entityType: string;
+            /** Format: uuid */
+            entityId: string;
+            content: string;
         };
         CreateDocumentUploadRequest: {
             candidateId: string;
@@ -3487,6 +3702,32 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
         };
     };
+    updateCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCurrentUserRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated current internal user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiCurrentUserEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
     searchWorkspace: {
         parameters: {
             query: {
@@ -3605,6 +3846,73 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    listNotifications: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notifications for the authenticated user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiNotificationsResponseEnvelope"];
+                };
+            };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    markAllNotificationsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notifications marked as read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiNotificationReadAllEnvelope"];
+                };
+            };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    markNotificationRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification marked as read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiNotificationEnvelope"];
+                };
+            };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     listWorkItems: {
         parameters: {
             query?: {
@@ -3612,6 +3920,7 @@ export interface operations {
                 sort?: string;
                 query?: string;
                 cursor?: string;
+                candidateId?: string;
                 limit?: number;
             };
             header?: never;
@@ -3655,6 +3964,32 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    listTaskAssignees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active users available for task assignment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            items: components["schemas"]["TaskAssignee"][];
+                        };
+                        requestId: string;
+                    };
+                };
+            };
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -3908,6 +4243,35 @@ export interface operations {
                     "application/json": components["schemas"]["ApiJobOrderEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    updateOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Recruitment order updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiJobOrderEnvelope"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -4757,6 +5121,28 @@ export interface operations {
             default: components["responses"]["Unauthorized"];
         };
     };
+    listMailboxEmailTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active email templates available to mailbox users */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiMailboxTemplatesResponseEnvelope"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
     createMailboxAttachmentDownload: {
         parameters: {
             query?: never;
@@ -4892,6 +5278,55 @@ export interface operations {
             };
             403: components["responses"]["Forbidden"];
             422: components["responses"]["ValidationError"];
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    listEntityNotes: {
+        parameters: {
+            query: {
+                entityType: string;
+                entityId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Entity notes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiNotesResponseEnvelope"];
+                };
+            };
+            default: components["responses"]["Unauthorized"];
+        };
+    };
+    createEntityNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEntityNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Entity note created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiEntityNoteEnvelope"];
+                };
+            };
             default: components["responses"]["Unauthorized"];
         };
     };
@@ -5047,6 +5482,8 @@ export interface operations {
                 orderId?: string;
                 industryId?: string;
                 sourceId?: string;
+                /** @description IANA timezone used to interpret the report window and format timestamps. */
+                timeZone?: string;
             };
             header?: never;
             path?: never;
@@ -5078,6 +5515,8 @@ export interface operations {
                 orderId?: string;
                 industryId?: string;
                 sourceId?: string;
+                /** @description IANA timezone used to interpret the report window and format timestamps. */
+                timeZone?: string;
             };
             header?: never;
             path?: never;
@@ -6565,13 +7004,16 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
         };
     };
     getDocument: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -6585,13 +7027,16 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
         };
     };
     createDocumentDownload: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -6605,13 +7050,16 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
         };
     };
     linkDocument: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -6629,13 +7077,16 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
         };
     };
     verifyDocument: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -6653,6 +7104,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiGenericObjectEnvelope"];
                 };
             };
+            default: components["responses"]["Unauthorized"];
         };
     };
     createEmailPreview: {

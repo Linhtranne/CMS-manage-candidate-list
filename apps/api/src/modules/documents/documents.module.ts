@@ -8,12 +8,14 @@ import { RUNTIME_CONFIG, RuntimeConfigModule, type RuntimeConfig } from '../../p
 import { IdentityAccessModule } from '../identity-access/identity-access.module.js';
 import { DocumentService, DisabledMalwareScanner, type MalwareScannerPort } from './application/document.service.js';
 import { DocumentsController } from './http/documents.controller.js';
+import { LocalStorageController } from './http/local-storage.controller.js';
 import { DocumentPrismaRepository } from './infrastructure/document.prisma-repository.js';
 import { DOCUMENT_MALWARE_SCANNER, MALWARE_SCANNER_CLIENT, createDocumentMalwareScanner, type MalwareScannerClient } from './infrastructure/malware-scanner.factory.js';
 
 @Module({
   imports: [DatabaseModule, CommandPlatformModule, IdentityAccessModule, RuntimeConfigModule.forRoot()],
-  controllers: [DocumentsController],
+  // Register static local signed-url routes before the guarded :id route.
+  controllers: [LocalStorageController, DocumentsController],
   providers: [
     DocumentPrismaRepository,
     DisabledObjectStorageAdapter,

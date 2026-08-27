@@ -30,7 +30,7 @@ Nếu đến required gate mà decision chưa approved, hệ thống dùng safe 
 |---|---|---|---|---|---|---|
 | DEC-001 | Role/action/scope/sensitivity matrix và separation of duties | `ready_for_human_approval` | Product Owner | Product Owner + Security Owner | Phase 0 IAM merge | deny-by-default; chỉ health/public bootstrap |
 | DEC-002 | OIDC provider, issuer/audience, MFA claim, session idle/absolute timeout | `blocked_by_external_decision` | IT Identity Owner | Security Owner + IT Identity Owner | staging login | production API refuses authenticated boot |
-| DEC-003 | Mail provider, mailbox address, tenant/DNS owner, OAuth scope, rate/retry limits | `blocked_by_external_decision` | IT/Mail Owner | Security Owner + Business Owner | Phase 1B staging email | `MAIL_PROVIDER=DISABLED` |
+| DEC-003 | AWS SES region/identity, Nodemailer SMTP credential reference, mailbox address, DNS owner, rate/retry limits | `blocked_by_external_decision` | IT/Mail Owner | Security Owner + Business Owner | Phase 1B staging email | `MAIL_PROVIDER=DISABLED` |
 | DEC-004 | Production catalog, question/email/Journey templates, milestone fields/evidence/SLA, decision authorities | `blocked_by_external_decision` | Product Owner | Product Owner + Japan Operations Owner | activate production seeds / Phase 2 UAT | technical seed only; no business template active |
 | DEC-005 | Privacy purpose/notice, retention, legal hold, cross-border recipient/approval và purge | `blocked_by_external_decision` | Privacy Owner | Privacy/Legal Owner + Business Owner | real-data import/share/go-live | synthetic data only; purge/share disabled |
 | DEC-006 | Production topology/capacity, support window, SLO, alerts, RPO/RTO, backup/object immutability | `blocked_by_external_decision` | Operations Owner | Operations Owner + Business Owner | production environment build | staging only; no availability/DR claim |
@@ -58,9 +58,11 @@ Không approve theo tên role chung chung; artifact approved phải chứa actio
 
 ## 5. DEC-003 required evidence
 
+Use the fillable draft [DEC-003 mail provider](./decisions/DEC-003-mail-provider-draft.md) and the collection runbook [DEC-003 DNS collection guide](./decisions/DEC-003-dns-collection-guide.md). The draft pre-fills the CMS one-way notification policy; only SES region/identity, mailbox, DNS, quota, sandbox, retention and approval evidence remain external inputs.
+
 - selected adapter trong interface của [07-email-hub-workers-and-storage](./07-email-hub-workers-and-storage.md);
-- mailbox/domain ownership, sender display, reply/bounce path;
-- OAuth permission và admin consent owner;
+- AWS account/region, verified SES identity, Nodemailer SMTP adapter, sender display, reply/bounce path;
+- SES SMTP credential secret reference, IAM principal/rotation owner và production-access evidence;
 - SPF/DKIM/DMARC records/results;
 - provider rate/quota, webhook/change feed/poller model, cursor behavior;
 - data location/retention, raw MIME/attachment policy;
@@ -102,7 +104,7 @@ Không dùng “theo chính sách công ty” nếu không có policy version/li
 
 ## 9. DEC-007 required artifact
 
-- report code/definition version/numerator/denominator/cohort/timezone/freshness;
+- report code/defi   nition version/numerator/denominator/cohort/timezone/freshness;
 - UAT actors theo role/scope, synthetic dataset và AC mapping;
 - performance thresholds và observation window;
 - release signatories, evidence retention và waiver authority;

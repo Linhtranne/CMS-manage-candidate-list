@@ -3,16 +3,20 @@ import { bindMailProvider } from '../../src/modules/email-hub/infrastructure/pro
 import { FakeMailProviderAdapter } from '../../src/modules/email-hub/infrastructure/providers/fake.adapter.js';
 import { DisabledMailProviderAdapter } from '../../src/modules/email-hub/infrastructure/providers/disabled.adapter.js';
 import { NoopMailOperationLimiter } from '../../src/modules/email-hub/infrastructure/providers/mail-provider-rate-limiter.js';
+import { SesSmtpMailProviderAdapter } from '../../src/modules/email-hub/infrastructure/providers/ses-smtp.adapter.js';
 
-const config = (provider: 'DISABLED' | 'FAKE' | 'MICROSOFT_GRAPH', enabled = provider !== 'DISABLED') => ({
+const config = (provider: 'DISABLED' | 'FAKE' | 'MICROSOFT_GRAPH' | 'SMTP_IMAP', enabled = provider !== 'DISABLED') => ({
   mail: {
     provider,
+    mode: 'NOTIFICATION_ONLY' as const,
+    senderAddress: null,
     enabled,
     approved: enabled,
     approvalFile: null,
     canaryOnly: false,
     canaryRecipients: [] as string[],
     operationalPolicy: enabled ? { ratePerMinute: 60, burst: 10, maxConcurrency: 5, maxAttempts: 8, retryWindowSeconds: 86400 } : null,
+    smtp: { endpoint: null, port: 587, secure: false, username: null, password: null },
   },
 });
 
@@ -49,6 +53,14 @@ describe('runtime mail provider binding', () => {
     expect(bound.provider).toBe('MICROSOFT_GRAPH');
     runtime.mail.approved = false;
     await expect(bound.validateConnection()).rejects.toThrow('MAIL_PROVIDER_APPROVAL_REQUIRED');
+  });
+
+  it('binds the approved SES SMTP adapter under the canonical SMTP_IMAP contract', async () => {
+    const runtime = config('SMTP_IMAP');
+    const delegate = new SesSmtpMailProviderAdapter({ endpoint: 'email-smtp.ap-southeast-2.amazonaws.com', port: 587, secure: false, username: 'smtp-user', password: 'smtp-password' }, { verify: async () => undefined, sendMail: async () => ({ messageId: '<message@example.com>' }) });
+    const bound = bindMailProvider(runtime, new DisabledMailProviderAdapter(), new NoopMailOperationLimiter(), delegate);
+    expect(bound.provider).toBe('SMTP_IMAP');
+    await expect(bound.validateConnection()).resolves.toMatchObject({ provider: 'SMTP_IMAP', status: 'healthy' });
   });
 
   it('enforces the staging canary list before delegating a send', async () => {

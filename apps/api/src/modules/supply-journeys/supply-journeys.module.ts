@@ -41,7 +41,7 @@ import { Prisma } from '../../generated/prisma/client.js';
           eventType: input.eventType,
           aggregateType: 'SupplyJourneyTemplateVersion',
           aggregateId: input.aggregateId,
-          idempotencyKey: `${input.eventType}:${input.aggregateId}`,
+          idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`,
           correlationId: input.correlationId,
           payload: { templateVersionId: input.aggregateId },
         }).then(() => undefined),
@@ -52,7 +52,7 @@ import { Prisma } from '../../generated/prisma/client.js';
       provide: SupplyJourneyService,
       useFactory: (repository: SupplyJourneyPrismaRepository, templates: JourneyTemplateService, config: RuntimeConfig, audit: AuditWriter, outbox: OutboxRepository) => new SupplyJourneyService(repository, templates, config.security.encryptionKey, {
         audit: async (transaction, input) => audit.append(transaction as Prisma.TransactionClient, { action: input.action, entityType: 'SupplyJourney', entityId: input.entityId, actorUserId: input.actorUserId, correlationId: input.correlationId, metadataJson: input.metadata }).then(() => undefined),
-        outbox: async (transaction, input) => outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'SupplyJourney', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}`, correlationId: input.correlationId, payload: input.payload }).then(() => undefined),
+        outbox: async (transaction, input) => outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'SupplyJourney', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`, correlationId: input.correlationId, payload: input.payload }).then(() => undefined),
       }),
       inject: [SupplyJourneyPrismaRepository, JourneyTemplateService, RUNTIME_CONFIG, AuditWriter, OutboxRepository],
     },
@@ -68,7 +68,7 @@ import { Prisma } from '../../generated/prisma/client.js';
       provide: JourneyCompletionService,
       useFactory: (repository: SupplyJourneyPrismaRepository, audit: AuditWriter, outbox: OutboxRepository) => new JourneyCompletionService(repository, {}, {
         audit: async (transaction, input) => audit.append(transaction as Prisma.TransactionClient, { action: input.action, entityType: 'SupplyJourney', entityId: input.entityId, actorUserId: input.actorUserId, correlationId: input.correlationId, metadataJson: input.metadata }).then(() => undefined),
-        outbox: async (transaction, input) => outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'SupplyJourney', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}`, correlationId: input.correlationId, payload: input.payload }).then(() => undefined),
+        outbox: async (transaction, input) => outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'SupplyJourney', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`, correlationId: input.correlationId, payload: input.payload }).then(() => undefined),
       }),
       inject: [SupplyJourneyPrismaRepository, AuditWriter, OutboxRepository],
     },

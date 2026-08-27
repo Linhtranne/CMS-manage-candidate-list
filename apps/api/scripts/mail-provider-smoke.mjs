@@ -76,6 +76,26 @@ export async function runProviderSmoke(env = process.env) {
   try { approval = JSON.parse(readFileSync(approvalFile, 'utf8')); } catch { return { blocked: 'DEC-003 approval record is unreadable' }; }
   if (!validateApproval(approval, { provider, scope })) return { blocked: 'DEC-003 approval record is not approved for this provider/environment' };
 
+  // SES SMTP has no provider HTTP health URL. Validate the complete runtime
+  // shape here; the adapter's verify() is the network-level health check.
+  if (provider === 'SMTP_IMAP') {
+    const endpoint = env.SES_SMTP_ENDPOINT?.trim();
+    const port = Number(env.SES_SMTP_PORT?.trim() || 587);
+    const username = env.SES_SMTP_USERNAME?.trim();
+    const password = env.SES_SMTP_PASSWORD?.trim();
+    const passwordFile = env.SES_SMTP_PASSWORD_FILE?.trim();
+    if (!endpoint || !/^email-smtp\.[a-z0-9-]+\.amazonaws\.com$/i.test(endpoint)) return { blocked: 'SES_SMTP_ENDPOINT must be an Amazon SES SMTP endpoint' };
+    if (!Number.isInteger(port) || port < 1 || port > 65535 || port === 25) return { blocked: 'SES_SMTP_PORT must be a non-25 SMTP port' };
+    if (!username) return { blocked: 'SES_SMTP_USERNAME is required' };
+    if (scope === 'staging' || scope === 'production') {
+      if (password) return { blocked: 'SES_SMTP_PASSWORD must not be set outside local development' };
+      if (!passwordFile) return { blocked: 'SES_SMTP_PASSWORD_FILE is required outside local development' };
+    } else if (!password && !passwordFile) {
+      return { blocked: 'SES_SMTP_PASSWORD or SES_SMTP_PASSWORD_FILE is required' };
+    }
+    return { ok: true, provider, scope, transport: 'smtp' };
+  }
+
   const smokeUrl = env.MAIL_PROVIDER_SMOKE_URL?.trim();
   if (!smokeUrl) return { blocked: 'MAIL_PROVIDER_SMOKE_URL must point to the approved provider sandbox health contract' };
   if (!validateSmokeUrl(approval.sandbox_endpoint, smokeUrl, scope)) return { blocked: 'MAIL_PROVIDER_SMOKE_URL must use the approved sandbox origin' };

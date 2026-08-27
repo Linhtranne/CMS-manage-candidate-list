@@ -4,6 +4,7 @@ import { DatabaseModule } from '../../platform/database/database.module.js';
 import { IdentityAccessModule } from '../identity-access/identity-access.module.js';
 import { CatalogService } from './application/catalog.service.js';
 import { CatalogController } from './http/catalog.controller.js';
+import { CatalogCompatibilityController } from './http/catalog-compatibility.controller.js';
 import { CatalogPrismaRepository } from './infrastructure/catalog.prisma-repository.js';
 import { AuditWriter } from '../audit/audit-writer.js';
 import { OutboxRepository } from '../../platform/outbox/outbox.repository.js';
@@ -12,7 +13,7 @@ import { CatalogApprovalGate } from './application/catalog-approval.gate.js';
 
 @Module({
   imports: [DatabaseModule, CommandPlatformModule, IdentityAccessModule],
-  controllers: [CatalogController],
+  controllers: [CatalogController, CatalogCompatibilityController],
   providers: [
     CatalogApprovalGate,
     CatalogPrismaRepository,
@@ -33,7 +34,7 @@ import { CatalogApprovalGate } from './application/catalog-approval.gate.js';
             eventType: input.eventType,
             aggregateType: 'CatalogVersion',
             aggregateId: input.aggregateId,
-            idempotencyKey: `${input.eventType}:${input.aggregateId}`,
+            idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`,
             correlationId: input.correlationId,
             payload: { catalogVersionId: input.aggregateId },
           });

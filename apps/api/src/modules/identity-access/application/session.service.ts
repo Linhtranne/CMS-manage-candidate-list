@@ -5,7 +5,7 @@ import { PrismaService } from '../../../platform/database/prisma.service.js';
 import { AuditWriter } from '../../../modules/audit/audit-writer.js';
 import { getRequestContext } from '../../../platform/http/request-context.middleware.js';
 import type { OidcClaims } from '../infrastructure/oidc.adapter.js';
-import { verifyPassword } from '../infrastructure/password-hasher.js';
+import { hashPassword, verifyPassword } from '../infrastructure/password-hasher.js';
 import { ROLE_ACTION_SCOPES, type ActorRole, type PermissionAction, type ScopeLevel } from '../domain/permission.registry.js';
 
 const ABSOLUTE_SESSION_MS = 8 * 60 * 60 * 1000;
@@ -68,6 +68,18 @@ export class CsrfViolationError extends Error {
   constructor() {
     super('CSRF token is missing or invalid');
     this.name = 'CsrfViolationError';
+  }
+}
+
+export class ProfileUpdateError extends Error {
+  readonly statusCode = 400;
+  readonly code: string;
+  readonly messageKey = 'errors.profileUpdate';
+
+  constructor(code: 'PROFILE_UPDATE_EMPTY' | 'PROFILE_PASSWORD_PAIR_REQUIRED' | 'CURRENT_PASSWORD_INVALID' | 'PASSWORD_CHANGE_UNAVAILABLE') {
+    super(code);
+    this.name = 'ProfileUpdateError';
+    this.code = code;
   }
 }
 
@@ -162,6 +174,44 @@ export class SessionService {
       throw new PasswordAuthenticationError();
     }
     return this.createSession(user.id);
+  }
+
+  async updateOwnProfile(userId: string, input: { displayName?: string; currentPassword?: string; newPassword?: string }): Promise<SessionUser> {
+    const displayName = input.displayName?.trim();
+    const changingPassword = input.currentPassword !== undefined || input.newPassword !== undefined;
+    if (!displayName && !changingPassword) throw new ProfileUpdateError('PROFILE_UPDATE_EMPTY');
+    if (changingPassword && (!input.currentPassword || !input.newPassword)) throw new ProfileUpdateError('PROFILE_PASSWORD_PAIR_REQUIRED');
+
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { userRoles: { include: { role: true } } },
+    });
+    if (!current || current.status !== 'ACTIVE') throw new SessionAuthenticationError('User is not active');
+
+    if (changingPassword) {
+      if (!current.passwordHash) throw new ProfileUpdateError('PASSWORD_CHANGE_UNAVAILABLE');
+      if (!(await verifyPassword(input.currentPassword!, current.passwordHash))) throw new ProfileUpdateError('CURRENT_PASSWORD_INVALID');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(displayName ? { displayName } : {}),
+        ...(changingPassword ? { passwordHash: await hashPassword(input.newPassword!) } : {}),
+        version: { increment: 1 },
+      },
+      include: { userRoles: { include: { role: true } } },
+    });
+
+    await this.appendAuditSafely({
+      actorUserId: userId,
+      action: 'AUTH_PROFILE_UPDATED',
+      entityType: 'USER',
+      entityId: userId,
+      correlationId: this.correlationId(),
+      diffJson: { ...(displayName ? { displayNameChanged: displayName !== current.displayName } : {}), ...(changingPassword ? { passwordChanged: true } : {}) },
+    });
+    return toUser(updated, updated.userRoles);
   }
 
   async establishFromOidc(claims: OidcClaims): Promise<CreatedSession> {

@@ -53,10 +53,25 @@ export type RolePermission = Prisma.RolePermissionModel
  */
 export type UserRole = Prisma.UserRoleModel
 /**
+ * Model EntityNote
+ * 
+ */
+export type EntityNote = Prisma.EntityNoteModel
+/**
  * Model Session
  * 
  */
 export type Session = Prisma.SessionModel
+/**
+ * Model SavedView
+ * 
+ */
+export type SavedView = Prisma.SavedViewModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
 /**
  * Model AuditEvent
  * 

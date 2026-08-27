@@ -19,9 +19,11 @@ import { TasksReportingModule } from './modules/tasks-reporting/tasks-reporting.
 import { DocumentsModule } from './modules/documents/documents.module.js';
 import { AuditModule } from './modules/audit/audit.module.js';
 import { RetentionModule } from './modules/retention/retention.module.js';
+import { SavedViewsModule } from './modules/saved-views/saved-views.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
 
 @Module({
-  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule, EmailHubModule, SupplyJourneysModule, TasksReportingModule, DocumentsModule, AuditModule, RetentionModule],
+  imports: [RuntimeConfigModule.forRoot(), QueueModule, TelemetryModule, CommandPlatformModule, IdentityAccessModule, CatalogModule, ClientsOrdersModule, CandidatesModule, ApplicationsInterviewsModule, EmailHubModule, SupplyJourneysModule, TasksReportingModule, DocumentsModule, AuditModule, RetentionModule, SavedViewsModule, NotificationsModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: EnvelopeInterceptor },

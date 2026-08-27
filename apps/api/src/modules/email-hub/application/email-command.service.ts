@@ -81,9 +81,10 @@ export class EmailCommandService {
   ) {}
 
   async preview(input: EmailPreviewRequest & { candidateId?: string }, context?: EmailCommandContext) {
+    this.assertInteractiveMode();
     const mailbox = await this.repository.findMailbox(input.mailboxId);
     if (!mailbox) throw new EmailDomainError('MAILBOX_NOT_FOUND', 'errors.mailboxNotFound', 404);
-    const serverOwnedInput = { ...input, from: mailbox.address };
+    const serverOwnedInput = { ...input, from: this.senderAddress(mailbox.address) };
     this.assertCanaryRecipients(serverOwnedInput.recipients);
     if (serverOwnedInput.candidateId) {
       const candidate = await this.prisma?.candidate.findUnique({ where: { id: serverOwnedInput.candidateId }, select: { id: true, contactabilityStatus: true, emailBlindIndex: true, ownerId: true, teamId: true } });
@@ -99,6 +100,7 @@ export class EmailCommandService {
   }
 
   async enqueue(input: EnqueueEmailInput, context: EmailCommandContext): Promise<EmailSendResult> {
+    this.assertInteractiveMode();
     if (!input.idempotencyKey || input.idempotencyKey.length < 8 || input.idempotencyKey.length > 240) {
       throw new EmailDomainError('IDEMPOTENCY_KEY_REQUIRED', 'errors.idempotencyKeyRequired', 422);
     }
@@ -155,7 +157,7 @@ export class EmailCommandService {
         // Preview signatures are an authorization boundary, but keep the
         // mailbox identity server-owned even if this service is called
         // outside the HTTP controller.
-        fromAddress: mailbox.address,
+        fromAddress: this.senderAddress(mailbox.address),
         subject: input.subject,
         bodyText: input.bodyText,
         ...(input.sanitizedHtml ? { sanitizedHtml: sanitizeEmailHtml(input.sanitizedHtml) } : {}),
@@ -198,6 +200,7 @@ export class EmailCommandService {
     idempotencyKey?: string;
     version?: number;
   }, context: EmailCommandContext) {
+    this.assertInteractiveMode();
     const recipients = normalizeRecipients([
       ...input.to.map((address) => ({ kind: 'TO' as const, address })),
       ...(input.cc ?? []).map((address) => ({ kind: 'CC' as const, address })),
@@ -242,7 +245,7 @@ export class EmailCommandService {
         direction: 'OUTBOUND',
         status: 'DRAFT',
         ...(input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : {}),
-        fromAddress: mailbox.address,
+        fromAddress: this.senderAddress(mailbox.address),
         subject: input.subject,
         bodyText: input.body,
         sentOrReceivedAt: new Date(),
@@ -278,6 +281,7 @@ export class EmailCommandService {
   }
 
   async sendConversation(input: SendConversationInput, context: EmailCommandContext): Promise<EmailSendResult> {
+    this.assertInteractiveMode();
     const conversation = await this.repository.findConversationForSend(input.conversationId);
     if (!conversation) throw new EmailDomainError('CONVERSATION_NOT_FOUND', 'errors.conversationNotFound', 404);
     if (conversation.version !== input.version) throw new EmailDomainError('VERSION_CONFLICT', 'errors.conflict', 409);
@@ -294,7 +298,7 @@ export class EmailCommandService {
     ];
     const previewRequest: EmailPreviewRequest = {
       mailboxId: conversation.mailboxId,
-      from: conversation.mailbox.address,
+      from: this.senderAddress(conversation.mailbox.address),
       recipients,
       subject: input.subject,
       bodyText: input.body,
@@ -311,6 +315,7 @@ export class EmailCommandService {
   }
 
   async linkConversation(conversationId: string, input: { candidateId: string; applicationId?: string | null; journeyId?: string | null; version: number }, context: EmailActionContext) {
+    this.assertInteractiveMode();
     return this.repository.withTransaction(async (repository, transaction) => {
       const conversation = await repository.findConversationForLink(conversationId);
       if (!conversation) throw new EmailDomainError('CONVERSATION_NOT_FOUND', 'errors.conversationNotFound', 404);
@@ -486,5 +491,15 @@ export class EmailCommandService {
     const mail = this.config?.mail;
     if (!mail) return;
     assertCanaryRecipients(recipients, mail.canaryOnly, mail.canaryRecipients);
+  }
+
+  private assertInteractiveMode(): void {
+    if (this.config?.mail?.mode === 'NOTIFICATION_ONLY') {
+      throw new EmailDomainError('EMAIL_INTERACTIVE_DISABLED', 'errors.emailInteractiveDisabled', 409);
+    }
+  }
+
+  private senderAddress(mailboxAddress: string): string {
+    return this.config?.mail?.senderAddress ?? mailboxAddress;
   }
 }

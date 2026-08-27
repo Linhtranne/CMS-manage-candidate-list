@@ -2,25 +2,32 @@
 
 ## 1. Mục tiêu
 
-Email Hub biến hộp thư chung thành một phần của hồ sơ ứng viên: nhân viên gửi đúng danh tính doanh nghiệp, nhận phản hồi tự động, lưu toàn bộ lịch sử và xử lý ngoại lệ có kiểm soát.
+Email Hub biến hộp thư doanh nghiệp thành một phần của hồ sơ ứng viên: hệ thống gửi thông báo trạng thái đúng danh tính doanh nghiệp, lưu toàn bộ lịch sử và xử lý lỗi có kiểm soát. Baseline local/notification-only không mở luồng trả lời trong CMS.
 
-## 2. Baseline một hộp thư chung
+## 1.1. Chế độ thông báo một chiều
 
-MVP kết nối đúng **một hộp thư chung chính danh**, ví dụ `ungvien@company.vn` (địa chỉ thực tế cần được duyệt). Tất cả email gửi cho ứng viên đi từ địa chỉ này; chữ ký hiển thị tên nhân viên/đội đang xử lý để ứng viên biết đầu mối.
+`MAIL_MODE=NOTIFICATION_ONLY` là chế độ mặc định. Các event `application.created`, đổi trạng thái ứng tuyển và thay đổi lịch phỏng vấn được chuyển qua outbox/worker để tạo message `QUEUED` từ `MAIL_SENDER_ADDRESS` (thường là `noreply@company.vn`) tới email đã được phép liên hệ của ứng viên. Message có idempotency key theo event, được audit và đi qua cùng retry/bounce/failure path của Email Hub.
 
-- Reply quay lại cùng hộp thư và được đồng bộ vào CMS.
-- Quyền đọc/gửi áp dụng theo phạm vi candidate/application/supply journey, không chia mailbox giả tạo theo phòng ban.
-- Mọi thao tác gửi vẫn lưu actor nội bộ dù địa chỉ `From` là hộp thư chung.
-- Hỗ trợ nhiều mailbox chỉ là khả năng mở rộng tương lai; chỉ kích hoạt khi có nhu cầu tách thương hiệu, pháp nhân, lưu lượng hoặc quyền truy cập đã được chứng minh.
+Ở chế độ này API từ chối inbound ingest, resolve-match, preview, draft, send thủ công và các thao tác reply/link; UI chỉ hiển thị lịch sử read-only. Đây là guardrail nghiệp vụ, không phải bằng chứng email đã tới Internet. Muốn bật provider thật phải hoàn thành DEC-003 và adapter tương ứng.
 
-Provider có thể là Microsoft 365, Google Workspace hoặc SMTP/IMAP doanh nghiệp. Adapter phải giữ cùng một hợp đồng nghiệp vụ để không khóa hệ thống vào nhà cung cấp.
+## 2. Baseline sender identity
+
+MVP dùng đúng **một domain identity đã verify trong Amazon SES**, ví dụ `noreply@company.vn` (địa chỉ thực tế cần được duyệt). Node.js gửi qua Nodemailer SMTP tới endpoint SES; Nodemailer không phải mail provider.
+
+Thiết kế không yêu cầu **một hộp thư chung chính danh** để nhận reply; nếu sau này bật interactive mode thì mailbox nhận phải được duyệt bằng DEC riêng.
+
+- `MAIL_MODE=NOTIFICATION_ONLY`: không mở reply/inbound/IMAP trong CMS.
+- Quyền gửi áp dụng theo phạm vi candidate/application/supply journey; mọi thao tác vẫn lưu actor nội bộ.
+- Hỗ trợ nhiều sender identity chỉ là khả năng mở rộng tương lai; chỉ kích hoạt sau một DEC riêng về thương hiệu, pháp nhân, lưu lượng hoặc quyền truy cập.
+
+Runtime contract hiện giữ `SMTP_IMAP` để tương thích API/DB; adapter cụ thể là `AWS_SES_SMTP_NODemailer` (`SesSmtpMailProviderAdapter`) và chỉ được bind sau khi DEC-003 approved.
 
 ### Điều kiện email chính danh trước go-live
 
-- Miền gửi và hộp thư phải được chủ sở hữu DNS/tenant xác minh; SPF khai báo đúng nhà cung cấp gửi thực tế, DKIM được bật ký và DMARC đạt alignment cho luồng gửi production.
-- `From` phải là hộp thư chung hoặc alias đã được phê duyệt. `Reply-To` phải quay về hộp thư chung/alias đã xác minh để phản hồi đi vào CMS; không giả mạo địa chỉ hiển thị của miền chưa xác minh.
-- Envelope sender/bounce address và webhook hoặc poller phải cho phép ghi nhận delayed bounce. Provider acceptance không được trình bày như bằng chứng delivered.
-- IT/Security lưu owner của DNS/tenant, bằng chứng cấu hình, kết quả gửi thử có SPF/DKIM/DMARC pass và lịch kiểm tra lại. Thay provider, miền hoặc alias phải chạy lại gate này.
+- Miền gửi phải được SES verify; SPF/DKIM/DMARC phải đạt alignment cho luồng gửi production.
+- `From` phải là địa chỉ thuộc SES verified identity đã phê duyệt; không giả mạo địa chỉ chưa verify.
+- SES configuration set/SNS/EventBridge hoặc feedback forwarding phải ghi nhận delayed bounce/complaint. Provider acceptance không được trình bày như bằng chứng delivered.
+- IT/Security lưu owner của DNS/AWS account, bằng chứng cấu hình, kết quả gửi thử có SPF/DKIM/DMARC pass và lịch kiểm tra lại. Thay region, provider, miền hoặc alias phải chạy lại gate này.
 - Chính sách DMARC cuối cùng và lộ trình nâng mức bảo vệ phải do chủ sở hữu miền phê duyệt dựa trên toàn bộ nguồn gửi hợp lệ; CMS không tự sửa DNS.
 
 ## 3. Luồng gửi đi
@@ -111,7 +118,7 @@ Các hàng đợi chính:
 - Tự động trả lời/out-of-office, mailer-daemon và email do chính hộp thư gửi phải được nhận diện để tránh vòng lặp gửi tự động.
 - HTML email phải được sanitize trước khi hiển thị; chặn script, remote tracking mặc định và liên kết nguy hiểm. Plain text là fallback bắt buộc.
 - Hỗ trợ MIME/charset phổ biến, inline image/CID, forward, CC/BCC và delayed bounce mà không làm mất raw headers cần cho đối soát.
-- Token OAuth/subscription sắp hết hạn, sync lag và poller cursor đứng yên phải có cảnh báo và runbook.
+- SES SMTP credential rotation, quota gần ngưỡng và delivery/bounce/complaint event lag phải có cảnh báo và runbook.
 
 ## 8. Audit email
 

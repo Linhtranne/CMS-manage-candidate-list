@@ -17,7 +17,6 @@ export class SchedulerRuntimeService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit(): void {
     this.timer = setInterval(() => { void this.runOnce().catch(() => undefined); }, 1000);
-    this.timer.unref();
   }
 
   async runOnce(): Promise<number> {

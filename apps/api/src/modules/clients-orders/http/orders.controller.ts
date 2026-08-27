@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { getRequestContext } from '../../../platform/http/request-context.middleware.js';
 import { JobOrderService } from '../application/job-order.service.js';
-import { CreateOrderDto, OrderStatusUpdateDto, UpdateOrderRequirementDto } from './clients-orders.dto.js';
+import { CreateOrderDto, OrderStatusUpdateDto, UpdateOrderDto, UpdateOrderRequirementDto } from './clients-orders.dto.js';
 import { CsrfGuard } from '../../identity-access/http/guards/csrf.guard.js';
 import { PolicyGuard, RequirePermission } from '../../identity-access/http/guards/policy.guard.js';
 import { SessionGuard, type AuthenticatedRequest } from '../../identity-access/http/guards/session.guard.js';
@@ -23,6 +23,17 @@ export class OrdersController {
   @Get(':id')
   @RequirePermission('job_order.view')
   async get(@Param('id') id: string) { return serializeOrder(await this.orders.get(id)); }
+
+  @Patch(':id')
+  @UseGuards(CsrfGuard)
+  @RequirePermission('job_order.update')
+  update(@Param('id') id: string, @Body() body: UpdateOrderDto, @Req() request: AuthenticatedRequest) {
+    return this.orders.updateDetails(id, {
+      position: body.position, industryLabel: body.industryLabel, occupation: body.occupation, location: body.location, target: body.target,
+      deadline: new Date(body.deadline), occupationCatalogVersionId: body.occupationCatalogVersionId,
+      requirementSnapshot: { catalogVersionId: body.occupationCatalogVersionId, occupation: body.occupation, criteria: body.criteria, salary: body.salary ?? '', contractType: body.contractType ?? '', japaneseLevel: body.japaneseLevel ?? '' },
+    }, body.version, this.context(request)).then(serializeOrder);
+  }
 
   @Post()
   @UseGuards(CsrfGuard)
@@ -57,9 +68,12 @@ export class OrdersController {
 
 function serializeOrder(order: Awaited<ReturnType<JobOrderService['get']>>) {
   const health = order.status === 'FILLED' ? 'FILLED' : order.deadline.getTime() < Date.now() ? 'EXPIRING' : order.status === 'ON_HOLD' ? 'CLIENT_PAUSED' : 'UNDER_TARGET';
+  const snapshot = order.requirementSnapshot;
   return {
     id: order.id, code: order.code, position: order.position, client: { id: order.clientId, name: order.clientName ?? order.clientId }, industryLabel: order.industryLabel,
     occupation: order.occupation, location: order.location, target: order.target, deadline: order.deadline.toISOString(), owner: { id: order.ownerId, name: order.ownerName ?? order.ownerId },
-    status: order.status, metrics: { target: order.target, ...order.metrics }, health, version: order.version, criteria: order.requirementSnapshot.criteria,
+    status: order.status, metrics: { target: order.target, ...order.metrics }, health, version: order.version,
+    occupationCatalogVersionId: order.requirementCatalogVersionId,
+    salary: snapshot.salary, contractType: snapshot.contractType, japaneseLevel: snapshot.japaneseLevel, criteria: snapshot.criteria,
   };
 }

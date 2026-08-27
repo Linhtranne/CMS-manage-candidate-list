@@ -26,16 +26,19 @@ export class EmailInboundService {
     private readonly repository: EmailPrismaRepository,
     private readonly matcher: EmailMatcherService,
     @Inject(MAIL_PROVIDER_ADAPTER) private readonly provider: MailProviderAdapter,
-    @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
+    @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig | undefined,
     private readonly audit: AuditWriter,
     private readonly outbox: OutboxRepository,
     @Optional() private readonly policy?: PolicyService,
   ) {}
 
   async ingest(input: IngestEmailInput): Promise<{ duplicate: boolean; messageId?: string; match: EmailMatchResult }> {
+    if (this.config?.mail?.mode === 'NOTIFICATION_ONLY') {
+      throw new EmailDomainError('EMAIL_INBOUND_DISABLED', 'errors.emailInboundDisabled', 409);
+    }
     const providerMessage = await this.provider.fetchMessage(input.providerMessageId);
     const candidates = await this.repository.findActiveMatchCandidates(input.mailboxId, providerMessage.from, providerMessage.providerThreadId);
-    const senderBlindIndex = candidateBlindIndex(providerMessage.from.trim().toLowerCase(), this.config.security.encryptionKey);
+    const senderBlindIndex = candidateBlindIndex(providerMessage.from.trim().toLowerCase(), this.config?.security.encryptionKey ?? '');
     const matchCandidates = candidates.map((candidate) => ({
       conversationId: candidate.conversationId,
       candidateId: candidate.candidateId,
@@ -129,6 +132,9 @@ export class EmailInboundService {
     applicationId?: string;
     journeyId?: string;
   }) {
+    if (this.config?.mail?.mode === 'NOTIFICATION_ONLY') {
+      throw new EmailDomainError('EMAIL_INTERACTIVE_DISABLED', 'errors.emailInteractiveDisabled', 409);
+    }
     if (!input.reason.trim()) throw new EmailDomainError('EMAIL_MATCH_REASON_REQUIRED', 'errors.emailMatchReasonRequired', 422);
     return this.repository.withTransaction(async (repository, transaction) => {
       const message = await repository.findMessage(input.messageId);

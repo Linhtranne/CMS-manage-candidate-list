@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test';
 
+test('configuration admin sees an actionable administration overview', async ({ page }) => {
+  await page.setExtraHTTPHeaders({ 'x-e2e-role': 'config-admin' });
+  await page.goto('/admin');
+  await expect(page.getByRole('heading', { name: 'Quản trị hệ thống' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Khu vực quản trị' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /Mở khu vực/ })).toHaveCount(5);
+});
+
 test('manager can drill down a denominator-based metric and queue an export', async ({ page }) => {
   await page.goto('/reports');
   await expect(page.getByRole('link', { name: 'Trúng tuyển 18/60 — 30%' })).toBeVisible();

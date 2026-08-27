@@ -96,7 +96,7 @@
 
 ### Task 5: Implement selected provider and production operations
 
-> Technical preparation, including subscription renewal lifecycle and canary enforcement, is complete; concrete provider binding and staging smoke are blocked until DEC-003 selects and approves the provider/mailbox/credential/DNS scope. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
+> Technical preparation and the SES SMTP + Nodemailer outbound adapter are complete; real provider activation and staging smoke remain blocked until DEC-003, mailbox/credential/DNS evidence are approved. See [Task 5 evidence](../phase-1b-task-5-evidence.md).
 
 **Files:**
 
@@ -108,9 +108,10 @@
 
 **Interfaces:** concrete adapter must satisfy shared contract; admin exposes masked health/pause/resume/sync, never credential/body.
 
-- [ ] After DEC-003 approval, bind `ApprovedMailProviderAdapter` to the selected provider SDK and add sandbox contract tests from approved cursor/send behavior.
+- [x] Implement and bind the approved SES SMTP + Nodemailer adapter behind `ApprovedMailProviderAdapter`; add local transport contract tests.
+- [ ] After DEC-003 approval, run the adapter against the approved SES sandbox and attach send/health evidence.
 - [ ] Run provider contract tests against fake and sandbox; verify concrete adapter initially fails.
-- [ ] Implement least-privilege OAuth/credential reference, send/fetch/attachment/subscription methods and rate/quota handling.
+- [x] Implement credential-backed outbound send, explicit unsupported inbound operations and rate/quota handling; receiving integration remains out of notification-only scope.
 - [x] Add health/alerts/runbooks, webhook endpoint config, cursor/subscription renewal scheduling and canary recipient enforcement. Concrete provider health/sandbox evidence remains gated by DEC-003.
 - [ ] Execute SPF/DKIM/DMARC, send/reply/bounce, auth expiry, duplicate and uncertain-send staging drills; attach evidence IDs.
 - [ ] Commit: `feat(email): integrate approved shared mailbox provider`.

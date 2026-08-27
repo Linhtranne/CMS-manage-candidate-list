@@ -66,7 +66,7 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
         },
         include: { contact: true, owner: { select: { displayName: true } } },
       });
-      return mapClient(row);
+      return (await this.enrichClients([mapClient(row)]))[0];
     }
     const row = await this.prisma.jobOrder.create({
       data: {
@@ -83,7 +83,7 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
   async findById(id: string): Promise<JobOrderEntity | null>;
   async findById(id: string): Promise<ClientEntity | JobOrderEntity | null> {
     const client = await this.prisma.client.findUnique({ where: { id }, include: { contact: true, owner: { select: { displayName: true } } } });
-    if (client) return mapClient(client);
+    if (client) return (await this.enrichClients([mapClient(client)]))[0];
     const order = await this.prisma.jobOrder.findUnique({ where: { id }, include: { owner: { select: { displayName: true } }, client: { select: { name: true } } } });
     return order ? mapOrder(order) : null;
   }
@@ -97,11 +97,11 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
         ...(input.industryLabels !== undefined ? { industryLabels: input.industryLabels as Prisma.InputJsonValue } : {}), ...(input.region !== undefined ? { region: input.region } : {}),
         ...(input.ownerId !== undefined ? { ownerId: input.ownerId } : {}), ...(input.teamId !== undefined ? { teamId: input.teamId } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}), ...(input.notes !== undefined ? { notes: input.notes } : {}), version: { increment: 1 },
-        ...(input.contact ? { contact: { upsert: { create: { name: input.contact.name, email: input.contact.email, phone: input.contact.phone }, update: { name: input.contact.name, email: input.contact.email, phone: input.contact.phone } } } } : {}),
+        ...(input.contact ? { contact: { upsert: { create: { name: input.contact.name, email: input.contact.email, phone: input.contact.phone }, update: { name: input.contact.name, email: input.contact.email, phone: input.contact.phone } } } } : input.contact === null ? { contact: { delete: true } } : {}),
       },
       include: { contact: true, owner: { select: { displayName: true } } },
       });
-      return mapClient(row);
+      return (await this.enrichClients([mapClient(row)]))[0];
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') throw new OrderDomainError('VERSION_CONFLICT', 'errors.versionConflict', 409);
       throw error;
@@ -128,6 +128,26 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
         requirements: { create: { version: requirementVersion, catalogVersionId: requirementSnapshot.catalogVersionId, snapshot: requirementSnapshot as Prisma.InputJsonValue } },
       },
       include: { owner: { select: { displayName: true } }, client: { select: { name: true } } },
+      });
+      return mapOrder(row);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') throw new OrderDomainError('VERSION_CONFLICT', 'errors.versionConflict', 409);
+      throw error;
+    }
+  }
+
+  async updateDetails(id: string, expectedVersion: number, input: { position: string; industryLabel: string; occupation: string; location: string; target: number; deadline: Date; requirementVersion: number; requirementSnapshot: RequirementSnapshot }): Promise<JobOrderEntity> {
+    try {
+      const row = await this.prisma.jobOrder.update({
+        where: { id, version: expectedVersion },
+        data: {
+          position: input.position, industryLabel: input.industryLabel, occupation: input.requirementSnapshot.occupation, location: input.location,
+          target: input.target, deadline: input.deadline, requirementVersion: input.requirementVersion,
+          requirementCatalogVersionId: input.requirementSnapshot.catalogVersionId, requirementSnapshot: input.requirementSnapshot as Prisma.InputJsonValue,
+          version: { increment: 1 },
+          requirements: { create: { version: input.requirementVersion, catalogVersionId: input.requirementSnapshot.catalogVersionId, snapshot: input.requirementSnapshot as Prisma.InputJsonValue } },
+        },
+        include: { owner: { select: { displayName: true } }, client: { select: { name: true } } },
       });
       return mapOrder(row);
     } catch (error) {
@@ -193,6 +213,23 @@ export class ClientsOrdersPrismaRepository implements ClientRepository, JobOrder
         ],
       }, orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }], take: filter.limit, include: { contact: true, owner: { select: { displayName: true } } },
     });
-    return rows.map(mapClient);
+    return this.enrichClients(rows.map(mapClient));
+  }
+
+  private async enrichClients(clients: ClientEntity[]): Promise<ClientEntity[]> {
+    if (!clients.length) return clients;
+    const orders = await this.prisma.jobOrder.findMany({
+      where: { clientId: { in: clients.map((client) => client.id) } },
+      select: { clientId: true, status: true, target: true, passedApplications: true },
+    });
+    const metrics = new Map<string, { activeOrders: number; target: number; passed: number }>();
+    for (const order of orders) {
+      const current = metrics.get(order.clientId) ?? { activeOrders: 0, target: 0, passed: 0 };
+      if (!['CANCELLED', 'CLOSED'].includes(order.status)) current.activeOrders += 1;
+      current.target += order.target;
+      current.passed += order.passedApplications;
+      metrics.set(order.clientId, current);
+    }
+    return clients.map((client) => ({ ...client, ...(metrics.get(client.id) ?? { activeOrders: 0, target: 0, passed: 0 }) }));
   }
 }

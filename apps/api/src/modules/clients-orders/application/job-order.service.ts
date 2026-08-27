@@ -8,6 +8,7 @@ export interface JobOrderRepository {
   findById(id: string): Promise<JobOrderEntity | null>;
   updateStatus(id: string, expectedVersion: number, status: JobOrderStatus): Promise<JobOrderEntity>;
   updateRequirement(id: string, expectedVersion: number, requirementVersion: number, requirementSnapshot: RequirementSnapshot): Promise<JobOrderEntity>;
+  updateDetails?(id: string, expectedVersion: number, input: { position: string; industryLabel: string; occupation: string; location: string; target: number; deadline: Date; requirementVersion: number; requirementSnapshot: RequirementSnapshot }): Promise<JobOrderEntity>;
   findActiveOccupationCatalogVersion?(occupation: string): Promise<string | null>;
   list(filter?: { query?: string; status?: JobOrderStatus; industry?: string; ownerId?: string; teamId?: string; cursor?: string; limit?: number }): Promise<JobOrderEntity[]>;
   findClientStatus?(clientId: string): Promise<string | null>;
@@ -86,6 +87,30 @@ export class JobOrderService {
         if (catalogStatus !== 'ACTIVE') throw new OrderDomainError('CATALOG_VERSION_NOT_ACTIVE', 'errors.catalogVersionNotActive', 422);
       }
       const updated = await repository.updateRequirement(id, expectedVersion, current.requirementVersion + 1, snapshot);
+      await this.recordEffects(transaction, context, updated, 'JOB_ORDER_REQUIREMENT_UPDATED', 'job_order.requirement.updated');
+      return updated;
+    });
+  }
+
+  async updateDetails(id: string, input: { position: string; industryLabel: string; occupation: string; location: string; target: number; deadline: Date; occupationCatalogVersionId: string; requirementSnapshot: unknown }, expectedVersion: number, context: OrderCommandContext): Promise<JobOrderEntity> {
+    return this.repository.withTransaction(async (repository, transaction) => {
+      const current = await repository.findById(id);
+      if (!current) throw new OrderDomainError('JOB_ORDER_NOT_FOUND', 'errors.jobOrderNotFound', 404);
+      if (current.version !== expectedVersion) throw new OrderDomainError('VERSION_CONFLICT', 'errors.versionConflict', 409);
+      if (current.status === 'CLOSED' || current.status === 'CANCELLED') throw new OrderDomainError('ORDER_NOT_OPEN_FOR_UPDATE', 'errors.orderNotOpenForUpdate', 409);
+      const occupationCatalogVersionId = input.occupationCatalogVersionId.trim();
+      validateJobOrderDraft({ target: input.target, deadline: input.deadline, occupationCatalogVersionId });
+      const snapshot = validateRequirementSnapshot({ ...(input.requirementSnapshot && typeof input.requirementSnapshot === 'object' ? input.requirementSnapshot : {}), catalogVersionId: occupationCatalogVersionId, occupation: input.occupation, criteria: (input.requirementSnapshot as { criteria?: unknown } | undefined)?.criteria ?? [] });
+      if (repository.findCatalogStatus) {
+        const catalogStatus = await repository.findCatalogStatus(snapshot.catalogVersionId);
+        if (catalogStatus !== 'ACTIVE') throw new OrderDomainError('CATALOG_VERSION_NOT_ACTIVE', 'errors.catalogVersionNotActive', 422);
+      }
+      if (!repository.updateDetails) throw new OrderDomainError('ORDER_UPDATE_UNAVAILABLE', 'errors.orderUpdateUnavailable', 503);
+      const updated = await repository.updateDetails(id, expectedVersion, {
+        position: input.position.trim(), industryLabel: input.industryLabel.trim(), occupation: snapshot.occupation, location: input.location.trim(), target: input.target, deadline: input.deadline,
+        requirementVersion: current.requirementVersion + 1, requirementSnapshot: snapshot,
+      });
+      await this.recordEffects(transaction, context, updated, 'JOB_ORDER_UPDATED', 'job_order.updated');
       await this.recordEffects(transaction, context, updated, 'JOB_ORDER_REQUIREMENT_UPDATED', 'job_order.requirement.updated');
       return updated;
     });

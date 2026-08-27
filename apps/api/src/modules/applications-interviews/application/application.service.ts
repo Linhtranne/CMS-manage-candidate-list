@@ -4,6 +4,7 @@ import { PrismaService } from '../../../platform/database/prisma.service.js';
 import { AuditWriter } from '../../audit/audit-writer.js';
 import { OutboxRepository } from '../../../platform/outbox/outbox.repository.js';
 import { ApplicationDomainError, assertApplicationTransition, type ApplicationContext, type ApplicationSource, type ApplicationStatus } from '../domain/application.types.js';
+import { NotificationService } from '../../notifications/application/notification.service.js';
 
 function jsonObject(value: Prisma.JsonValue): Record<string, unknown> { return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}; }
 function jsonArray(value: Prisma.JsonValue): unknown[] { return Array.isArray(value) ? value : []; }
@@ -20,11 +21,12 @@ function encodeCursor(updatedAt: Date, id: string): string { return Buffer.from(
 
 type ParticipantRow = { user: { id: string; displayName: string } };
 type InterviewRow = { id: string; roundNo: number; scheduledAt: Date; scheduledEndAt: Date; timeZone: string; mode: string; meetingUrl: string | null; location: string | null; scheduleStatus: string; result: string | null; feedback: string | null; strengths: Prisma.JsonValue; concerns: Prisma.JsonValue; nextStep: string | null; version: number; createdAt: Date; updatedAt: Date; participants: ParticipantRow[]; history: unknown[] };
-type ApplicationRow = { id: string; candidate: { id: string; code: string; name: string }; jobOrder: { id: string; code: string; position: string; client: { id: string; name: string } }; owner: { id: string; displayName: string }; status: string; source: string; appliedAt: Date; lastActivityAt: Date; dueAt: Date | null; version: number; decisionReason: string | null; interviews: InterviewRow[] };
+type ApplicationHistoryRow = { id: string; fromStatus: string; toStatus: string; actor: { id: string; displayName: string }; reason: string | null; metadata: Prisma.JsonValue; createdAt: Date };
+type ApplicationRow = { id: string; candidate: { id: string; code: string; name: string }; jobOrder: { id: string; code: string; position: string; client: { id: string; name: string } }; owner: { id: string; displayName: string }; status: string; source: string; appliedAt: Date; lastActivityAt: Date; dueAt: Date | null; version: number; decisionReason: string | null; interviews: InterviewRow[]; history: ApplicationHistoryRow[] };
 
 @Injectable()
 export class ApplicationService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditWriter, private readonly outbox: OutboxRepository) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditWriter, private readonly outbox: OutboxRepository, private readonly notifications: NotificationService) {}
 
   async createMany(jobOrderId: string, candidateIds: string[], source: ApplicationSource, context: ApplicationContext): Promise<string[]> {
     return this.prisma.$transaction(async (tx) => {
@@ -93,7 +95,7 @@ export class ApplicationService {
     const hasMore = rows.length > 100;
     const pageRows = rows.slice(0, 100);
     const last = pageRows.at(-1);
-    return { items: pageRows.map((row) => this.map(row)), page: { hasMore, nextCursor: hasMore && last ? encodeCursor(last.updatedAt, last.id) : null } };
+    return { items: await Promise.all(pageRows.map((row) => this.map(row))), page: { hasMore, nextCursor: hasMore && last ? encodeCursor(last.updatedAt, last.id) : null } };
   }
 
   async transition(id: string, status: ApplicationStatus, version: number, reason: string | undefined, context: ApplicationContext) {
@@ -108,6 +110,14 @@ export class ApplicationService {
       await tx.applicationStatusHistory.create({ data: { applicationId: id, fromStatus: current.status, toStatus: status, actorUserId: context.actorId, reason } });
       await this.audit.append(tx, { action: 'APPLICATION_STATUS_CHANGED', entityType: 'Application', entityId: id, actorUserId: context.actorId, correlationId: context.correlationId, metadataJson: { fromStatus: current.status, toStatus: status, reason } });
       await this.outbox.append(tx, { eventType: status === 'PASSED' ? 'application.passed' : 'application.status_changed', aggregateType: 'Application', aggregateId: id, idempotencyKey: `application.status:${id}:${next.version}`, correlationId: context.correlationId, payload: { fromStatus: current.status, toStatus: status, reason } });
+      await this.notifications.create({
+        userId: current.owner.id,
+        kind: 'APPLICATION_DECISION',
+        severity: status === 'PASSED' ? 'INFO' : status === 'ON_HOLD' ? 'WARNING' : 'DANGER',
+        params: { name: current.candidate.name, status },
+        href: `/applications?selectedId=${id}`,
+        dedupeKey: `application-notification:${id}:${next.version}`,
+      }, tx);
       return this.map(next);
     });
   }
@@ -128,16 +138,33 @@ export class ApplicationService {
   }
 
   private include() {
-    return { candidate: { select: { id: true, code: true, name: true } }, jobOrder: { include: { client: { select: { id: true, name: true } } } }, owner: { select: { id: true, displayName: true } }, interviews: { orderBy: { roundNo: 'asc' as const }, include: { participants: { include: { user: { select: { id: true, displayName: true } } } }, history: true } } };
+    return { candidate: { select: { id: true, code: true, name: true } }, jobOrder: { include: { client: { select: { id: true, name: true } } } }, owner: { select: { id: true, displayName: true } }, interviews: { orderBy: { roundNo: 'asc' as const }, include: { participants: { include: { user: { select: { id: true, displayName: true } } } }, history: true } }, history: { orderBy: [{ createdAt: 'asc' as const }, { id: 'asc' as const }], include: { actor: { select: { id: true, displayName: true } } } } };
   }
 
-  private map(row: ApplicationRow) {
+  private async map(row: ApplicationRow) {
+    const [documents, notes] = await Promise.all([
+      this.prisma.document.findMany({
+        where: { candidateId: row.candidate.id, status: { notIn: ['DELETED', 'REJECTED'] } },
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.prisma.entityNote.findMany({ where: { entityType: 'APPLICATION', entityId: row.id }, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], select: { content: true } }),
+    ]);
     return {
       id: row.id, candidate: { id: row.candidate.id, code: row.candidate.code, name: row.candidate.name },
       order: { id: row.jobOrder.id, code: row.jobOrder.code, position: row.jobOrder.position },
       client: { id: row.jobOrder.client.id, name: row.jobOrder.client.name }, owner: { id: row.owner.id, name: row.owner.displayName },
       status: row.status, source: row.source, appliedAt: row.appliedAt.toISOString(), lastActivityAt: row.lastActivityAt.toISOString(), dueAt: row.dueAt?.toISOString() ?? null,
       version: row.version, decisionReason: row.decisionReason, interviews: (row.interviews ?? []).map((interview) => ({ id: interview.id, round: interview.roundNo, scheduledAt: interview.scheduledAt.toISOString(), scheduledEndAt: interview.scheduledEndAt.toISOString(), timeZone: interview.timeZone, mode: interview.mode, meetingUrl: interview.meetingUrl, location: interview.location, participants: interview.participants.map((participant) => ({ id: participant.user.id, name: participant.user.displayName })), scheduleStatus: interview.scheduleStatus, result: interview.result, feedback: interview.feedback, strengths: jsonArray(interview.strengths), concerns: jsonArray(interview.concerns), nextStep: interview.nextStep, version: interview.version, history: interview.history ?? [], createdAt: interview.createdAt.toISOString(), updatedAt: interview.updatedAt.toISOString() })),
+      history: (row.history ?? []).map((event) => ({
+        id: event.id,
+        type: event.fromStatus === 'NEW' && event.toStatus === 'MATCHED' ? 'APPLICATION_CREATED' as const : 'STATUS_CHANGED' as const,
+        occurredAt: event.createdAt.toISOString(),
+        actor: { id: event.actor.id, name: event.actor.displayName },
+        summary: event.reason?.trim() || `Chuyển trạng thái từ ${event.fromStatus} sang ${event.toStatus}.`,
+        metadata: { fromStatus: event.fromStatus, toStatus: event.toStatus, ...jsonObject(event.metadata) },
+      })),
+      notes: notes.map((item) => item.content),
+      files: documents.map((document) => document.title),
     };
   }
 }

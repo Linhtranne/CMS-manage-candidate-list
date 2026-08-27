@@ -238,6 +238,7 @@ export type TeamWhereInput = {
   candidates?: Prisma.CandidateListRelationFilter
   candidateImports?: Prisma.CandidateImportBatchListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
+  savedViews?: Prisma.SavedViewListRelationFilter
 }
 
 export type TeamOrderByWithRelationInput = {
@@ -254,6 +255,7 @@ export type TeamOrderByWithRelationInput = {
   candidates?: Prisma.CandidateOrderByRelationAggregateInput
   candidateImports?: Prisma.CandidateImportBatchOrderByRelationAggregateInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
+  savedViews?: Prisma.SavedViewOrderByRelationAggregateInput
 }
 
 export type TeamWhereUniqueInput = Prisma.AtLeast<{
@@ -273,6 +275,7 @@ export type TeamWhereUniqueInput = Prisma.AtLeast<{
   candidates?: Prisma.CandidateListRelationFilter
   candidateImports?: Prisma.CandidateImportBatchListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
+  savedViews?: Prisma.SavedViewListRelationFilter
 }, "id" | "code">
 
 export type TeamOrderByWithAggregationInput = {
@@ -317,6 +320,7 @@ export type TeamCreateInput = {
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateInput = {
@@ -333,6 +337,7 @@ export type TeamUncheckedCreateInput = {
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUpdateInput = {
@@ -349,6 +354,7 @@ export type TeamUpdateInput = {
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateInput = {
@@ -365,6 +371,7 @@ export type TeamUncheckedUpdateInput = {
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateManyInput = {
@@ -472,6 +479,22 @@ export type TeamUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeamUpdateToOneWithWhereWithoutUsersInput, Prisma.TeamUpdateWithoutUsersInput>, Prisma.TeamUncheckedUpdateWithoutUsersInput>
 }
 
+export type TeamCreateNestedOneWithoutSavedViewsInput = {
+  create?: Prisma.XOR<Prisma.TeamCreateWithoutSavedViewsInput, Prisma.TeamUncheckedCreateWithoutSavedViewsInput>
+  connectOrCreate?: Prisma.TeamCreateOrConnectWithoutSavedViewsInput
+  connect?: Prisma.TeamWhereUniqueInput
+}
+
+export type TeamUpdateOneWithoutSavedViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.TeamCreateWithoutSavedViewsInput, Prisma.TeamUncheckedCreateWithoutSavedViewsInput>
+  connectOrCreate?: Prisma.TeamCreateOrConnectWithoutSavedViewsInput
+  upsert?: Prisma.TeamUpsertWithoutSavedViewsInput
+  disconnect?: Prisma.TeamWhereInput | boolean
+  delete?: Prisma.TeamWhereInput | boolean
+  connect?: Prisma.TeamWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TeamUpdateToOneWithWhereWithoutSavedViewsInput, Prisma.TeamUpdateWithoutSavedViewsInput>, Prisma.TeamUncheckedUpdateWithoutSavedViewsInput>
+}
+
 export type TeamCreateNestedOneWithoutClientsInput = {
   create?: Prisma.XOR<Prisma.TeamCreateWithoutClientsInput, Prisma.TeamUncheckedCreateWithoutClientsInput>
   connectOrCreate?: Prisma.TeamCreateOrConnectWithoutClientsInput
@@ -565,6 +588,7 @@ export type TeamCreateWithoutUsersInput = {
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutUsersInput = {
@@ -580,6 +604,7 @@ export type TeamUncheckedCreateWithoutUsersInput = {
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutUsersInput = {
@@ -611,6 +636,7 @@ export type TeamUpdateWithoutUsersInput = {
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutUsersInput = {
@@ -621,6 +647,87 @@ export type TeamUncheckedUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   version?: Prisma.IntFieldUpdateOperationsInput | number
+  clients?: Prisma.ClientUncheckedUpdateManyWithoutTeamNestedInput
+  jobOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutTeamNestedInput
+  candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
+  candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
+}
+
+export type TeamCreateWithoutSavedViewsInput = {
+  id?: string
+  code: string
+  name: string
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  users?: Prisma.UserCreateNestedManyWithoutTeamInput
+  clients?: Prisma.ClientCreateNestedManyWithoutTeamInput
+  jobOrders?: Prisma.JobOrderCreateNestedManyWithoutTeamInput
+  candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
+  candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+}
+
+export type TeamUncheckedCreateWithoutSavedViewsInput = {
+  id?: string
+  code: string
+  name: string
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTeamInput
+  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutTeamInput
+  jobOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutTeamInput
+  candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
+  candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+}
+
+export type TeamCreateOrConnectWithoutSavedViewsInput = {
+  where: Prisma.TeamWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeamCreateWithoutSavedViewsInput, Prisma.TeamUncheckedCreateWithoutSavedViewsInput>
+}
+
+export type TeamUpsertWithoutSavedViewsInput = {
+  update: Prisma.XOR<Prisma.TeamUpdateWithoutSavedViewsInput, Prisma.TeamUncheckedUpdateWithoutSavedViewsInput>
+  create: Prisma.XOR<Prisma.TeamCreateWithoutSavedViewsInput, Prisma.TeamUncheckedCreateWithoutSavedViewsInput>
+  where?: Prisma.TeamWhereInput
+}
+
+export type TeamUpdateToOneWithWhereWithoutSavedViewsInput = {
+  where?: Prisma.TeamWhereInput
+  data: Prisma.XOR<Prisma.TeamUpdateWithoutSavedViewsInput, Prisma.TeamUncheckedUpdateWithoutSavedViewsInput>
+}
+
+export type TeamUpdateWithoutSavedViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUpdateManyWithoutTeamNestedInput
+  clients?: Prisma.ClientUpdateManyWithoutTeamNestedInput
+  jobOrders?: Prisma.JobOrderUpdateManyWithoutTeamNestedInput
+  candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
+  candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+}
+
+export type TeamUncheckedUpdateWithoutSavedViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUncheckedUpdateManyWithoutTeamNestedInput
   clients?: Prisma.ClientUncheckedUpdateManyWithoutTeamNestedInput
   jobOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutTeamNestedInput
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
@@ -641,6 +748,7 @@ export type TeamCreateWithoutClientsInput = {
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutClientsInput = {
@@ -656,6 +764,7 @@ export type TeamUncheckedCreateWithoutClientsInput = {
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutClientsInput = {
@@ -687,6 +796,7 @@ export type TeamUpdateWithoutClientsInput = {
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutClientsInput = {
@@ -702,6 +812,7 @@ export type TeamUncheckedUpdateWithoutClientsInput = {
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateWithoutJobOrdersInput = {
@@ -717,6 +828,7 @@ export type TeamCreateWithoutJobOrdersInput = {
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutJobOrdersInput = {
@@ -732,6 +844,7 @@ export type TeamUncheckedCreateWithoutJobOrdersInput = {
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutJobOrdersInput = {
@@ -763,6 +876,7 @@ export type TeamUpdateWithoutJobOrdersInput = {
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutJobOrdersInput = {
@@ -778,6 +892,7 @@ export type TeamUncheckedUpdateWithoutJobOrdersInput = {
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateWithoutCandidatesInput = {
@@ -793,6 +908,7 @@ export type TeamCreateWithoutCandidatesInput = {
   jobOrders?: Prisma.JobOrderCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutCandidatesInput = {
@@ -808,6 +924,7 @@ export type TeamUncheckedCreateWithoutCandidatesInput = {
   jobOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutCandidatesInput = {
@@ -839,6 +956,7 @@ export type TeamUpdateWithoutCandidatesInput = {
   jobOrders?: Prisma.JobOrderUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutCandidatesInput = {
@@ -854,6 +972,7 @@ export type TeamUncheckedUpdateWithoutCandidatesInput = {
   jobOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateWithoutCandidateImportsInput = {
@@ -869,6 +988,7 @@ export type TeamCreateWithoutCandidateImportsInput = {
   jobOrders?: Prisma.JobOrderCreateNestedManyWithoutTeamInput
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutCandidateImportsInput = {
@@ -884,6 +1004,7 @@ export type TeamUncheckedCreateWithoutCandidateImportsInput = {
   jobOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutTeamInput
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutCandidateImportsInput = {
@@ -915,6 +1036,7 @@ export type TeamUpdateWithoutCandidateImportsInput = {
   jobOrders?: Prisma.JobOrderUpdateManyWithoutTeamNestedInput
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutCandidateImportsInput = {
@@ -930,6 +1052,7 @@ export type TeamUncheckedUpdateWithoutCandidateImportsInput = {
   jobOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutTeamNestedInput
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamCreateWithoutApplicationsInput = {
@@ -945,6 +1068,7 @@ export type TeamCreateWithoutApplicationsInput = {
   jobOrders?: Prisma.JobOrderCreateNestedManyWithoutTeamInput
   candidates?: Prisma.CandidateCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutTeamInput
 }
 
 export type TeamUncheckedCreateWithoutApplicationsInput = {
@@ -960,6 +1084,7 @@ export type TeamUncheckedCreateWithoutApplicationsInput = {
   jobOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutTeamInput
   candidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutTeamInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutTeamInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutTeamInput
 }
 
 export type TeamCreateOrConnectWithoutApplicationsInput = {
@@ -991,6 +1116,7 @@ export type TeamUpdateWithoutApplicationsInput = {
   jobOrders?: Prisma.JobOrderUpdateManyWithoutTeamNestedInput
   candidates?: Prisma.CandidateUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutTeamNestedInput
 }
 
 export type TeamUncheckedUpdateWithoutApplicationsInput = {
@@ -1006,6 +1132,7 @@ export type TeamUncheckedUpdateWithoutApplicationsInput = {
   jobOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutTeamNestedInput
   candidates?: Prisma.CandidateUncheckedUpdateManyWithoutTeamNestedInput
   candidateImports?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutTeamNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 
@@ -1020,6 +1147,7 @@ export type TeamCountOutputType = {
   candidates: number
   candidateImports: number
   applications: number
+  savedViews: number
 }
 
 export type TeamCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1029,6 +1157,7 @@ export type TeamCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   candidates?: boolean | TeamCountOutputTypeCountCandidatesArgs
   candidateImports?: boolean | TeamCountOutputTypeCountCandidateImportsArgs
   applications?: boolean | TeamCountOutputTypeCountApplicationsArgs
+  savedViews?: boolean | TeamCountOutputTypeCountSavedViewsArgs
 }
 
 /**
@@ -1083,6 +1212,13 @@ export type TeamCountOutputTypeCountApplicationsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.ApplicationWhereInput
 }
 
+/**
+ * TeamCountOutputType without action
+ */
+export type TeamCountOutputTypeCountSavedViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedViewWhereInput
+}
+
 
 export type TeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1098,6 +1234,7 @@ export type TeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   candidates?: boolean | Prisma.Team$candidatesArgs<ExtArgs>
   candidateImports?: boolean | Prisma.Team$candidateImportsArgs<ExtArgs>
   applications?: boolean | Prisma.Team$applicationsArgs<ExtArgs>
+  savedViews?: boolean | Prisma.Team$savedViewsArgs<ExtArgs>
   _count?: boolean | Prisma.TeamCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["team"]>
 
@@ -1139,6 +1276,7 @@ export type TeamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   candidates?: boolean | Prisma.Team$candidatesArgs<ExtArgs>
   candidateImports?: boolean | Prisma.Team$candidateImportsArgs<ExtArgs>
   applications?: boolean | Prisma.Team$applicationsArgs<ExtArgs>
+  savedViews?: boolean | Prisma.Team$savedViewsArgs<ExtArgs>
   _count?: boolean | Prisma.TeamCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TeamIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1153,6 +1291,7 @@ export type $TeamPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     candidates: Prisma.$CandidatePayload<ExtArgs>[]
     candidateImports: Prisma.$CandidateImportBatchPayload<ExtArgs>[]
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
+    savedViews: Prisma.$SavedViewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1562,6 +1701,7 @@ export interface Prisma__TeamClient<T, Null = never, ExtArgs extends runtime.Typ
   candidates<T extends Prisma.Team$candidatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Team$candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   candidateImports<T extends Prisma.Team$candidateImportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Team$candidateImportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateImportBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applications<T extends Prisma.Team$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Team$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedViews<T extends Prisma.Team$savedViewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Team$savedViewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2132,6 +2272,30 @@ export type Team$applicationsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ApplicationScalarFieldEnum | Prisma.ApplicationScalarFieldEnum[]
+}
+
+/**
+ * Team.savedViews
+ */
+export type Team$savedViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedView
+   */
+  select?: Prisma.SavedViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedView
+   */
+  omit?: Prisma.SavedViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedViewInclude<ExtArgs> | null
+  where?: Prisma.SavedViewWhereInput
+  orderBy?: Prisma.SavedViewOrderByWithRelationInput | Prisma.SavedViewOrderByWithRelationInput[]
+  cursor?: Prisma.SavedViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
 }
 
 /**

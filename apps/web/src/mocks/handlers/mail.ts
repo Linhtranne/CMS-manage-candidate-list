@@ -8,13 +8,14 @@ const problem = (code: string, message: string, status: number) => HttpResponse.
 const idempotencyResults = new Map<string, components['schemas']['EmailSendResult']>();
 
 export const mailHandlers = [
+  http.get('*/api/v1/mailbox/templates', () => HttpResponse.json({ data: { items: [{ id: 'INTERVIEW_INVITATION', name: 'Mời phỏng vấn', subject: 'Lịch phỏng vấn', body: 'Thời gian phỏng vấn: {{interviewTime}}', variables: ['interviewTime'] }] }, page: { nextCursor: null, hasMore: false }, requestId: 'mock-mailbox-templates' })),
   http.get('*/api/v1/mailbox/conversations', ({ request }) => {
     const url = new URL(request.url);
     const query = (url.searchParams.get('query') ?? '').toLowerCase();
     const view = url.searchParams.get('view') ?? 'all';
     const journeyId = url.searchParams.get('journeyId');
     const items = conversationFixtures.filter((conversation) => {
-      const haystack = `${conversation.subject} ${conversation.snippet} ${conversation.candidate.name} ${conversation.candidate.code}`.toLowerCase();
+      const haystack = `${conversation.subject} ${conversation.snippet} ${conversation.candidate?.name ?? ''} ${conversation.candidate?.code ?? ''}`.toLowerCase();
       const failed = findConversation(conversation.id)?.messages.some((message) => message.status === 'FAILED' || message.status === 'BOUNCED') ?? false;
       const matchesView = view === 'all' || (view === 'needs-action' && conversation.status === 'NEEDS_ACTION') || (view === 'unmatched' && conversation.status === 'UNMATCHED') || (view === 'sent' && conversation.status === 'SENT') || (view === 'received' && conversation.status === 'RECEIVED') || (view === 'waiting-candidate' && conversation.status === 'RECEIVED') || (view === 'waiting-internal' && conversation.status === 'NEEDS_ACTION') || (view === 'completed' && conversation.status === 'CLOSED') || (view === 'failed' && failed);
       return (!query || haystack.includes(query)) && (!journeyId || conversation.journeyId === journeyId) && matchesView;
@@ -35,7 +36,7 @@ export const mailHandlers = [
     const messageId = `message-out-${conversation.id}-${conversation.version + 1}`;
     const result = { messageId, status: 'QUEUED' as const, queuedAt: now };
     idempotencyResults.set(key, result);
-    const message: components['schemas']['EmailMessage'] = { id: messageId, direction: 'OUTBOUND', status: 'QUEUED', from: 'ungvien@company.vn', to: body.to, cc: body.cc ?? [], subject: body.subject, bodyText: body.body, sanitizedHtml: null, sentOrReceivedAt: now, attachmentIds: body.attachmentIds ?? [], immutable: true };
+    const message: components['schemas']['EmailMessage'] = { id: messageId, direction: 'OUTBOUND', status: 'QUEUED', from: 'noreply@company.vn', to: body.to, cc: body.cc ?? [], subject: body.subject, bodyText: body.body, sanitizedHtml: null, sentOrReceivedAt: now, attachmentIds: body.attachmentIds ?? [], immutable: true };
     conversation.messages.push(message);
     conversation.messageCount += 1;
     conversation.lastActivityAt = now;

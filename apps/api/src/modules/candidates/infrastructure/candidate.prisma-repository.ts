@@ -6,11 +6,15 @@ import { RUNTIME_CONFIG, type RuntimeConfig } from '../../../platform/config/con
 import { decryptCandidateValue } from './candidate.crypto.js';
 import { decodeCandidateCursor, candidateLimit } from '../domain/pagination.js';
 import type { CandidateRepository } from '../application/candidate.service.js';
-import type { CandidateEntity, CandidateListQuery, CandidateMatchEntity, OccupationProfileEntity } from '../domain/candidate.types.js';
+import type { CandidateApplicationSummary, CandidateEntity, CandidateFileSummary, CandidateJourneySummary, CandidateListQuery, CandidateMatchEntity, OccupationProfileEntity } from '../domain/candidate.types.js';
 
 type CandidateClient = PrismaService | Prisma.TransactionClient;
 type CandidateRow = Prisma.CandidateGetPayload<{ include: { owner: { select: { displayName: true } }; profiles: true } }>;
 type ProfileRow = Prisma.CandidateOccupationProfileGetPayload<object>;
+type CandidateApplicationRow = Prisma.ApplicationGetPayload<{ include: { jobOrder: { include: { client: { select: { id: true; name: true } } } }; owner: { select: { id: true; displayName: true } }; interviews: { orderBy: { roundNo: 'asc' }; select: { id: true; roundNo: true; scheduledAt: true; scheduleStatus: true; result: true; version: true } } } }>;
+type CandidateJourneyRow = Prisma.SupplyJourneyGetPayload<{ include: { milestones: { orderBy: { sequence: 'asc' }; select: { status: true; name: true; dueAt: true; completedAt: true } } } }>;
+type JourneyOrderRow = { id: string; code: string; position: string; client: { id: string; name: string } };
+type CandidateDocumentRow = Prisma.DocumentGetPayload<{ include: { versions: { orderBy: { versionNo: 'desc' }; take: 1 } } }>;
 
 function jsonArray(value: Prisma.JsonValue): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
@@ -39,7 +43,7 @@ export class CandidatePrismaRepository implements CandidateRepository {
 
   async findById(id: string): Promise<CandidateEntity | null> {
     const row = await this.prisma.candidate.findUnique({ where: { id }, include: { owner: { select: { displayName: true } }, profiles: true } });
-    return row ? this.map(row) : null;
+    return row ? this.enrich([this.map(row)]).then(([candidate]) => candidate ?? null) : null;
   }
 
   async findDuplicateByBlindIndex(kind: 'passport' | 'email' | 'phone', blindIndex: string): Promise<CandidateEntity | null> {
@@ -110,8 +114,16 @@ export class CandidatePrismaRepository implements CandidateRepository {
     if (query.source) where.source = query.source;
     if (query.view === 'archived') where.recordStatus = 'ARCHIVED';
     if (query.view === 'potential') where.readinessStatus = 'POTENTIAL';
-    if (query.view === 'ready-to-match') where.readinessStatus = 'READY';
-    if (query.view === 'paused') where.readinessStatus = 'PAUSED';
+    if (query.view === 'ready-to-match') {
+      where.readinessStatus = 'READY';
+      where.applications = { none: {} };
+    }
+    if (query.view === 'new-unassigned') where.applications = { none: {} };
+    if (query.view === 'applying') where.applications = { some: { status: { notIn: ['PASSED', 'FAILED', 'WITHDRAWN'] } } };
+    if (query.view === 'passed') where.applications = { some: { status: 'PASSED' } };
+    if (query.view === 'duplicates') where.duplicateSources = { some: { state: 'OPEN' } };
+    if (query.view === 'paused') where.AND = [{ OR: [{ readinessStatus: 'PAUSED' }, { contactabilityStatus: 'DO_NOT_CONTACT' }] }];
+    if (query.view === 'missing-contact') where.AND = [{ OR: [{ emailCiphertext: null }, { phoneCiphertext: null }, { contactabilityStatus: { in: ['TEMPORARILY_UNREACHABLE', 'DO_NOT_CONTACT'] } }] }];
     const profileFilters: Prisma.CandidateOccupationProfileWhereInput[] = [];
     if (query.skill) profileFilters.push({ skills: { array_contains: [query.skill] } });
     if (query.desiredLocation) profileFilters.push({ desiredLocation: { contains: query.desiredLocation, mode: 'insensitive' } });
@@ -123,11 +135,21 @@ export class CandidatePrismaRepository implements CandidateRepository {
     }
     if (profileFilters.length) where.profiles = { some: { AND: profileFilters } };
     if (cursor) {
-      where.AND = [{ OR: [{ updatedAt: { lt: new Date(cursor.updatedAt) } }, { updatedAt: new Date(cursor.updatedAt), id: { lt: cursor.id } }] }];
+      where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), { OR: [{ updatedAt: { lt: new Date(cursor.updatedAt) } }, { updatedAt: new Date(cursor.updatedAt), id: { lt: cursor.id } }] }];
+    }
+    if (query.view === 'supplying' || query.view === 'supplied') {
+      const journeyRows = await this.prisma.supplyJourney.findMany({ where: { status: query.view === 'supplied' ? 'COMPLETED' : { in: ['ACTIVE', 'ON_HOLD'] } }, select: { candidateId: true } });
+      const ids = [...new Set(journeyRows.map((row) => row.candidateId))];
+      where.id = ids.length ? { in: ids } : '__DENY_ALL__';
+    }
+    if (query.view === 'missing-documents') {
+      const documentRows = await this.prisma.document.findMany({ where: { status: { notIn: ['DELETED', 'REJECTED'] } }, select: { candidateId: true } });
+      const candidatesWithDocuments = [...new Set(documentRows.map((row) => row.candidateId))];
+      where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), { OR: [{ readinessStatus: { in: ['POTENTIAL', 'PAUSED', 'NOT_SUITABLE'] } }, ...(candidatesWithDocuments.length ? [{ id: { notIn: candidatesWithDocuments } }] : [])] }];
     }
     const rows = await this.prisma.candidate.findMany({ where, orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }], take: limit + 1, include: { owner: { select: { displayName: true } }, profiles: true } });
     const hasMore = rows.length > limit;
-    return { items: rows.slice(0, limit).map((row) => this.map(row)), hasMore };
+    return { items: await this.enrich(rows.slice(0, limit).map((row) => this.map(row))), hasMore };
   }
 
   async createOccupationProfile(input: Parameters<CandidateRepository['createOccupationProfile']>[0]): Promise<OccupationProfileEntity> {
@@ -209,9 +231,112 @@ export class CandidatePrismaRepository implements CandidateRepository {
       source: row.source, recordStatus: row.recordStatus as CandidateEntity['recordStatus'], readinessStatus: row.readinessStatus as CandidateEntity['readinessStatus'],
       contactabilityStatus: row.contactabilityStatus as CandidateEntity['contactabilityStatus'], ownerId: row.ownerId, ownerName: row.owner?.displayName,
       teamId: row.teamId ?? undefined, email: decryptCandidateValue(row.emailCiphertext, this.secret), phone: decryptCandidateValue(row.phoneCiphertext, this.secret),
-      address: decryptCandidateValue(row.addressCiphertext, this.secret), version: row.version, createdAt: row.createdAt, updatedAt: row.updatedAt,
+      passportNumber: decryptCandidateValue(row.passportCiphertext, this.secret), address: decryptCandidateValue(row.addressCiphertext, this.secret), version: row.version, createdAt: row.createdAt, updatedAt: row.updatedAt,
       profiles: (row.profiles ?? []).map((profile) => this.mapProfile(profile)),
     };
+  }
+
+  private async enrich(candidates: CandidateEntity[]): Promise<CandidateEntity[]> {
+    if (!candidates.length) return candidates;
+    const ids = candidates.map((candidate) => candidate.id);
+    const [applications, journeys, duplicates, documents, emailCounts, entityNotes] = await Promise.all([
+      this.prisma.application.findMany({
+        where: { candidateId: { in: ids } },
+        orderBy: [{ lastActivityAt: 'desc' }, { id: 'desc' }],
+        include: {
+          jobOrder: { include: { client: { select: { id: true, name: true } } } },
+          owner: { select: { id: true, displayName: true } },
+          interviews: { orderBy: { roundNo: 'asc' }, select: { id: true, roundNo: true, scheduledAt: true, scheduleStatus: true, result: true, version: true } },
+        },
+      }),
+      this.prisma.supplyJourney.findMany({
+        where: { candidateId: { in: ids } },
+        include: { milestones: { orderBy: { sequence: 'asc' }, select: { status: true, name: true, dueAt: true, completedAt: true } } },
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.prisma.candidateDuplicateCase.findMany({ where: { sourceCandidateId: { in: ids }, state: 'OPEN' }, select: { sourceCandidateId: true } }),
+      this.prisma.document.findMany({ where: { candidateId: { in: ids }, status: { notIn: ['DELETED', 'REJECTED'] } }, include: { versions: { orderBy: { versionNo: 'desc' }, take: 1 } } }),
+      this.prisma.emailConversation.groupBy({ by: ['candidateId'], where: { candidateId: { in: ids } }, _count: { _all: true } }),
+      this.prisma.entityNote.findMany({ where: { entityType: 'CANDIDATE', entityId: { in: ids } }, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], select: { entityId: true, content: true } }),
+    ]);
+    const journeyApplicationIds = [...new Set(journeys.map((journey) => journey.applicationId))];
+    const [journeyApplications, templateVersions, journeyOwners] = await Promise.all([
+      journeyApplicationIds.length ? this.prisma.application.findMany({ where: { id: { in: journeyApplicationIds } }, select: { id: true, jobOrder: { select: { id: true, code: true, position: true, client: { select: { id: true, name: true } } } } } }) : [],
+      journeys.length ? this.prisma.supplyJourneyTemplateVersion.findMany({ where: { id: { in: journeys.map((journey) => journey.templateVersionId) } }, select: { id: true, template: { select: { name: true } } } }) : [],
+      journeys.length ? this.prisma.user.findMany({ where: { id: { in: journeys.map((journey) => journey.ownerUserId) } }, select: { id: true, displayName: true } }) : [],
+    ]);
+    const applicationsByCandidate = new Map<string, typeof applications>();
+    for (const application of applications) applicationsByCandidate.set(application.candidateId, [...(applicationsByCandidate.get(application.candidateId) ?? []), application]);
+    const journeysByCandidate = new Map<string, typeof journeys>();
+    for (const journey of journeys) journeysByCandidate.set(journey.candidateId, [...(journeysByCandidate.get(journey.candidateId) ?? []), journey]);
+    const duplicateIds = new Set(duplicates.map((duplicate) => duplicate.sourceCandidateId));
+    const documentByCandidate = new Map<string, typeof documents>();
+    for (const document of documents) documentByCandidate.set(document.candidateId, [...(documentByCandidate.get(document.candidateId) ?? []), document]);
+    const emailCountByCandidate = new Map(emailCounts.map((row) => [row.candidateId, row._count._all]));
+    const notesByCandidate = new Map<string, string[]>();
+    for (const note of entityNotes) notesByCandidate.set(note.entityId, [...(notesByCandidate.get(note.entityId) ?? []), note.content]);
+    const journeyApplicationById = new Map(journeyApplications.map((row) => [row.id, row.jobOrder]));
+    const templateById = new Map(templateVersions.map((row) => [row.id, row.template.name]));
+    const ownerById = new Map(journeyOwners.map((row) => [row.id, row.displayName]));
+    return candidates.map((candidate) => {
+      const candidateApplications = applicationsByCandidate.get(candidate.id) ?? [];
+      const candidateJourneys = journeysByCandidate.get(candidate.id) ?? [];
+      const activeJourney = candidateJourneys.find((journey) => journey.status === 'ACTIVE' || journey.status === 'ON_HOLD');
+      const completedJourney = candidateJourneys.find((journey) => journey.status === 'COMPLETED');
+      const activeApplication = candidateApplications.find((application) => !['PASSED', 'FAILED', 'WITHDRAWN'].includes(application.status));
+      const phase = completedJourney ? 'SUPPLIED' : activeJourney ? 'SUPPLYING' : candidateApplications.some((application) => application.status === 'PASSED') ? 'PASSED' : activeApplication ? 'APPLYING' : 'POTENTIAL';
+      const profile = candidate.profiles.find((entry) => entry.status !== 'ARCHIVED') ?? candidate.profiles[0];
+      return {
+        ...candidate,
+        applicationCount: candidateApplications.length,
+        operationalPhase: phase,
+        hasActiveJourney: Boolean(activeJourney),
+        isPossibleDuplicate: duplicateIds.has(candidate.id),
+        missingDocumentCount: candidate.readinessStatus === 'NOT_SUITABLE' || candidate.readinessStatus === 'PAUSED' ? Math.max(1, documentByCandidate.get(candidate.id)?.length ? 0 : 1) : documentByCandidate.get(candidate.id)?.length ? 0 : 0,
+        nextAction: phase === 'POTENTIAL' ? candidate.contactabilityStatus === 'DO_NOT_CONTACT' ? 'REVIEW_PROFILE' : 'REVIEW_PROFILE' : phase === 'APPLYING' ? 'FOLLOW_UP_INTERVIEW' : phase === 'PASSED' ? 'START_SUPPLY_JOURNEY' : phase === 'SUPPLYING' ? 'COMPLETE_DOCUMENTS' : 'MONITOR_ONBOARDING',
+        skills: profile?.skills ?? [],
+        yearsExperience: profile?.yearsExperience ?? 0,
+        desiredLocation: profile?.desiredLocation ?? null,
+        applications: candidateApplications.map((application) => this.mapApplication(application)),
+        journeys: candidateJourneys.map((journey) => this.mapJourney(journey, candidate, journeyApplicationById, templateById, ownerById)),
+        emailCount: emailCountByCandidate.get(candidate.id) ?? 0,
+        files: (documentByCandidate.get(candidate.id) ?? []).map((document) => this.mapDocument(document)),
+        notes: notesByCandidate.get(candidate.id) ?? [],
+        history: candidateApplications.map((application) => ({ id: `${application.id}:created`, type: 'APPLICATION_CREATED' as const, occurredAt: application.appliedAt.toISOString(), actor: application.owner ? { id: application.owner.id, name: application.owner.displayName } : { id: candidate.ownerId, name: candidate.ownerName ?? candidate.ownerId }, summary: `Tạo hồ sơ ứng tuyển ${application.jobOrder.code}.` })),
+      };
+    });
+  }
+
+  private mapApplication(application: CandidateApplicationRow): CandidateApplicationSummary {
+    return {
+      id: application.id,
+      order: { id: application.jobOrder.id, code: application.jobOrder.code, position: application.jobOrder.position },
+      client: { id: application.jobOrder.client.id, name: application.jobOrder.client.name },
+      owner: { id: application.owner.id, name: application.owner.displayName },
+      status: application.status,
+      source: application.source,
+      appliedAt: application.appliedAt.toISOString(),
+      lastActivityAt: application.lastActivityAt.toISOString(),
+      dueAt: application.dueAt?.toISOString() ?? null,
+      version: application.version,
+      interviews: application.interviews.map((interview) => ({ id: interview.id, round: interview.roundNo, scheduledAt: interview.scheduledAt.toISOString(), scheduleStatus: interview.scheduleStatus, result: interview.result, version: interview.version })),
+      decisionReason: application.decisionReason,
+    };
+  }
+
+  private mapJourney(journey: CandidateJourneyRow, candidate: CandidateEntity, orders: Map<string, JourneyOrderRow>, templates: Map<string, string>, owners: Map<string, string>): CandidateJourneySummary {
+    const order = orders.get(journey.applicationId) ?? { id: journey.applicationId, code: '—', position: '—', client: { id: '', name: '—' } };
+    const applicable = journey.milestones.length;
+    const completed = journey.milestones.filter((milestone) => milestone.status === 'COMPLETED').length;
+    const current = journey.milestones.find((milestone) => milestone.status !== 'COMPLETED');
+    const nearest = journey.milestones.filter((milestone) => milestone.dueAt && milestone.status !== 'COMPLETED').sort((left, right) => left.dueAt!.getTime() - right.dueAt!.getTime())[0];
+    const health = journey.status === 'COMPLETED' ? 'COMPLETED' : nearest?.dueAt && nearest.dueAt < new Date() ? 'OVERDUE' : current?.dueAt && current.dueAt.getTime() - Date.now() < 72 * 60 * 60 * 1000 ? 'AT_RISK' : 'ON_TRACK';
+    return { id: journey.id, status: journey.status, candidate: { id: candidate.id, code: candidate.code, name: candidate.name }, order: { id: order.id, code: order.code, position: order.position }, client: { id: order.client.id, name: order.client.name }, owner: { id: journey.ownerUserId, name: owners.get(journey.ownerUserId) ?? journey.ownerUserId }, templateName: templates.get(journey.templateVersionId) ?? journey.templateVersionId, currentMilestone: current?.name ?? 'COMPLETED', nearestDueAt: nearest?.dueAt?.toISOString() ?? null, progress: { completed, applicable }, health };
+  }
+
+  private mapDocument(document: CandidateDocumentRow): CandidateFileSummary {
+    const version = document.versions[0];
+    return { id: document.id, fileName: document.title, category: document.category as CandidateFileSummary['category'], scanStatus: (version?.status ?? document.status) as CandidateFileSummary['scanStatus'], uploadedAt: document.updatedAt.toISOString(), downloadUrl: null };
   }
 
   private mapProfile(row: ProfileRow): OccupationProfileEntity {

@@ -24,7 +24,7 @@ import { CandidateImportsController } from './http/candidate-imports.controller.
       provide: CandidateService,
       useFactory: (repository: CandidatePrismaRepository, audit: AuditWriter, outbox: OutboxRepository, config: RuntimeConfig) => new CandidateService(repository, config.security.encryptionKey, {
         audit: async (transaction, input) => { await audit.append(transaction as Prisma.TransactionClient, { action: input.action, entityType: 'Candidate', entityId: input.entityId, actorUserId: input.actorUserId, correlationId: input.correlationId, metadataJson: input.metadata ?? {} }); },
-        outbox: async (transaction, input) => { await outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'Candidate', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}`, correlationId: input.correlationId, payload: { candidateId: input.aggregateId } }); },
+        outbox: async (transaction, input) => { await outbox.append(transaction as Prisma.TransactionClient, { eventType: input.eventType, aggregateType: 'Candidate', aggregateId: input.aggregateId, idempotencyKey: `${input.eventType}:${input.aggregateId}:${input.correlationId}`, correlationId: input.correlationId, payload: { candidateId: input.aggregateId } }); },
       }),
       inject: [CandidatePrismaRepository, AuditWriter, OutboxRepository, RUNTIME_CONFIG],
     },

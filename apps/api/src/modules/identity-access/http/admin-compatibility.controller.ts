@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../../../platform/database/prisma.service.js';
+import { RUNTIME_CONFIG, type RuntimeConfig } from '../../../platform/config/config.module.js';
 import { CsrfGuard } from './guards/csrf.guard.js';
 import { PolicyGuard, RequirePermission } from './guards/policy.guard.js';
 import { SessionGuard } from './guards/session.guard.js';
@@ -15,7 +16,7 @@ function teamId(value: string | undefined, fallback: string | null): string | nu
 @Controller('admin')
 @UseGuards(SessionGuard, PolicyGuard)
 export class AdminCompatibilityController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig) {}
 
   @Get('users')
   @RequirePermission('iam.configure')
@@ -144,6 +145,6 @@ export class AdminCompatibilityController {
 
   private mailboxView(row: { address: string; displayName: string; provider: string; status: string; updatedAt: Date } | null, patch: Partial<{ senderName: string; adapter: string; maxAttachmentBytes: number; signature: string; receiveFolder: string; sentFolder: string; retryLimit: number; alertAddress: string }> = {}) {
     const adapter = (patch.adapter ?? row?.provider ?? 'SMTP_IMAP') as 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
-    return { address: row?.address ?? 'cms@local.test', senderName: patch.senderName ?? row?.displayName ?? 'Candidate Supply CMS', adapter, maxAttachmentBytes: patch.maxAttachmentBytes ?? 10 * 1024 * 1024, health: row?.status === 'HEALTHY' ? 'HEALTHY' : row?.status === 'DEGRADED' ? 'DEGRADED' : 'DISCONNECTED', lastCheckedAt: (row?.updatedAt ?? new Date()).toISOString(), credentialConfigured: false, signature: patch.signature ?? '', receiveFolder: patch.receiveFolder ?? 'Inbox', sentFolder: patch.sentFolder ?? 'Sent', retryLimit: patch.retryLimit ?? 3, alertAddress: patch.alertAddress ?? '' };
+    return { address: row?.address ?? 'cms@local.test', senderName: patch.senderName ?? row?.displayName ?? 'Candidate Supply CMS', adapter, maxAttachmentBytes: patch.maxAttachmentBytes ?? 10 * 1024 * 1024, health: row?.status === 'HEALTHY' ? 'HEALTHY' : row?.status === 'DEGRADED' ? 'DEGRADED' : 'DISCONNECTED', lastCheckedAt: (row?.updatedAt ?? new Date()).toISOString(), credentialConfigured: this.config.mail.provider === 'SMTP_IMAP' && Boolean(this.config.mail.smtp.username && this.config.mail.smtp.password), signature: patch.signature ?? '', receiveFolder: patch.receiveFolder ?? 'Inbox', sentFolder: patch.sentFolder ?? 'Sent', retryLimit: patch.retryLimit ?? 3, alertAddress: patch.alertAddress ?? '' };
   }
 }

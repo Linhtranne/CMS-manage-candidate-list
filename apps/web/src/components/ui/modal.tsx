@@ -22,7 +22,7 @@ type ModalProps = {
   closeConfirmation?: string;
 };
 
-export function Modal({ open, title, description, onClose, children, footer, size = 'md', confirmOnClose = false, closeConfirmation }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, size = 'md', confirmOnClose = false, closeConfirmation }: ModalProps) {
   const { t } = useI18n();
   const titleId = useId();
   const panelRef = useRef<HTMLElement>(null);
@@ -107,7 +107,6 @@ export function Modal({ open, title, description, onClose, children, footer, siz
         <header inert={confirmOpen || undefined} aria-hidden={confirmOpen || undefined} className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
           <div>
             <h2 id={titleId} className="text-xl font-bold text-text">{title}</h2>
-            {description ? <p className="mt-1 text-sm text-text-muted">{description}</p> : null}
           </div>
           <button type="button" aria-label={t('common.dialog.closeLabel', { title })} title={t('common.actions.close')} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" onClick={requestClose}>
             <X aria-hidden="true" size={20} strokeWidth={1.8} />

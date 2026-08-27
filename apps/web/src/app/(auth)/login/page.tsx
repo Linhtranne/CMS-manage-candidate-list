@@ -41,7 +41,6 @@ export default function LoginPage() {
       <section className="w-full max-w-md rounded-xl border border-border bg-panel p-8 shadow-panel">
         <div className="flex items-start justify-between gap-4"><p className="pt-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent">{t('common.brand.name')}</p><LanguageSwitcher compact /></div>
         <h1 className="mt-3 text-2xl font-bold text-text">{t('auth.login.title')}</h1>
-        <p className="mt-2 text-sm text-text-muted">{t('auth.login.staffOnly')}</p>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="mb-1 block text-sm font-medium text-text">{t('auth.login.email')}</label>

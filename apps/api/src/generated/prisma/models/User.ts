@@ -266,6 +266,9 @@ export type UserWhereInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseListRelationFilter
   mergeActions?: Prisma.CandidateMergeAliasListRelationFilter
   emailMatchDecisions?: Prisma.EmailMatchDecisionListRelationFilter
+  savedViews?: Prisma.SavedViewListRelationFilter
+  entityNotes?: Prisma.EntityNoteListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -296,6 +299,9 @@ export type UserOrderByWithRelationInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseOrderByRelationAggregateInput
   mergeActions?: Prisma.CandidateMergeAliasOrderByRelationAggregateInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionOrderByRelationAggregateInput
+  savedViews?: Prisma.SavedViewOrderByRelationAggregateInput
+  entityNotes?: Prisma.EntityNoteOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -329,6 +335,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   duplicateResolutions?: Prisma.CandidateDuplicateCaseListRelationFilter
   mergeActions?: Prisma.CandidateMergeAliasListRelationFilter
   emailMatchDecisions?: Prisma.EmailMatchDecisionListRelationFilter
+  savedViews?: Prisma.SavedViewListRelationFilter
+  entityNotes?: Prisma.EntityNoteListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -390,6 +399,9 @@ export type UserCreateInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -419,6 +431,9 @@ export type UserUncheckedCreateInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -448,6 +463,9 @@ export type UserUpdateInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -477,6 +495,9 @@ export type UserUncheckedUpdateInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -652,6 +673,20 @@ export type UserUpdateOneRequiredWithoutUserRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserRolesInput, Prisma.UserUpdateWithoutUserRolesInput>, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
 }
 
+export type UserCreateNestedOneWithoutEntityNotesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEntityNotesInput, Prisma.UserUncheckedCreateWithoutEntityNotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEntityNotesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEntityNotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEntityNotesInput, Prisma.UserUncheckedCreateWithoutEntityNotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEntityNotesInput
+  upsert?: Prisma.UserUpsertWithoutEntityNotesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEntityNotesInput, Prisma.UserUpdateWithoutEntityNotesInput>, Prisma.UserUncheckedUpdateWithoutEntityNotesInput>
+}
+
 export type UserCreateNestedOneWithoutSessionsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
@@ -664,6 +699,34 @@ export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutSessionsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+}
+
+export type UserCreateNestedOneWithoutSavedViewsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedViewsInput, Prisma.UserUncheckedCreateWithoutSavedViewsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedViewsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavedViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedViewsInput, Prisma.UserUncheckedCreateWithoutSavedViewsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedViewsInput
+  upsert?: Prisma.UserUpsertWithoutSavedViewsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedViewsInput, Prisma.UserUpdateWithoutSavedViewsInput>, Prisma.UserUncheckedUpdateWithoutSavedViewsInput>
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
 export type UserCreateNestedOneWithoutAuditEventsInput = {
@@ -894,6 +957,9 @@ export type UserCreateWithoutTeamInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamInput = {
@@ -922,6 +988,9 @@ export type UserUncheckedCreateWithoutTeamInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamInput = {
@@ -991,6 +1060,9 @@ export type UserCreateWithoutIdentityLinksInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutIdentityLinksInput = {
@@ -1019,6 +1091,9 @@ export type UserUncheckedCreateWithoutIdentityLinksInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutIdentityLinksInput = {
@@ -1063,6 +1138,9 @@ export type UserUpdateWithoutIdentityLinksInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutIdentityLinksInput = {
@@ -1091,6 +1169,9 @@ export type UserUncheckedUpdateWithoutIdentityLinksInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserRolesInput = {
@@ -1119,6 +1200,9 @@ export type UserCreateWithoutUserRolesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -1147,6 +1231,9 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -1191,6 +1278,9 @@ export type UserUpdateWithoutUserRolesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -1219,6 +1309,149 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutEntityNotesInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  team?: Prisma.TeamCreateNestedOneWithoutUsersInput
+  identityLinks?: Prisma.IdentityLinkCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEntityNotesInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  teamId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  identityLinks?: Prisma.IdentityLinkUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientUncheckedCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEntityNotesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEntityNotesInput, Prisma.UserUncheckedCreateWithoutEntityNotesInput>
+}
+
+export type UserUpsertWithoutEntityNotesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEntityNotesInput, Prisma.UserUncheckedUpdateWithoutEntityNotesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEntityNotesInput, Prisma.UserUncheckedCreateWithoutEntityNotesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEntityNotesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEntityNotesInput, Prisma.UserUncheckedUpdateWithoutEntityNotesInput>
+}
+
+export type UserUpdateWithoutEntityNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  team?: Prisma.TeamUpdateOneWithoutUsersNestedInput
+  identityLinks?: Prisma.IdentityLinkUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEntityNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  identityLinks?: Prisma.IdentityLinkUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUncheckedUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUncheckedUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUncheckedUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1247,6 +1480,9 @@ export type UserCreateWithoutSessionsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1275,6 +1511,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1319,6 +1558,9 @@ export type UserUpdateWithoutSessionsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1347,6 +1589,289 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSavedViewsInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  team?: Prisma.TeamCreateNestedOneWithoutUsersInput
+  identityLinks?: Prisma.IdentityLinkCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSavedViewsInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  teamId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  identityLinks?: Prisma.IdentityLinkUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientUncheckedCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSavedViewsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedViewsInput, Prisma.UserUncheckedCreateWithoutSavedViewsInput>
+}
+
+export type UserUpsertWithoutSavedViewsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedViewsInput, Prisma.UserUncheckedUpdateWithoutSavedViewsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedViewsInput, Prisma.UserUncheckedCreateWithoutSavedViewsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavedViewsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedViewsInput, Prisma.UserUncheckedUpdateWithoutSavedViewsInput>
+}
+
+export type UserUpdateWithoutSavedViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  team?: Prisma.TeamUpdateOneWithoutUsersNestedInput
+  identityLinks?: Prisma.IdentityLinkUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavedViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  identityLinks?: Prisma.IdentityLinkUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUncheckedUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUncheckedUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUncheckedUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  team?: Prisma.TeamCreateNestedOneWithoutUsersInput
+  identityLinks?: Prisma.IdentityLinkCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  displayName: string
+  email: string
+  passwordHash?: string | null
+  status?: string
+  teamId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  version?: number
+  identityLinks?: Prisma.IdentityLinkUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  ownedClients?: Prisma.ClientUncheckedCreateNestedManyWithoutOwnerInput
+  ownedOrders?: Prisma.JobOrderUncheckedCreateNestedManyWithoutOwnerInput
+  ownedCandidates?: Prisma.CandidateUncheckedCreateNestedManyWithoutOwnerInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  ownedApplications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutOwnerInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedCreateNestedManyWithoutActorInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedCreateNestedManyWithoutUserInput
+  ownedInterviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutOwnerInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  team?: Prisma.TeamUpdateOneWithoutUsersNestedInput
+  identityLinks?: Prisma.IdentityLinkUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  teamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  identityLinks?: Prisma.IdentityLinkUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  ownedClients?: Prisma.ClientUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedOrders?: Prisma.JobOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedCandidates?: Prisma.CandidateUncheckedUpdateManyWithoutOwnerNestedInput
+  orderStatusHistory?: Prisma.JobOrderStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  ownedApplications?: Prisma.ApplicationUncheckedUpdateManyWithoutOwnerNestedInput
+  applicationHistory?: Prisma.ApplicationStatusHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewHistory?: Prisma.InterviewHistoryUncheckedUpdateManyWithoutActorNestedInput
+  interviewParticipants?: Prisma.InterviewParticipantUncheckedUpdateManyWithoutUserNestedInput
+  ownedInterviews?: Prisma.InterviewUncheckedUpdateManyWithoutOwnerNestedInput
+  importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
+  duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
+  mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
+  emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutAuditEventsInput = {
@@ -1375,6 +1900,9 @@ export type UserCreateWithoutAuditEventsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuditEventsInput = {
@@ -1403,6 +1931,9 @@ export type UserUncheckedCreateWithoutAuditEventsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuditEventsInput = {
@@ -1447,6 +1978,9 @@ export type UserUpdateWithoutAuditEventsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditEventsInput = {
@@ -1475,6 +2009,9 @@ export type UserUncheckedUpdateWithoutAuditEventsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedClientsInput = {
@@ -1503,6 +2040,9 @@ export type UserCreateWithoutOwnedClientsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedClientsInput = {
@@ -1531,6 +2071,9 @@ export type UserUncheckedCreateWithoutOwnedClientsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedClientsInput = {
@@ -1575,6 +2118,9 @@ export type UserUpdateWithoutOwnedClientsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedClientsInput = {
@@ -1603,6 +2149,9 @@ export type UserUncheckedUpdateWithoutOwnedClientsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedOrdersInput = {
@@ -1631,6 +2180,9 @@ export type UserCreateWithoutOwnedOrdersInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedOrdersInput = {
@@ -1659,6 +2211,9 @@ export type UserUncheckedCreateWithoutOwnedOrdersInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedOrdersInput = {
@@ -1703,6 +2258,9 @@ export type UserUpdateWithoutOwnedOrdersInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedOrdersInput = {
@@ -1731,6 +2289,9 @@ export type UserUncheckedUpdateWithoutOwnedOrdersInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOrderStatusHistoryInput = {
@@ -1759,6 +2320,9 @@ export type UserCreateWithoutOrderStatusHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOrderStatusHistoryInput = {
@@ -1787,6 +2351,9 @@ export type UserUncheckedCreateWithoutOrderStatusHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOrderStatusHistoryInput = {
@@ -1831,6 +2398,9 @@ export type UserUpdateWithoutOrderStatusHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderStatusHistoryInput = {
@@ -1859,6 +2429,9 @@ export type UserUncheckedUpdateWithoutOrderStatusHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedCandidatesInput = {
@@ -1887,6 +2460,9 @@ export type UserCreateWithoutOwnedCandidatesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedCandidatesInput = {
@@ -1915,6 +2491,9 @@ export type UserUncheckedCreateWithoutOwnedCandidatesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedCandidatesInput = {
@@ -1959,6 +2538,9 @@ export type UserUpdateWithoutOwnedCandidatesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedCandidatesInput = {
@@ -1987,6 +2569,9 @@ export type UserUncheckedUpdateWithoutOwnedCandidatesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutImportBatchesInput = {
@@ -2015,6 +2600,9 @@ export type UserCreateWithoutImportBatchesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutImportBatchesInput = {
@@ -2043,6 +2631,9 @@ export type UserUncheckedCreateWithoutImportBatchesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutImportBatchesInput = {
@@ -2087,6 +2678,9 @@ export type UserUpdateWithoutImportBatchesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImportBatchesInput = {
@@ -2115,6 +2709,9 @@ export type UserUncheckedUpdateWithoutImportBatchesInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDuplicateResolutionsInput = {
@@ -2143,6 +2740,9 @@ export type UserCreateWithoutDuplicateResolutionsInput = {
   importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDuplicateResolutionsInput = {
@@ -2171,6 +2771,9 @@ export type UserUncheckedCreateWithoutDuplicateResolutionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDuplicateResolutionsInput = {
@@ -2215,6 +2818,9 @@ export type UserUpdateWithoutDuplicateResolutionsInput = {
   importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDuplicateResolutionsInput = {
@@ -2243,6 +2849,9 @@ export type UserUncheckedUpdateWithoutDuplicateResolutionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMergeActionsInput = {
@@ -2271,6 +2880,9 @@ export type UserCreateWithoutMergeActionsInput = {
   importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMergeActionsInput = {
@@ -2299,6 +2911,9 @@ export type UserUncheckedCreateWithoutMergeActionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMergeActionsInput = {
@@ -2343,6 +2958,9 @@ export type UserUpdateWithoutMergeActionsInput = {
   importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMergeActionsInput = {
@@ -2371,6 +2989,9 @@ export type UserUncheckedUpdateWithoutMergeActionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedApplicationsInput = {
@@ -2399,6 +3020,9 @@ export type UserCreateWithoutOwnedApplicationsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedApplicationsInput = {
@@ -2427,6 +3051,9 @@ export type UserUncheckedCreateWithoutOwnedApplicationsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedApplicationsInput = {
@@ -2471,6 +3098,9 @@ export type UserUpdateWithoutOwnedApplicationsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedApplicationsInput = {
@@ -2499,6 +3129,9 @@ export type UserUncheckedUpdateWithoutOwnedApplicationsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutApplicationHistoryInput = {
@@ -2527,6 +3160,9 @@ export type UserCreateWithoutApplicationHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApplicationHistoryInput = {
@@ -2555,6 +3191,9 @@ export type UserUncheckedCreateWithoutApplicationHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApplicationHistoryInput = {
@@ -2599,6 +3238,9 @@ export type UserUpdateWithoutApplicationHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApplicationHistoryInput = {
@@ -2627,6 +3269,9 @@ export type UserUncheckedUpdateWithoutApplicationHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedInterviewsInput = {
@@ -2655,6 +3300,9 @@ export type UserCreateWithoutOwnedInterviewsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedInterviewsInput = {
@@ -2683,6 +3331,9 @@ export type UserUncheckedCreateWithoutOwnedInterviewsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedInterviewsInput = {
@@ -2727,6 +3378,9 @@ export type UserUpdateWithoutOwnedInterviewsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedInterviewsInput = {
@@ -2755,6 +3409,9 @@ export type UserUncheckedUpdateWithoutOwnedInterviewsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInterviewParticipantsInput = {
@@ -2783,6 +3440,9 @@ export type UserCreateWithoutInterviewParticipantsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInterviewParticipantsInput = {
@@ -2811,6 +3471,9 @@ export type UserUncheckedCreateWithoutInterviewParticipantsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInterviewParticipantsInput = {
@@ -2855,6 +3518,9 @@ export type UserUpdateWithoutInterviewParticipantsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInterviewParticipantsInput = {
@@ -2883,6 +3549,9 @@ export type UserUncheckedUpdateWithoutInterviewParticipantsInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInterviewHistoryInput = {
@@ -2911,6 +3580,9 @@ export type UserCreateWithoutInterviewHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInterviewHistoryInput = {
@@ -2939,6 +3611,9 @@ export type UserUncheckedCreateWithoutInterviewHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedCreateNestedManyWithoutResolvedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInterviewHistoryInput = {
@@ -2983,6 +3658,9 @@ export type UserUpdateWithoutInterviewHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInterviewHistoryInput = {
@@ -3011,6 +3689,9 @@ export type UserUncheckedUpdateWithoutInterviewHistoryInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailMatchDecisionsInput = {
@@ -3039,6 +3720,9 @@ export type UserCreateWithoutEmailMatchDecisionsInput = {
   importBatches?: Prisma.CandidateImportBatchCreateNestedManyWithoutOwnerInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasCreateNestedManyWithoutMergedByInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailMatchDecisionsInput = {
@@ -3067,6 +3751,9 @@ export type UserUncheckedCreateWithoutEmailMatchDecisionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedCreateNestedManyWithoutOwnerInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedCreateNestedManyWithoutResolvedByInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedCreateNestedManyWithoutMergedByInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutOwnerInput
+  entityNotes?: Prisma.EntityNoteUncheckedCreateNestedManyWithoutAuthorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailMatchDecisionsInput = {
@@ -3111,6 +3798,9 @@ export type UserUpdateWithoutEmailMatchDecisionsInput = {
   importBatches?: Prisma.CandidateImportBatchUpdateManyWithoutOwnerNestedInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailMatchDecisionsInput = {
@@ -3139,6 +3829,9 @@ export type UserUncheckedUpdateWithoutEmailMatchDecisionsInput = {
   importBatches?: Prisma.CandidateImportBatchUncheckedUpdateManyWithoutOwnerNestedInput
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyTeamInput = {
@@ -3178,6 +3871,9 @@ export type UserUpdateWithoutTeamInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamInput = {
@@ -3206,6 +3902,9 @@ export type UserUncheckedUpdateWithoutTeamInput = {
   duplicateResolutions?: Prisma.CandidateDuplicateCaseUncheckedUpdateManyWithoutResolvedByNestedInput
   mergeActions?: Prisma.CandidateMergeAliasUncheckedUpdateManyWithoutMergedByNestedInput
   emailMatchDecisions?: Prisma.EmailMatchDecisionUncheckedUpdateManyWithoutResolvedByNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutOwnerNestedInput
+  entityNotes?: Prisma.EntityNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutTeamInput = {
@@ -3242,6 +3941,9 @@ export type UserCountOutputType = {
   duplicateResolutions: number
   mergeActions: number
   emailMatchDecisions: number
+  savedViews: number
+  entityNotes: number
+  notifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3262,6 +3964,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   duplicateResolutions?: boolean | UserCountOutputTypeCountDuplicateResolutionsArgs
   mergeActions?: boolean | UserCountOutputTypeCountMergeActionsArgs
   emailMatchDecisions?: boolean | UserCountOutputTypeCountEmailMatchDecisionsArgs
+  savedViews?: boolean | UserCountOutputTypeCountSavedViewsArgs
+  entityNotes?: boolean | UserCountOutputTypeCountEntityNotesArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -3393,6 +4098,27 @@ export type UserCountOutputTypeCountEmailMatchDecisionsArgs<ExtArgs extends runt
   where?: Prisma.EmailMatchDecisionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSavedViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedViewWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEntityNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EntityNoteWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3422,6 +4148,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   duplicateResolutions?: boolean | Prisma.User$duplicateResolutionsArgs<ExtArgs>
   mergeActions?: boolean | Prisma.User$mergeActionsArgs<ExtArgs>
   emailMatchDecisions?: boolean | Prisma.User$emailMatchDecisionsArgs<ExtArgs>
+  savedViews?: boolean | Prisma.User$savedViewsArgs<ExtArgs>
+  entityNotes?: boolean | Prisma.User$entityNotesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3483,6 +4212,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   duplicateResolutions?: boolean | Prisma.User$duplicateResolutionsArgs<ExtArgs>
   mergeActions?: boolean | Prisma.User$mergeActionsArgs<ExtArgs>
   emailMatchDecisions?: boolean | Prisma.User$emailMatchDecisionsArgs<ExtArgs>
+  savedViews?: boolean | Prisma.User$savedViewsArgs<ExtArgs>
+  entityNotes?: boolean | Prisma.User$entityNotesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3513,6 +4245,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     duplicateResolutions: Prisma.$CandidateDuplicateCasePayload<ExtArgs>[]
     mergeActions: Prisma.$CandidateMergeAliasPayload<ExtArgs>[]
     emailMatchDecisions: Prisma.$EmailMatchDecisionPayload<ExtArgs>[]
+    savedViews: Prisma.$SavedViewPayload<ExtArgs>[]
+    entityNotes: Prisma.$EntityNotePayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3936,6 +4671,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   duplicateResolutions<T extends Prisma.User$duplicateResolutionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$duplicateResolutionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateDuplicateCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mergeActions<T extends Prisma.User$mergeActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$mergeActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CandidateMergeAliasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailMatchDecisions<T extends Prisma.User$emailMatchDecisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailMatchDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailMatchDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedViews<T extends Prisma.User$savedViewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedViewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  entityNotes<T extends Prisma.User$entityNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$entityNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EntityNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4799,6 +5537,78 @@ export type User$emailMatchDecisionsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.EmailMatchDecisionScalarFieldEnum | Prisma.EmailMatchDecisionScalarFieldEnum[]
+}
+
+/**
+ * User.savedViews
+ */
+export type User$savedViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedView
+   */
+  select?: Prisma.SavedViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedView
+   */
+  omit?: Prisma.SavedViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedViewInclude<ExtArgs> | null
+  where?: Prisma.SavedViewWhereInput
+  orderBy?: Prisma.SavedViewOrderByWithRelationInput | Prisma.SavedViewOrderByWithRelationInput[]
+  cursor?: Prisma.SavedViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
+}
+
+/**
+ * User.entityNotes
+ */
+export type User$entityNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EntityNote
+   */
+  select?: Prisma.EntityNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EntityNote
+   */
+  omit?: Prisma.EntityNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EntityNoteInclude<ExtArgs> | null
+  where?: Prisma.EntityNoteWhereInput
+  orderBy?: Prisma.EntityNoteOrderByWithRelationInput | Prisma.EntityNoteOrderByWithRelationInput[]
+  cursor?: Prisma.EntityNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EntityNoteScalarFieldEnum | Prisma.EntityNoteScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

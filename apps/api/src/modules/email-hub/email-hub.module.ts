@@ -10,6 +10,7 @@ import { IdentityAccessModule } from '../identity-access/identity-access.module.
 import { DisabledMailProviderAdapter } from './infrastructure/providers/disabled.adapter.js';
 import { EmailPrismaRepository } from './infrastructure/email.prisma-repository.js';
 import { FakeMailProviderAdapter } from './infrastructure/providers/fake.adapter.js';
+import { SesSmtpMailProviderAdapter } from './infrastructure/providers/ses-smtp.adapter.js';
 import { MAIL_PROVIDER_ADAPTER } from './infrastructure/providers/mail-provider.port.js';
 import { bindMailProvider } from './infrastructure/providers/mail-provider.factory.js';
 import { MAIL_PROVIDER_OPERATION_LIMITER, NoopMailOperationLimiter, RedisMailOperationLimiter, type MailOperationLimiter } from './infrastructure/providers/mail-provider-rate-limiter.js';
@@ -17,11 +18,13 @@ import { EmailPreviewService } from './application/email-preview.service.js';
 import { EmailCommandService } from './application/email-command.service.js';
 import { EmailQueryService } from './application/email-query.service.js';
 import { SendEmailProcessor } from './workers/send-email.processor.js';
+import { StatusNotificationProcessor } from './workers/status-notification.processor.js';
 import { ReconcileSendProcessor } from './workers/reconcile-send.processor.js';
 import { EmailsController } from './http/emails.controller.js';
 import { EmailMessagesController } from './http/email-messages.controller.js';
 import { MailWebhookController } from './http/mail-webhook.controller.js';
 import { ConversationsController } from './http/conversations.controller.js';
+import { MailboxTemplatesController } from './http/mailbox-templates.controller.js';
 import { MailboxAdminController } from './http/mailbox-admin.controller.js';
 import { LegacyEmailPreviewController, LegacyConversationMessagesController, LegacyInboxMatchController, LegacyEmailDraftController } from './http/legacy-email.controller.js';
 import { EmailMatcherService } from './application/email-matcher.service.js';
@@ -40,7 +43,7 @@ import type { S3CompatibleClient } from '../../platform/storage/s3-object-storag
 
 @Module({
   imports: [DatabaseModule, CommandPlatformModule, QueueModule, RuntimeConfigModule.forRoot(), IdentityAccessModule],
-  controllers: [EmailsController, EmailMessagesController, MailWebhookController, ConversationsController, MailboxAdminController, LegacyEmailPreviewController, LegacyConversationMessagesController, LegacyInboxMatchController, LegacyEmailDraftController],
+  controllers: [EmailsController, EmailMessagesController, MailWebhookController, ConversationsController, MailboxTemplatesController, MailboxAdminController, LegacyEmailPreviewController, LegacyConversationMessagesController, LegacyInboxMatchController, LegacyEmailDraftController],
   providers: [
     EmailPrismaRepository,
     DisabledMailProviderAdapter,
@@ -53,6 +56,7 @@ import type { S3CompatibleClient } from '../../platform/storage/s3-object-storag
     EmailCommandService,
     EmailQueryService,
     SendEmailProcessor,
+    StatusNotificationProcessor,
     ReconcileSendProcessor,
     {
       provide: EmailMatcherService,
@@ -62,7 +66,7 @@ import type { S3CompatibleClient } from '../../platform/storage/s3-object-storag
     {
       provide: MailWebhookService,
       inject: [RUNTIME_CONFIG, EmailPrismaRepository, QueueService],
-      useFactory: (config: RuntimeConfig, repository: EmailPrismaRepository, queue: QueueService) => new MailWebhookService(config.security.sessionSecret, repository, queue, undefined, () => config.mail.enabled),
+      useFactory: (config: RuntimeConfig, repository: EmailPrismaRepository, queue: QueueService) => new MailWebhookService(config.security.sessionSecret, repository, queue, undefined, () => config.mail.enabled && config.mail.mode === 'INTERACTIVE'),
     },
     EmailInboundService,
     MailSyncProcessor,
@@ -84,8 +88,20 @@ import type { S3CompatibleClient } from '../../platform/storage/s3-object-storag
     {
       provide: MAIL_PROVIDER_ADAPTER,
       inject: [RUNTIME_CONFIG, DisabledMailProviderAdapter, FakeMailProviderAdapter, MAIL_PROVIDER_OPERATION_LIMITER],
-      useFactory: (config: RuntimeConfig, disabled: DisabledMailProviderAdapter, fake: FakeMailProviderAdapter, limiter: MailOperationLimiter) =>
-        bindMailProvider(config, disabled, limiter, config.mail.provider === 'FAKE' ? fake : undefined),
+      useFactory: (config: RuntimeConfig, disabled: DisabledMailProviderAdapter, fake: FakeMailProviderAdapter, limiter: MailOperationLimiter) => {
+        const delegate = config.mail.provider === 'FAKE'
+          ? fake
+          : config.mail.provider === 'SMTP_IMAP' && config.mail.smtp.endpoint && config.mail.smtp.username && config.mail.smtp.password
+            ? new SesSmtpMailProviderAdapter({
+              endpoint: config.mail.smtp.endpoint,
+              port: config.mail.smtp.port,
+              secure: config.mail.smtp.secure,
+              username: config.mail.smtp.username,
+              password: config.mail.smtp.password,
+            })
+            : undefined;
+        return bindMailProvider(config, disabled, limiter, delegate);
+      },
     },
     {
       provide: FILE_SCANNER,
@@ -99,15 +115,18 @@ import type { S3CompatibleClient } from '../../platform/storage/s3-object-storag
     },
     {
       provide: QUEUE_HANDLERS,
-      inject: [SendEmailProcessor, ReconcileSendProcessor, FetchMessageProcessor, MailSyncProcessor, ScanAttachmentProcessor, RenewMailSubscriptionProcessor, RUNTIME_CONFIG],
-      useFactory: (processor: SendEmailProcessor, reconciler: ReconcileSendProcessor, fetcher: FetchMessageProcessor, sync: MailSyncProcessor, scanner: ScanAttachmentProcessor, renewSubscription: RenewMailSubscriptionProcessor, config: RuntimeConfig): QueueHandlerRegistration[] => [
-        { name: 'outbox', handler: (payload: QueuePayload) => processor.handleOutbox(payload) },
+      inject: [SendEmailProcessor, StatusNotificationProcessor, ReconcileSendProcessor, FetchMessageProcessor, MailSyncProcessor, ScanAttachmentProcessor, RenewMailSubscriptionProcessor, RUNTIME_CONFIG],
+      useFactory: (processor: SendEmailProcessor, statusNotifications: StatusNotificationProcessor, reconciler: ReconcileSendProcessor, fetcher: FetchMessageProcessor, sync: MailSyncProcessor, scanner: ScanAttachmentProcessor, renewSubscription: RenewMailSubscriptionProcessor, config: RuntimeConfig): QueueHandlerRegistration[] => {
+        const inboundEnabled = config.mail.mode === 'INTERACTIVE' && config.mail.provider !== 'SMTP_IMAP';
+        return [
+        { name: 'outbox', handler: async (payload: QueuePayload) => { await processor.handleOutbox(payload); await statusNotifications.handle(payload); } },
         ...(config.queue.names.includes('reconcile') ? [{ name: 'reconcile', handler: (payload: QueuePayload) => reconciler.handle(payload) }] : []),
-        ...(config.queue.names.includes('mail-ingest') ? [{ name: 'mail-ingest', handler: (payload: QueuePayload) => fetcher.handle(payload) }] : []),
-        ...(config.queue.names.includes('mail-sync') ? [{ name: 'mail-sync', handler: (payload: QueuePayload) => sync.handle(payload) }] : []),
-        ...(config.queue.names.includes('mail-subscription') ? [{ name: 'mail-subscription', handler: (payload: QueuePayload) => renewSubscription.handle(payload) }] : []),
+        ...(inboundEnabled && config.queue.names.includes('mail-ingest') ? [{ name: 'mail-ingest', handler: (payload: QueuePayload) => fetcher.handle(payload) }] : []),
+        ...(inboundEnabled && config.queue.names.includes('mail-sync') ? [{ name: 'mail-sync', handler: (payload: QueuePayload) => sync.handle(payload) }] : []),
+        ...(inboundEnabled && config.queue.names.includes('mail-subscription') ? [{ name: 'mail-subscription', handler: (payload: QueuePayload) => renewSubscription.handle(payload) }] : []),
         ...(config.queue.names.includes('file-scan') ? [{ name: 'file-scan', handler: (payload: QueuePayload) => scanner.handle(payload) }] : []),
-      ],
+        ];
+      },
     },
   ],
   exports: [EmailPrismaRepository, MAIL_PROVIDER_ADAPTER, MAIL_PROVIDER_OPERATION_LIMITER, FakeMailProviderAdapter, EmailPreviewService, EmailCommandService, SendEmailProcessor, ReconcileSendProcessor, RenewMailSubscriptionProcessor, MailSubscriptionSchedulerService, EmailMatcherService, EmailInboundService, QUEUE_HANDLERS],

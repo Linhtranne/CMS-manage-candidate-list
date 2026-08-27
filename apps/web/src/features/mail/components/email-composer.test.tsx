@@ -10,6 +10,7 @@ describe('EmailComposer', () => {
     const conversation = { ...conversationDetails[1], applicationId: null };
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(<QueryClientProvider client={client}><EmailComposer conversation={conversation} /></QueryClientProvider>);
+    await screen.findByRole('option', { name: 'Mời phỏng vấn' });
     await userEvent.selectOptions(screen.getByLabelText('Mẫu email'), 'INTERVIEW_INVITATION');
     await userEvent.type(screen.getByLabelText('Nội dung'), 'Xin chào');
     await userEvent.click(screen.getByRole('button', { name: 'Gửi email' }));

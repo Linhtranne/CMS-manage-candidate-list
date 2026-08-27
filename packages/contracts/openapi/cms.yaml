@@ -19,6 +19,28 @@ paths:
                 $ref: '#/components/schemas/ApiCurrentUserEnvelope'
         '401':
           $ref: '#/components/responses/Unauthorized'
+    patch:
+      operationId: updateCurrentUser
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCurrentUserRequest'
+      responses:
+        '200':
+          description: Updated current internal user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiCurrentUserEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /search:
     get:
       operationId: searchWorkspace
@@ -117,6 +139,64 @@ paths:
       security:
         - sessionCookie: []
           csrfHeader: []
+  /notifications:
+    get:
+      operationId: listNotifications
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Notifications for the authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiNotificationsResponseEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /notifications/read-all:
+    post:
+      operationId: markAllNotificationsRead
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      responses:
+        '200':
+          description: Notifications marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiNotificationReadAllEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+  /notifications/{id}/read:
+    post:
+      operationId: markNotificationRead
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiNotificationEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /work-items:
     post:
       operationId: createWorkItem
@@ -166,6 +246,12 @@ paths:
           schema:
             type: string
         - in: query
+          name: candidateId
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - in: query
           name: limit
           required: false
           schema:
@@ -181,6 +267,36 @@ paths:
                 $ref: '#/components/schemas/ApiWorkItemsResponseEnvelope'
         default:
           $ref: '#/components/responses/Unauthorized'
+  /tasks/assignees:
+    get:
+      operationId: listTaskAssignees
+      responses:
+        '200':
+          description: Active users available for task assignment
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - requestId
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - items
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TaskAssignee'
+                  requestId:
+                    type: string
+                    minLength: 1
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
   /work-items/summary:
     get:
       operationId: getWorkSummary
@@ -429,6 +545,36 @@ paths:
                 $ref: '#/components/schemas/ApiJobOrderEnvelope'
         default:
           $ref: '#/components/responses/Unauthorized'
+    patch:
+      operationId: updateOrder
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateRequest'
+      responses:
+        '200':
+          description: Recruitment order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiJobOrderEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+          csrfHeader: []
   /orders/{id}/status:
     patch:
       operationId: updateOrderStatus
@@ -1463,6 +1609,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       security:
         - sessionCookie: []
+  /mailbox/templates:
+    get:
+      operationId: listMailboxEmailTemplates
+      responses:
+        '200':
+          description: Active email templates available to mailbox users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiMailboxTemplatesResponseEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
   /mailbox/conversations/{id}/attachments/{attachmentId}/download:
     post:
       operationId: createMailboxAttachmentDownload
@@ -1611,6 +1773,52 @@ paths:
       security:
         - sessionCookie: []
           csrfHeader: []
+  /notes:
+    get:
+      operationId: listEntityNotes
+      parameters:
+        - in: query
+          name: entityType
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: entityId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Entity notes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiNotesResponseEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - sessionCookie: []
+    post:
+      operationId: createEntityNote
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEntityNoteRequest'
+      responses:
+        '201':
+          description: Entity note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEntityNoteEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /tasks/{id}:
     get:
       operationId: getTask
@@ -1805,6 +2013,12 @@ paths:
           required: false
           schema:
             type: string
+        - in: query
+          name: timeZone
+          required: false
+          description: IANA timezone used to interpret the report window and format timestamps.
+          schema:
+            type: string
       responses:
         '200':
           description: Operational report summary
@@ -1860,6 +2074,12 @@ paths:
         - in: query
           name: sourceId
           required: false
+          schema:
+            type: string
+        - in: query
+          name: timeZone
+          required: false
+          description: IANA timezone used to interpret the report window and format timestamps.
           schema:
             type: string
       responses:
@@ -2986,21 +3206,39 @@ paths:
         '200':
           description: createDocumentUpload
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /documents/{id}:
     get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
       operationId: getDocument
       responses:
         '200':
           description: getDocument
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /documents/{id}/downloads:
     post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
       operationId: createDocumentDownload
       security:
         - sessionCookie: []
@@ -3009,11 +3247,20 @@ paths:
         '200':
           description: createDocumentDownload
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /documents/{id}/links:
     post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
       operationId: linkDocument
       security:
         - sessionCookie: []
@@ -3028,11 +3275,20 @@ paths:
         '200':
           description: linkDocument
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /documents/{id}/verification:
     post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
       operationId: verifyDocument
       security:
         - sessionCookie: []
@@ -3047,9 +3303,11 @@ paths:
         '200':
           description: verifyDocument
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ApiGenericObjectEnvelope'
+        default:
+          $ref: '#/components/responses/Unauthorized'
   /email-previews:
     post:
       operationId: createEmailPreview
@@ -3414,6 +3672,8 @@ components:
       required:
         - id
         - displayName
+        - email
+        - status
         - roles
         - permissions
       properties:
@@ -3422,6 +3682,16 @@ components:
           format: uuid
         displayName:
           type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - LOCKED
+            - DISABLED
+            - INVITED
         roles:
           type: array
           items:
@@ -3430,6 +3700,23 @@ components:
           type: array
           items:
             type: string
+    UpdateCurrentUserRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 160
+        currentPassword:
+          type: string
+          minLength: 8
+          maxLength: 128
+        newPassword:
+          type: string
+          minLength: 8
+          maxLength: 128
     ApiProblem:
       type: object
       required:
@@ -3525,6 +3812,47 @@ components:
             createdAt:
               type: string
               format: date-time
+    Notification:
+      type: object
+      required:
+        - id
+        - kind
+        - severity
+        - params
+        - href
+        - readAt
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+            - INTERVIEW_SCHEDULED
+            - MAIL_NEEDS_ACTION
+            - JOURNEY_AT_RISK
+            - TASK_ASSIGNED
+            - APPLICATION_DECISION
+        severity:
+          type: string
+          enum:
+            - INFO
+            - WARNING
+            - DANGER
+        params:
+          type: object
+          additionalProperties: true
+        href:
+          type: string
+          nullable: true
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
     PersonRef:
       type: object
       required:
@@ -3704,6 +4032,19 @@ components:
             - CLIENT_PARTNER
             - INTERNAL
             - SYSTEM
+    TaskAssignee:
+      type: object
+      required:
+        - id
+        - displayName
+        - email
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
     Client:
       type: object
       required:
@@ -3755,8 +4096,17 @@ components:
           type: string
         contactName:
           type: string
+          nullable: true
+        contactEmail:
+          type: string
+          format: email
+          nullable: true
+        contactPhone:
+          type: string
+          nullable: true
         notes:
           type: string
+          nullable: true
         version:
           type: integer
           minimum: 1
@@ -3819,6 +4169,13 @@ components:
         ownerId:
           type: string
         contactName:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          format: email
+          nullable: true
+        contactPhone:
           type: string
           nullable: true
         notes:
@@ -3938,6 +4295,9 @@ components:
           type: array
           items:
             type: string
+        occupationCatalogVersionId:
+          type: string
+          format: uuid
     CreateOrderRequest:
       type: object
       required:
@@ -3982,6 +4342,53 @@ components:
           type: array
           items:
             type: string
+    OrderUpdateRequest:
+      type: object
+      required:
+        - position
+        - industryLabel
+        - occupation
+        - location
+        - target
+        - deadline
+        - occupationCatalogVersionId
+        - criteria
+        - version
+      properties:
+        position:
+          type: string
+          minLength: 2
+        industryLabel:
+          type: string
+          minLength: 2
+        occupation:
+          type: string
+          minLength: 2
+        location:
+          type: string
+          minLength: 2
+        target:
+          type: integer
+          minimum: 1
+        deadline:
+          type: string
+          format: date-time
+        occupationCatalogVersionId:
+          type: string
+          format: uuid
+        salary:
+          type: string
+        contractType:
+          type: string
+        japaneseLevel:
+          type: string
+        criteria:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+          minimum: 1
     OrdersResponse:
       type: object
       required:
@@ -4325,6 +4732,9 @@ components:
               format: email
               nullable: true
             phone:
+              type: string
+              nullable: true
+            passportNumber:
               type: string
               nullable: true
             address:
@@ -5424,8 +5834,9 @@ components:
             - RECEIVED
             - CLOSED
         candidate:
-          $ref: '#/components/schemas/CandidateRef'
-          nullable: true
+          anyOf:
+            - $ref: '#/components/schemas/CandidateRef'
+            - type: 'null'
         applicationId:
           type: string
           nullable: true
@@ -6483,6 +6894,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AdminTemplate'
+    MailboxEmailTemplate:
+      type: object
+      required:
+        - id
+        - name
+        - subject
+        - body
+        - variables
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+    MailboxTemplatesResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailboxEmailTemplate'
     MailboxSettingsView:
       type: object
       required:
@@ -6750,6 +7192,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SavedView'
+    NotificationsResponse:
+      type: object
+      required:
+        - items
+        - unreadCount
+        - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        unreadCount:
+          type: integer
+          minimum: 0
+        nextCursor:
+          type: string
+          nullable: true
+    NotificationReadAll:
+      type: object
+      required:
+        - updatedCount
+      properties:
+        updatedCount:
+          type: integer
+          minimum: 0
     HealthStatus:
       type: object
       required:
@@ -6863,6 +7330,39 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/SavedView'
+        requestId:
+          type: string
+          minLength: 1
+    ApiNotificationsResponseEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/NotificationsResponse'
+        requestId:
+          type: string
+          minLength: 1
+    ApiNotificationEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/Notification'
+        requestId:
+          type: string
+          minLength: 1
+    ApiNotificationReadAllEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/NotificationReadAll'
         requestId:
           type: string
           minLength: 1
@@ -7333,6 +7833,20 @@ components:
         requestId:
           type: string
           minLength: 1
+    ApiMailboxTemplatesResponseEnvelope:
+      type: object
+      required:
+        - data
+        - page
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/MailboxTemplatesResponse'
+        page:
+          $ref: '#/components/schemas/ApiPage'
+        requestId:
+          type: string
+          minLength: 1
     ApiAdminTemplateEnvelope:
       type: object
       required:
@@ -7383,6 +7897,78 @@ components:
     GenericCommand:
       type: object
       additionalProperties: true
+    EntityNote:
+      type: object
+      required:
+        - id
+        - entityType
+        - entityId
+        - content
+        - createdAt
+        - author
+      properties:
+        id:
+          type: string
+          format: uuid
+        entityType:
+          type: string
+        entityId:
+          type: string
+          format: uuid
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        author:
+          $ref: '#/components/schemas/PersonRef'
+    NotesResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityNote'
+    ApiNotesResponseEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/NotesResponse'
+        requestId:
+          type: string
+          minLength: 1
+    ApiEntityNoteEnvelope:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/EntityNote'
+        requestId:
+          type: string
+          minLength: 1
+    CreateEntityNoteRequest:
+      type: object
+      required:
+        - entityType
+        - entityId
+        - content
+      properties:
+        entityType:
+          type: string
+        entityId:
+          type: string
+          format: uuid
+        content:
+          type: string
+          minLength: 1
+          maxLength: 5000
     CreateDocumentUploadRequest:
       type: object
       additionalProperties: false

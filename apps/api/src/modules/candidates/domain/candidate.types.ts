@@ -25,11 +25,74 @@ export interface CandidateEntity {
   teamId?: string;
   email?: string | null;
   phone?: string | null;
+  passportNumber?: string | null;
   address?: string | null;
   version: number;
   createdAt: Date;
   updatedAt: Date;
   profiles: OccupationProfileEntity[];
+  /** Read-model fields used by candidate list/detail views. */
+  applicationCount?: number;
+  operationalPhase?: 'POTENTIAL' | 'APPLYING' | 'PASSED' | 'SUPPLYING' | 'SUPPLIED';
+  hasActiveJourney?: boolean;
+  isPossibleDuplicate?: boolean;
+  missingDocumentCount?: number;
+  nextAction?: string;
+  skills?: string[];
+  yearsExperience?: number;
+  desiredLocation?: string | null;
+  applications?: CandidateApplicationSummary[];
+  journeys?: CandidateJourneySummary[];
+  emailCount?: number;
+  files?: CandidateFileSummary[];
+  notes?: string[];
+  history?: CandidateHistorySummary[];
+}
+
+export interface CandidateApplicationSummary {
+  id: string;
+  order: { id: string; code: string; position: string };
+  client: { id: string; name: string };
+  owner: { id: string; name: string };
+  status: string;
+  source: string;
+  appliedAt: string;
+  lastActivityAt: string;
+  dueAt: string | null;
+  version: number;
+  interviews: Array<Record<string, unknown>>;
+  decisionReason: string | null;
+}
+
+export interface CandidateJourneySummary {
+  id: string;
+  status: string;
+  candidate: { id: string; code: string; name: string };
+  order: { id: string; code: string; position: string };
+  client: { id: string; name: string };
+  owner: { id: string; name: string };
+  templateName: string;
+  currentMilestone: string;
+  nearestDueAt: string | null;
+  progress: { completed: number; applicable: number };
+  health: 'ON_TRACK' | 'OVERDUE' | 'AT_RISK' | 'COMPLETED';
+}
+
+export interface CandidateFileSummary {
+  id: string;
+  fileName: string;
+  category: 'CV' | 'IDENTITY' | 'CERTIFICATE' | 'LANGUAGE' | 'OTHER';
+  scanStatus: 'PENDING' | 'SAFE' | 'QUARANTINED' | 'REJECTED';
+  uploadedAt: string;
+  downloadUrl: string | null;
+}
+
+export interface CandidateHistorySummary {
+  id: string;
+  type: 'CREATED' | 'STATUS_CHANGED' | 'APPLICATION_CREATED' | 'JOURNEY_STARTED';
+  occurredAt: string;
+  actor: { id: string; name: string };
+  summary: string;
 }
 
 export interface OccupationProfileEntity {

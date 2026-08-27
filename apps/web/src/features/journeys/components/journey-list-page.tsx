@@ -9,5 +9,91 @@ import { useI18n } from '@/i18n/use-i18n';
 import { useJourneys } from '../services/journey-queries';
 import { JourneyDrawer } from './journey-drawer';
 import { JourneyTable } from './journey-table';
-const views = [['all', 'journeys.views.all'], ['active', 'journeys.views.active'], ['on-hold', 'journeys.views.onHold'], ['at-risk', 'journeys.views.atRisk'], ['overdue', 'journeys.views.overdue'], ['waiting-candidate', 'journeys.views.waitingCandidate'], ['waiting-external', 'journeys.views.waitingExternal'], ['near-complete', 'journeys.views.nearComplete'], ['completed', 'journeys.views.completed'], ['cancelled', 'journeys.views.cancelled']] as const;
-export function JourneyListPage() { const { t } = useI18n(); const { params, setQuery, setView, setSelectedId } = useListParams({ defaultView: 'all' }); const currentUser = useCurrentUser(); const view = views.some(([id]) => id === params.view) ? params.view : 'all'; const handleTabKeyDown = useTabKeyboard(views.map(([id]) => id), setView); const query = useJourneys({ query: params.query, view }); return <div className="space-y-6"><div><p className="text-sm font-medium text-accent">{t('journeys.list.eyebrow')}</p><h1 className="mt-1 text-2xl font-bold text-text">{t('journeys.list.title')}</h1><p className="mt-2 max-w-3xl text-sm text-text-muted">{t('journeys.list.description')}</p></div><SavedViewBar><label className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm font-semibold text-text">{t('journeys.list.searchLabel')}<input aria-label={t('journeys.list.searchAria')} name="journey-search" value={params.query} onChange={(event) => setQuery(event.target.value)} placeholder={t('journeys.list.searchPlaceholder')} className="min-h-10 min-w-0 flex-1 rounded-control border border-border bg-panel px-3 font-normal sm:w-80 sm:flex-none" /></label><span className="text-sm text-text-muted">{t('journeys.list.scope')}</span>{currentUser.data ? <SavedViewMenu resource="journeys" user={currentUser.data} query={{ view, query: params.query }} onApply={(saved) => { if (typeof saved.view === 'string') setView(saved.view); if (typeof saved.query === 'string') setQuery(saved.query); }} /> : null}</SavedViewBar><div className="flex flex-wrap gap-2" role="tablist" aria-label={t('journeys.list.tabLabel')} onKeyDown={handleTabKeyDown}>{views.map(([id, key]) => <button key={id} type="button" role="tab" data-tab-value={id} tabIndex={view === id ? 0 : -1} aria-selected={view === id} onClick={() => setView(id)} className={`min-h-10 rounded-control border px-3 text-sm font-semibold ${view === id ? 'border-accent bg-accent text-white' : 'border-border bg-panel text-text-muted hover:text-text'}`}>{t(key as Parameters<typeof t>[0])}</button>)}</div><JourneyTable journeys={query.data?.items ?? []} isLoading={query.isPending} error={query.error ? t('journeys.list.loadError') : undefined} onRetry={() => void query.refetch()} onRowClick={(journey) => setSelectedId(journey.id)} /><JourneyDrawer journeyId={params.selectedId} open={Boolean(params.selectedId)} onClose={() => setSelectedId(undefined)} /></div>; }
+const views = [
+  ['all', 'journeys.views.all'],
+  ['active', 'journeys.views.active'],
+  ['on-hold', 'journeys.views.onHold'],
+  ['at-risk', 'journeys.views.atRisk'],
+  ['overdue', 'journeys.views.overdue'],
+  ['waiting-candidate', 'journeys.views.waitingCandidate'],
+  ['waiting-external', 'journeys.views.waitingExternal'],
+  ['near-complete', 'journeys.views.nearComplete'],
+  ['completed', 'journeys.views.completed'],
+  ['cancelled', 'journeys.views.cancelled'],
+] as const;
+export function JourneyListPage() {
+  const { t } = useI18n();
+  const { params, setQuery, setView, setSelectedId } = useListParams({ defaultView: 'all' });
+  const currentUser = useCurrentUser();
+  const view = views.some(([id]) => id === params.view) ? params.view : 'all';
+  const handleTabKeyDown = useTabKeyboard(
+    views.map(([id]) => id),
+    setView,
+  );
+  const query = useJourneys({ query: params.query, view });
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-sm font-medium text-accent">{t('journeys.list.eyebrow')}</p>
+        <h1 className="mt-1 text-2xl font-bold text-text">{t('journeys.list.title')}</h1>
+      </div>
+      <SavedViewBar>
+        <label className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm font-semibold text-text">
+          {t('journeys.list.searchLabel')}
+          <input
+            aria-label={t('journeys.list.searchAria')}
+            name="journey-search"
+            value={params.query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t('journeys.list.searchPlaceholder')}
+            className="min-h-10 min-w-0 flex-1 rounded-control border border-border bg-panel px-3 font-normal sm:w-80 sm:flex-none"
+          />
+        </label>
+        {currentUser.data ? (
+          <SavedViewMenu
+            resource="journeys"
+            user={currentUser.data}
+            query={{ view, query: params.query }}
+            onApply={(saved) => {
+              if (typeof saved.view === 'string') setView(saved.view);
+              if (typeof saved.query === 'string') setQuery(saved.query);
+            }}
+          />
+        ) : null}
+      </SavedViewBar>
+      <div
+        className="flex flex-nowrap gap-2 overflow-x-auto pb-1"
+        role="tablist"
+        aria-label={t('journeys.list.tabLabel')}
+        onKeyDown={handleTabKeyDown}
+      >
+        {views.map(([id, key]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            data-tab-value={id}
+            tabIndex={view === id ? 0 : -1}
+            aria-selected={view === id}
+            onClick={() => setView(id)}
+            className={`shrink-0 min-h-10 rounded-control border px-3 text-sm font-semibold ${view === id ? 'border-accent bg-accent text-white' : 'border-border bg-panel text-text-muted hover:text-text'}`}
+          >
+            {t(key as Parameters<typeof t>[0])}
+          </button>
+        ))}
+      </div>
+      <JourneyTable
+        journeys={query.data?.items ?? []}
+        isLoading={query.isPending}
+        error={query.error ? t('journeys.list.loadError') : undefined}
+        onRetry={() => void query.refetch()}
+        onRowClick={(journey) => setSelectedId(journey.id)}
+      />
+      <JourneyDrawer
+        journeyId={params.selectedId}
+        open={Boolean(params.selectedId)}
+        onClose={() => setSelectedId(undefined)}
+      />
+    </div>
+  );
+}

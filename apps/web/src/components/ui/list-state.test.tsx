@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { recruiterFixture } from '@/mocks/fixtures/users';
+import { configAdminFixture, recruiterFixture } from '@/mocks/fixtures/users';
 import { useListParams } from '@/hooks/use-list-params';
 import { QueryProvider } from '@/providers/query-provider';
 import { SavedViewMenu } from './saved-view-menu';
@@ -34,5 +34,15 @@ describe('list foundation', () => {
 
     expect(screen.getByRole('option', { name: 'Dùng riêng' })).toBeVisible();
     expect(screen.queryByRole('option', { name: 'Chia sẻ cho đội' })).not.toBeInTheDocument();
+  });
+
+  it('lets config admins publish team views using the canonical permission', () => {
+    const configAdminWithoutLegacyPermission = {
+      ...configAdminFixture,
+      permissions: configAdminFixture.permissions.filter((permission) => permission !== 'admin.read'),
+    };
+    render(<QueryProvider><SavedViewMenu resource="candidates" user={configAdminWithoutLegacyPermission} /></QueryProvider>);
+
+    expect(screen.getByRole('option', { name: 'Chia sẻ cho đội' })).toBeVisible();
   });
 });

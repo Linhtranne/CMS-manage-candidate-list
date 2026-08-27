@@ -9,6 +9,7 @@ export const PERMISSION_ACTIONS = [
   'document.upload', 'document.download', 'document.download_sensitive',
   'task.view', 'task.update', 'task.assign', 'report.view', 'export.create',
   'catalog.configure', 'iam.configure', 'audit.view', 'break_glass.activate',
+  'saved_view.view', 'saved_view.manage',
 ] as const;
 
 export type PermissionAction = (typeof PERMISSION_ACTIONS)[number];
@@ -50,6 +51,7 @@ export const ROLE_ACTION_SCOPES: Record<string, Partial<Record<PermissionAction,
     'interview.schedule': 'TEAM', 'interview.record_result': 'TEAM', 'supply_journey.view': 'ASSIGNED',
     'email.read': 'ASSIGNED', 'email.send': 'ASSIGNED', 'document.upload': 'ASSIGNED', 'document.download': 'ASSIGNED',
     'task.view': 'TEAM', 'task.update': 'SELF', 'report.view': 'TEAM',
+    'saved_view.view': 'TEAM', 'saved_view.manage': 'TEAM',
   },
   BUSINESS: {
     'candidate.view': 'DEPARTMENT', 'candidate.create': 'DEPARTMENT', 'candidate.update_basic': 'DEPARTMENT', 'candidate.view_sensitive': 'ASSIGNED',
@@ -58,6 +60,7 @@ export const ROLE_ACTION_SCOPES: Record<string, Partial<Record<PermissionAction,
     'application.view': 'DEPARTMENT', 'application.create': 'DEPARTMENT', 'application.update': 'DEPARTMENT', 'interview.schedule': 'DEPARTMENT',
     'supply_journey.view': 'DEPARTMENT', 'email.read': 'DEPARTMENT', 'email.send': 'DEPARTMENT', 'document.download': 'ASSIGNED',
     'task.view': 'DEPARTMENT', 'task.update': 'SELF', 'report.view': 'DEPARTMENT',
+    'saved_view.view': 'DEPARTMENT', 'saved_view.manage': 'DEPARTMENT',
   },
   JAPAN_COORDINATOR: {
     'candidate.view': 'ASSIGNED', 'candidate.update_basic': 'ASSIGNED', 'candidate.view_sensitive': 'ASSIGNED',
@@ -65,6 +68,7 @@ export const ROLE_ACTION_SCOPES: Record<string, Partial<Record<PermissionAction,
     'interview.schedule': 'ASSIGNED', 'interview.record_result': 'ASSIGNED', 'supply_journey.view': 'ASSIGNED',
     'supply_journey.create': 'ASSIGNED', 'supply_journey.update_milestone': 'ASSIGNED', 'email.read': 'ASSIGNED', 'email.send': 'ASSIGNED',
     'document.upload': 'ASSIGNED', 'document.download': 'ASSIGNED', 'task.view': 'ASSIGNED', 'task.update': 'SELF',
+    'saved_view.view': 'ASSIGNED', 'saved_view.manage': 'ASSIGNED',
   },
   MANAGER: {
     'candidate.view': 'DEPARTMENT', 'candidate.create': 'DEPARTMENT', 'candidate.update_basic': 'DEPARTMENT', 'candidate.view_sensitive': 'DEPARTMENT',
@@ -77,8 +81,9 @@ export const ROLE_ACTION_SCOPES: Record<string, Partial<Record<PermissionAction,
     'document.upload': 'DEPARTMENT', 'document.download': 'DEPARTMENT', 'document.download_sensitive': 'DEPARTMENT',
     'task.view': 'DEPARTMENT', 'task.update': 'DEPARTMENT', 'task.assign': 'DEPARTMENT', 'report.view': 'DEPARTMENT', 'export.create': 'DEPARTMENT',
     'audit.view': 'DEPARTMENT',
+    'saved_view.view': 'DEPARTMENT', 'saved_view.manage': 'DEPARTMENT',
   },
-  CONFIG_ADMIN: { 'catalog.configure': 'COMPANY', 'iam.configure': 'COMPANY', 'audit.view': 'COMPANY' },
+  CONFIG_ADMIN: { 'catalog.configure': 'COMPANY', 'iam.configure': 'COMPANY', 'audit.view': 'COMPANY', 'saved_view.view': 'COMPANY', 'saved_view.manage': 'COMPANY' },
 };
 
 export const REASON_REQUIRED_ACTIONS = new Set<PermissionAction>([

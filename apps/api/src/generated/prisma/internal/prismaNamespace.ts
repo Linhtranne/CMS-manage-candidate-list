@@ -404,7 +404,10 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   UserRole: 'UserRole',
+  EntityNote: 'EntityNote',
   Session: 'Session',
+  SavedView: 'SavedView',
+  Notification: 'Notification',
   AuditEvent: 'AuditEvent',
   OutboxEvent: 'OutboxEvent',
   JobAttempt: 'JobAttempt',
@@ -470,7 +473,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "team" | "user" | "identityLink" | "role" | "permission" | "rolePermission" | "userRole" | "session" | "auditEvent" | "outboxEvent" | "jobAttempt" | "idempotencyRecord" | "oidcLoginState" | "catalogItem" | "catalogVersion" | "interviewQuestionTemplate" | "interviewQuestionTemplateVersion" | "client" | "clientContact" | "jobOrder" | "jobOrderRequirementVersion" | "jobOrderStatusHistory" | "candidate" | "candidateOccupationProfile" | "candidateImportBatch" | "candidateImportRow" | "candidateDuplicateCase" | "candidateMergeAlias" | "application" | "applicationStatusHistory" | "interview" | "interviewParticipant" | "interviewHistory" | "mailbox" | "emailConversation" | "emailMessage" | "emailWebhookNotification" | "emailRecipient" | "emailAttachment" | "emailMatchDecision" | "supplyJourneyTemplate" | "supplyJourneyTemplateVersion" | "journeyMilestoneTemplate" | "taskRuleVersion" | "task" | "reportProjectionWatermark" | "reportProjectionRow" | "reportExportJob" | "supplyJourney" | "journeyMilestone" | "journeyMilestoneHistory" | "journeyMilestoneAttempt" | "document" | "documentVersion" | "documentLink" | "documentAccessAudit" | "retentionPolicy" | "legalHold"
+    modelProps: "team" | "user" | "identityLink" | "role" | "permission" | "rolePermission" | "userRole" | "entityNote" | "session" | "savedView" | "notification" | "auditEvent" | "outboxEvent" | "jobAttempt" | "idempotencyRecord" | "oidcLoginState" | "catalogItem" | "catalogVersion" | "interviewQuestionTemplate" | "interviewQuestionTemplateVersion" | "client" | "clientContact" | "jobOrder" | "jobOrderRequirementVersion" | "jobOrderStatusHistory" | "candidate" | "candidateOccupationProfile" | "candidateImportBatch" | "candidateImportRow" | "candidateDuplicateCase" | "candidateMergeAlias" | "application" | "applicationStatusHistory" | "interview" | "interviewParticipant" | "interviewHistory" | "mailbox" | "emailConversation" | "emailMessage" | "emailWebhookNotification" | "emailRecipient" | "emailAttachment" | "emailMatchDecision" | "supplyJourneyTemplate" | "supplyJourneyTemplateVersion" | "journeyMilestoneTemplate" | "taskRuleVersion" | "task" | "reportProjectionWatermark" | "reportProjectionRow" | "reportExportJob" | "supplyJourney" | "journeyMilestone" | "journeyMilestoneHistory" | "journeyMilestoneAttempt" | "document" | "documentVersion" | "documentLink" | "documentAccessAudit" | "retentionPolicy" | "legalHold"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -992,6 +995,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EntityNote: {
+      payload: Prisma.$EntityNotePayload<ExtArgs>
+      fields: Prisma.EntityNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EntityNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EntityNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        findFirst: {
+          args: Prisma.EntityNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EntityNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        findMany: {
+          args: Prisma.EntityNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>[]
+        }
+        create: {
+          args: Prisma.EntityNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        createMany: {
+          args: Prisma.EntityNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EntityNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>[]
+        }
+        delete: {
+          args: Prisma.EntityNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        update: {
+          args: Prisma.EntityNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.EntityNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EntityNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EntityNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.EntityNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityNotePayload>
+        }
+        aggregate: {
+          args: Prisma.EntityNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEntityNote>
+        }
+        groupBy: {
+          args: Prisma.EntityNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntityNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EntityNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntityNoteCountAggregateOutputType> | number
+        }
+      }
+    }
     Session: {
       payload: Prisma.$SessionPayload<ExtArgs>
       fields: Prisma.SessionFieldRefs
@@ -1063,6 +1140,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SessionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    SavedView: {
+      payload: Prisma.$SavedViewPayload<ExtArgs>
+      fields: Prisma.SavedViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SavedViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SavedViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        findFirst: {
+          args: Prisma.SavedViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SavedViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        findMany: {
+          args: Prisma.SavedViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        create: {
+          args: Prisma.SavedViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        createMany: {
+          args: Prisma.SavedViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SavedViewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        delete: {
+          args: Prisma.SavedViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        update: {
+          args: Prisma.SavedViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.SavedViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SavedViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SavedViewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        upsert: {
+          args: Prisma.SavedViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        aggregate: {
+          args: Prisma.SavedViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSavedView>
+        }
+        groupBy: {
+          args: Prisma.SavedViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SavedViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedViewCountAggregateOutputType> | number
+        }
+      }
+    }
+    Notification: {
+      payload: Prisma.$NotificationPayload<ExtArgs>
+      fields: Prisma.NotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.NotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        update: {
+          args: Prisma.NotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.NotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification>
+        }
+        groupBy: {
+          args: Prisma.NotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
         }
       }
     }
@@ -4886,6 +5111,18 @@ export const UserRoleScalarFieldEnum = {
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
+export const EntityNoteScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  content: 'content',
+  authorUserId: 'authorUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type EntityNoteScalarFieldEnum = (typeof EntityNoteScalarFieldEnum)[keyof typeof EntityNoteScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -4899,6 +5136,36 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const SavedViewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  teamId: 'teamId',
+  resource: 'resource',
+  name: 'name',
+  query: 'query',
+  visibility: 'visibility',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  severity: 'severity',
+  params: 'params',
+  href: 'href',
+  readAt: 'readAt',
+  dedupeKey: 'dedupeKey',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const AuditEventScalarFieldEnum = {
@@ -6065,7 +6332,10 @@ export type GlobalOmitConfig = {
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit
   userRole?: Prisma.UserRoleOmit
+  entityNote?: Prisma.EntityNoteOmit
   session?: Prisma.SessionOmit
+  savedView?: Prisma.SavedViewOmit
+  notification?: Prisma.NotificationOmit
   auditEvent?: Prisma.AuditEventOmit
   outboxEvent?: Prisma.OutboxEventOmit
   jobAttempt?: Prisma.JobAttemptOmit

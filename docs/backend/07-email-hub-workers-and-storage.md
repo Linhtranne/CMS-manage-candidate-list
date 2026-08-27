@@ -2,7 +2,7 @@
 title: Email Hub Workers and Storage Specification
 status: ready_for_human_approval
 version: 1.0.0
-updated_at: 2026-08-20
+updated_at: 2026-08-27
 owner: Backend Tech Lead
 reviewers:
   - Security Owner
@@ -18,9 +18,10 @@ risk: critical
 
 ## 1. Release posture
 
-Baseline dùng đúng một shared mailbox. Provider, địa chỉ mailbox, tenant/DNS owner và credential flow đang `blocked_by_external_decision`; cho đến khi DEC-003 approved, `MAIL_PROVIDER=DISABLED` và mọi send/poll/webhook trả `MAIL_PROVIDER_DISABLED` hoặc health `not_configured`.
+Baseline dùng đúng một sender identity của Amazon SES. Adapter outbound SES SMTP + Nodemailer đã được triển khai và bind dưới contract `SMTP_IMAP`; việc bật gửi thật vẫn fail-closed cho tới khi DEC-003, verified identity/DNS, credential và sandbox evidence hợp lệ.
+Khi các điều kiện này chưa đạt, runtime giữ `MAIL_PROVIDER=DISABLED` (hoặc `FAKE` trong development/test) và không gửi Internet.
 
-Email Hub lưu trao đổi hai chiều có audit; không phải marketing automation. Candidate không có tài khoản/portal.
+Email Hub hiện chỉ gửi thông báo trạng thái một chiều có audit; inbound/reply/polling bị tắt theo DEC-003. Đây không phải marketing automation và candidate không có tài khoản/portal.
 
 ## 2. Adapter contracts
 
@@ -31,9 +32,9 @@ interface MailProviderAdapter {
   readonly provider: 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
   validateConnection(): Promise<ProviderHealth>;
   send(input: ProviderSendRequest, idempotencyKey: string): Promise<ProviderSendResult>;
-  fetchChanges(cursor: MailCursor | null, limit: number): Promise<ProviderChangePage>;
-  fetchMessage(providerMessageId: string): Promise<ProviderMessage>;
-  fetchAttachment(providerMessageId: string, attachmentId: string): Promise<NodeJS.ReadableStream>;
+  fetchChanges(cursor: MailCursor | null, limit: number): Promise<ProviderChangePage>; // unsupported for outbound-only SES SMTP
+  fetchMessage(providerMessageId: string): Promise<ProviderMessage>; // unsupported for outbound-only SES SMTP
+  fetchAttachment(providerMessageId: string, attachmentId: string): Promise<NodeJS.ReadableStream>; // unsupported for outbound-only SES SMTP
   renewSubscription?(subscriptionId: string): Promise<ProviderSubscription>;
 }
 

@@ -21,6 +21,7 @@
     "db:migrate:deploy": "node scripts/migrate-deploy.mjs",
     "db:migrate:status": "prisma migrate status",
     "db:seed:local": "tsx scripts/seed-local-user.ts",
+    "db:seed:local-data": "tsx scripts/seed-local-demo.ts",
     "db:runtime-role-smoke": "node scripts/runtime-role-smoke.mjs",
     "db:query-plan-smoke": "node scripts/query-plan-smoke.mjs",
     "test:migration": "vitest run test/migrations",
@@ -47,6 +48,7 @@
     "helmet": "8.1.0",
     "ioredis": "6.0.0",
     "jose": "6.2.9",
+    "nodemailer": "7.0.13",
     "pg": "8.23.0",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
@@ -55,6 +57,7 @@
     "@nestjs/testing": "11.2.1",
     "@types/express": "5.0.6",
     "@types/node": "26.2.0",
+    "@types/nodemailer": "8.0.1",
     "@types/pg": "8.15.5",
     "@types/supertest": "6.0.3",
     "prisma": "7.9.1",

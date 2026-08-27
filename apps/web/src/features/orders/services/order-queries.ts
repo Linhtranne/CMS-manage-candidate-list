@@ -6,6 +6,10 @@ import { apiClient } from '@/lib/api/client';
 
 type WebJobOrder = components['schemas']['JobOrder'];
 
+export function toApiOrderStatus(status?: string) {
+  return status === 'RECRUITING' ? 'OPEN' : status === 'PAUSED' ? 'ON_HOLD' : status;
+}
+
 function normalizeOrder(order: WebJobOrder): WebJobOrder {
   const status = order.status === 'OPEN'
     ? 'RECRUITING'
@@ -16,7 +20,7 @@ function normalizeOrder(order: WebJobOrder): WebJobOrder {
 }
 
 export async function fetchOrders(params: { query?: string; status?: string; industry?: string } = {}) {
-  const response = await apiClient.GET('/orders', { params: { query: params } });
+  const response = await apiClient.GET('/orders', { params: { query: { ...params, ...(params.status ? { status: toApiOrderStatus(params.status) } : {}) } } });
   if (response.error) throw new Error(response.error.message);
   return { ...response.data, items: response.data.items.map(normalizeOrder) };
 }
@@ -93,6 +97,36 @@ export function useUpdateOrderStatus() {
       void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       void queryClient.invalidateQueries({ queryKey: ['orders'] });
     }
+  });
+}
+
+export function useUpdateOrderRequirements() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, body }: { orderId: string; body: components['schemas']['OrderRequirementUpdate'] }) => {
+      const response = await apiClient.PATCH('/orders/{id}/requirements', { params: { path: { id: orderId } }, body });
+      if (response.error) throw new Error(response.error.message);
+      return normalizeOrder(response.data);
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}
+
+export function useUpdateOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, body }: { orderId: string; body: components['schemas']['OrderUpdateRequest'] }) => {
+      const response = await apiClient.PATCH('/orders/{id}', { params: { path: { id: orderId } }, body });
+      if (response.error) throw new Error(response.error.message);
+      return normalizeOrder(response.data);
+    },
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 }
 

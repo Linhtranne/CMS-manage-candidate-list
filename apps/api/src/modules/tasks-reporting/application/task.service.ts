@@ -1,4 +1,4 @@
-import { assertTaskTransition, TaskDomainError, validateCreateTask, type CreateTaskInput, type TaskEntity, type TaskStatus, type TaskWaitingOn } from '../domain/task.rules.js';
+import { assertTaskTransition, TASK_WAITING_ON, TaskDomainError, validateCreateTask, type CreateTaskInput, type TaskEntity, type TaskStatus, type TaskWaitingOn } from '../domain/task.rules.js';
 
 export type TaskScope = 'SELF' | 'TEAM';
 export interface TaskScopeContext { actorId: string; teamId?: string; scope: TaskScope; correlationId: string }
@@ -11,6 +11,7 @@ export interface TaskRepository {
   findByDedupe(dedupeKey: string, context: TaskScopeContext): Promise<TaskEntity | null>;
   list(filter: TaskListFilter, context: TaskScopeContext): Promise<TaskEntity[]>;
   updateStatus(id: string, expectedVersion: number, status: TaskStatus, context: TaskScopeContext): Promise<TaskEntity | null>;
+  updateDetails(id: string, expectedVersion: number, input: { dueAt?: Date | null; waitingOn?: TaskWaitingOn | null; description?: string | null }, context: TaskScopeContext): Promise<TaskEntity | null>;
   assign(id: string, expectedVersion: number, assigneeUserId: string, teamId: string | null, context: TaskScopeContext): Promise<TaskEntity | null>;
   userInScope(userId: string, teamId: string | null, context: TaskScopeContext): Promise<boolean>;
 }
@@ -18,6 +19,7 @@ export interface TaskRepository {
 export interface TaskMutationEffects {
   audit(transaction: unknown, input: { action: string; entityId: string; actorUserId: string; correlationId: string; metadata?: Record<string, unknown> }): Promise<void>;
   outbox(transaction: unknown, input: { eventType: string; aggregateId: string; correlationId: string; payload: Record<string, unknown> }): Promise<void>;
+  notification?(transaction: unknown, input: { userId: string; kind: 'TASK_ASSIGNED'; severity: 'INFO'; params: Record<string, unknown>; href: string; dedupeKey: string }): Promise<void>;
 }
 
 export class TaskService {
@@ -74,6 +76,21 @@ export class TaskService {
     });
   }
 
+  async updateDetails(id: string, input: { dueAt?: Date | null; waitingOn?: TaskWaitingOn | null; description?: string | null }, expectedVersion: number, context: TaskScopeContext): Promise<TaskEntity> {
+    return this.repository.withTransaction(async (repository, transaction) => {
+      const current = await repository.findScoped(id, context);
+      if (!current) throw new TaskDomainError('TASK_NOT_FOUND', 404);
+      if (current.version !== expectedVersion) throw new TaskDomainError('VERSION_CONFLICT', 409);
+      if (current.status === 'DONE' || current.status === 'CANCELLED') throw new TaskDomainError('TASK_TERMINAL', 409);
+      if (input.waitingOn !== undefined && input.waitingOn !== null && !TASK_WAITING_ON.includes(input.waitingOn)) throw new TaskDomainError('INVALID_TASK_WAITING_ON');
+      if (input.dueAt === null && !current.noDueDateReason) throw new TaskDomainError('MANUAL_TASK_DUE_DATE_REQUIRED');
+      const updated = await repository.updateDetails(id, expectedVersion, input, context);
+      if (!updated) throw new TaskDomainError('VERSION_CONFLICT', 409);
+      await this.recordEffects(transaction, context, updated, 'TASK_DETAILS_UPDATED', 'task.updated', { dueAt: updated.dueAt?.toISOString() ?? null, waitingOn: updated.waitingOn ?? null });
+      return updated;
+    });
+  }
+
   private async transition(id: string, expectedVersion: number, target: TaskStatus, context: TaskScopeContext, action: string, eventType: string, metadata: Record<string, unknown> = {}): Promise<TaskEntity> {
     return this.repository.withTransaction(async (repository, transaction) => {
       const current = await repository.findScoped(id, context);
@@ -91,6 +108,15 @@ export class TaskService {
     if (!this.effects) return;
     await this.effects.audit(transaction, { action, entityId: entity.id, actorUserId: context.actorId, correlationId: context.correlationId, metadata });
     await this.effects.outbox(transaction, { eventType, aggregateId: entity.id, correlationId: context.correlationId, payload: { taskId: entity.id, status: entity.status, reference: entity.reference, ...metadata } });
+    if (this.effects.notification && (action === 'TASK_CREATED' || action === 'TASK_ASSIGNED')) {
+      await this.effects.notification(transaction, {
+        userId: entity.assigneeUserId,
+        kind: 'TASK_ASSIGNED',
+        severity: 'INFO',
+        params: { title: entity.title },
+        href: `/work?selectedId=${encodeURIComponent(entity.id)}`,
+        dedupeKey: `task-notification:${entity.id}:${action}:${entity.version}`,
+      });
+    }
   }
 }
-

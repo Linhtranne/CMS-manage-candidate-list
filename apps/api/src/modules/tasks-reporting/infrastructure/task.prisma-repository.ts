@@ -65,6 +65,21 @@ export class TaskPrismaRepository implements TaskRepository {
     return row ? mapRow(row) : null;
   }
 
+  async updateDetails(id: string, expectedVersion: number, input: { dueAt?: Date | null; waitingOn?: TaskWaitingOn | null; description?: string | null }, context: TaskScopeContext): Promise<TaskEntity | null> {
+    const updated = await this.prisma.task.updateMany({
+      where: { id, version: expectedVersion, ...this.scopedWhere(context) },
+      data: {
+        ...(input.dueAt !== undefined ? { dueAt: input.dueAt } : {}),
+        ...(input.waitingOn !== undefined ? { waitingOn: input.waitingOn } : {}),
+        ...(input.description !== undefined ? { description: input.description } : {}),
+        version: { increment: 1 },
+      },
+    });
+    if (updated.count !== 1) return null;
+    const row = await this.prisma.task.findUnique({ where: { id } });
+    return row ? mapRow(row) : null;
+  }
+
   async assign(id: string, expectedVersion: number, assigneeUserId: string, teamId: string | null, context: TaskScopeContext): Promise<TaskEntity | null> {
     const updated = await this.prisma.task.updateMany({ where: { id, version: expectedVersion, ...this.scopedWhere(context) }, data: { assigneeUserId, teamId, version: { increment: 1 } } });
     if (updated.count !== 1) return null;
@@ -79,4 +94,3 @@ export class TaskPrismaRepository implements TaskRepository {
     return user.id === context.actorId;
   }
 }
-

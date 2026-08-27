@@ -24,6 +24,8 @@ export function CreateClientModal({ open, onClose }: { open: boolean; onClose: (
   const [industry, setIndustry] = useState('');
   const [region, setRegion] = useState('');
   const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [errorField, setErrorField] = useState<'name' | 'industry' | 'region' | null>(null);
@@ -31,7 +33,7 @@ export function CreateClientModal({ open, onClose }: { open: boolean; onClose: (
 
   useEffect(() => {
     if (open) return;
-    setName(''); setOrganizationType('Doanh nghiệp tiếp nhận'); setIndustry(''); setRegion(''); setContactName(''); setNotes(''); setError(''); setErrorField(null); setSavedCode('');
+    setName(''); setOrganizationType('Doanh nghiệp tiếp nhận'); setIndustry(''); setRegion(''); setContactName(''); setContactEmail(''); setContactPhone(''); setNotes(''); setError(''); setErrorField(null); setSavedCode('');
   }, [open]);
 
   const submit = () => {
@@ -49,13 +51,13 @@ export function CreateClientModal({ open, onClose }: { open: boolean; onClose: (
     }
     setError('');
     setErrorField(null);
-    mutation.mutate({ name: name.trim(), organizationType, industryLabels: [catalogValue(t, industry)], region: region.trim(), ownerId: currentUser.data?.id ?? '', contactName: contactName.trim() || null, notes: notes.trim() || null }, {
+    mutation.mutate({ name: name.trim(), organizationType, industryLabels: [catalogValue(t, industry)], region: region.trim(), ownerId: currentUser.data?.id ?? '', contactName: contactName.trim() || null, contactEmail: contactEmail.trim() || null, contactPhone: contactPhone.trim() || null, notes: notes.trim() || null }, {
       onSuccess: (client) => setSavedCode(client.code),
       onError: (cause) => setError(localizedError(t, cause, t('common.errors.loadFailed')))
     });
   };
 
-  return <Modal open={open} onClose={onClose} confirmOnClose={!savedCode && Boolean(name.trim() || industry || region.trim() || contactName.trim() || notes.trim())} title={t('clients.form.createTitle')} description={t('clients.form.createDescription')} size="lg" footer={savedCode ? <Button variant="primary" onClick={onClose}>{t('clients.form.close')}</Button> : <><Button onClick={onClose}>{t('clients.form.cancel')}</Button><Button variant="primary" onClick={submit} disabled={mutation.isPending || !currentUser.data}>{mutation.isPending ? t('clients.form.saving') : t('clients.form.save')}</Button></>}> 
+  return <Modal open={open} onClose={onClose} confirmOnClose={!savedCode && Boolean(name.trim() || industry || region.trim() || contactName.trim() || contactEmail.trim() || contactPhone.trim() || notes.trim())} title={t('clients.form.createTitle')} size="lg" footer={savedCode ? <Button variant="primary" onClick={onClose}>{t('clients.form.close')}</Button> : <><Button onClick={onClose}>{t('clients.form.cancel')}</Button><Button variant="primary" onClick={submit} disabled={mutation.isPending || !currentUser.data}>{mutation.isPending ? t('clients.form.saving') : t('clients.form.save')}</Button></>}>
     {savedCode ? <p role="status" className="rounded-control border border-success/30 bg-success/10 px-4 py-3 text-sm font-semibold text-success">{t('clients.form.created', { code: savedCode })}</p> : <div className="space-y-5">
       {error ? <p id={errorId} role="alert" className="rounded-control border border-danger/30 bg-danger/10 px-4 py-3 text-sm font-semibold text-danger">{error}</p> : null}
       <div className="grid gap-4 sm:grid-cols-2">
@@ -64,6 +66,8 @@ export function CreateClientModal({ open, onClose }: { open: boolean; onClose: (
         <label className="text-sm font-semibold text-text">{t('clients.form.industry')}<select ref={industryRef} aria-label={t('clients.form.industryAria')} aria-invalid={errorField === 'industry'} aria-describedby={errorField === 'industry' ? errorId : undefined} name="client-industry" value={industry} onChange={(event) => { setIndustry(event.target.value); setErrorField(null); }} className={inputClass}><option value="">{t('clients.form.chooseIndustry')}</option>{candidateIndustryOptions.map(({ value, key }) => <option key={value} value={value}>{t(key)}</option>)}</select></label>
         <label className="text-sm font-semibold text-text">{t('clients.form.region')}<input ref={regionRef} aria-label={t('clients.form.regionAria')} aria-invalid={errorField === 'region'} aria-describedby={errorField === 'region' ? errorId : undefined} name="client-region" value={region} onChange={(event) => { setRegion(event.target.value); setErrorField(null); }} className={inputClass} placeholder={t('clients.form.regionPlaceholder')} autoComplete="off" /></label>
         <label className="text-sm font-semibold text-text">{t('clients.form.contact')}<input aria-label={t('clients.form.contactAria')} name="client-contact" value={contactName} onChange={(event) => setContactName(event.target.value)} className={inputClass} /></label>
+        <label className="text-sm font-semibold text-text">{t('clients.form.contactEmail')}<input aria-label={t('clients.form.contactEmailAria')} name="client-contact-email" type="email" value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} className={inputClass} /></label>
+        <label className="text-sm font-semibold text-text">{t('clients.form.contactPhone')}<input aria-label={t('clients.form.contactPhoneAria')} name="client-contact-phone" value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} className={inputClass} inputMode="tel" /></label>
         <label className="text-sm font-semibold text-text sm:col-span-2">{t('clients.form.notes')}<textarea aria-label={t('clients.form.notesAria')} name="client-notes" value={notes} onChange={(event) => setNotes(event.target.value)} className={`${inputClass} min-h-24 py-2`} /></label>
       </div>
     </div>}

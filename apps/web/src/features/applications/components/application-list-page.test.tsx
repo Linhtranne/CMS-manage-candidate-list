@@ -31,6 +31,16 @@ describe('ApplicationListPage', () => {
     expect(window.location.search).toContain('query=UV-0001');
   });
 
+  it('opens application history without crashing and renders the event timeline', async () => {
+    window.history.replaceState({}, '', '/applications?view=screening');
+    renderPage();
+
+    await userEvent.click(await screen.findByText('Đỗ Mai Lan'));
+    await userEvent.click(screen.getByRole('tab', { name: 'Lịch sử' }));
+
+    expect(screen.getByText('Tạo đơn ứng tuyển từ danh sách ghép ứng viên.')).toBeVisible();
+  });
+
   it('opens interview operations in a focused modal instead of below the fold', async () => {
     window.history.replaceState({}, '', '/applications?view=waiting-interview');
     renderPage();

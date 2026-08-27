@@ -5,7 +5,7 @@ const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
 const configuredApiOrigin = configuredApiBaseUrl && /^https?:\/\//i.test(configuredApiBaseUrl)
   ? new URL(configuredApiBaseUrl).origin
   : undefined;
-const connectSources = ["'self'", 'https:', ...(configuredApiOrigin ? [configuredApiOrigin] : [])].join(' ');
+const connectSources = ["'self'", 'https:', 'http://localhost:3100', ...(configuredApiOrigin ? [configuredApiOrigin] : [])].join(' ');
 
 const nextConfig: NextConfig = {
   output: 'standalone',

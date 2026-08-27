@@ -5,6 +5,7 @@ import { AuditWriter } from '../../audit/audit-writer.js';
 import { OutboxRepository } from '../../../platform/outbox/outbox.repository.js';
 import { InterviewDomainError, validateSchedule, type InterviewMode } from '../domain/interview.types.js';
 import type { ApplicationContext } from '../domain/application.types.js';
+import { NotificationService } from '../../notifications/application/notification.service.js';
 
 function jsonArray(value: Prisma.JsonValue): unknown[] { return Array.isArray(value) ? value : []; }
 type InterviewParticipantRow = { user: { id: string; displayName: string } };
@@ -12,7 +13,7 @@ type InterviewRow = { id: string; roundNo: number; scheduledAt: Date; scheduledE
 
 @Injectable()
 export class InterviewService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditWriter, private readonly outbox: OutboxRepository) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditWriter, private readonly outbox: OutboxRepository, private readonly notifications: NotificationService) {}
 
   async create(applicationId: string, input: { scheduledAt: Date; scheduledEndAt: Date; timeZone: string; mode: InterviewMode; meetingUrl?: string | null; location?: string | null; participants: string[] }, context: ApplicationContext) {
     validateSchedule(input);
@@ -41,6 +42,14 @@ export class InterviewService {
         await tx.interviewHistory.create({ data: { interviewId: interview.id, actorUserId: context.actorId, action: 'SCHEDULED', toStatus: 'SCHEDULED' } });
         await this.audit.append(tx, { action: 'INTERVIEW_SCHEDULED', entityType: 'Interview', entityId: interview.id, actorUserId: context.actorId, correlationId: context.correlationId, metadataJson: { applicationId, roundNo: round + 1 } });
         await this.outbox.append(tx, { eventType: 'interview.scheduled', aggregateType: 'Interview', aggregateId: interview.id, idempotencyKey: `interview.scheduled:${interview.id}`, correlationId: context.correlationId, payload: { applicationId, roundNo: round + 1 } });
+        await Promise.all(input.participants.map((userId) => this.notifications.create({
+          userId,
+          kind: 'INTERVIEW_SCHEDULED',
+          severity: 'WARNING',
+          params: { name: application.candidate.name },
+          href: `/applications?selectedId=${applicationId}`,
+          dedupeKey: `interview-notification:${interview.id}:${userId}`,
+        }, tx)));
         return this.map(interview);
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw new InterviewDomainError('INTERVIEW_ROUND_CONFLICT', 'errors.interviewRoundConflict', 409);
@@ -107,7 +116,7 @@ export class InterviewService {
   private applicationScope(context: ApplicationContext): Prisma.ApplicationWhereInput { return context.scope === 'TEAM' && context.teamId ? { teamId: context.teamId } : { ownerId: context.actorId }; }
 
   private async application(tx: Prisma.TransactionClient, id: string, context: ApplicationContext) {
-    const application = await tx.application.findFirst({ where: { id, ...this.applicationScope(context) }, select: { id: true, status: true } });
+    const application = await tx.application.findFirst({ where: { id, ...this.applicationScope(context) }, select: { id: true, status: true, candidate: { select: { name: true } } } });
     if (!application) throw new InterviewDomainError('APPLICATION_NOT_FOUND', 'errors.applicationNotFound', 404);
     return application;
   }

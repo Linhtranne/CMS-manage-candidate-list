@@ -58,7 +58,10 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   UserRole: 'UserRole',
+  EntityNote: 'EntityNote',
   Session: 'Session',
+  SavedView: 'SavedView',
+  Notification: 'Notification',
   AuditEvent: 'AuditEvent',
   OutboxEvent: 'OutboxEvent',
   JobAttempt: 'JobAttempt',
@@ -208,6 +211,18 @@ export const UserRoleScalarFieldEnum = {
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
+export const EntityNoteScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  content: 'content',
+  authorUserId: 'authorUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type EntityNoteScalarFieldEnum = (typeof EntityNoteScalarFieldEnum)[keyof typeof EntityNoteScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -221,6 +236,36 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const SavedViewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  teamId: 'teamId',
+  resource: 'resource',
+  name: 'name',
+  query: 'query',
+  visibility: 'visibility',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  severity: 'severity',
+  params: 'params',
+  href: 'href',
+  readAt: 'readAt',
+  dedupeKey: 'dedupeKey',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const AuditEventScalarFieldEnum = {

@@ -13,19 +13,19 @@ function renderPage() {
 describe('MailboxPage', () => {
   beforeEach(() => window.history.replaceState({}, '', '/mailbox'));
 
-  it('separates internal notes and supports an audited queued reply', async () => {
+  it('separates internal notes and keeps status notifications read-only', async () => {
     renderPage();
     await userEvent.click(screen.getByRole('tab', { name: 'Cần xử lý' }));
     await userEvent.click(await screen.findByText('Xác nhận lịch phỏng vấn'));
     expect(await screen.findByText('Ghi chú nội bộ')).toBeVisible();
-    const conversationDialog = screen.getByRole('dialog', { name: 'Chi tiết hộp thư chung' });
-    await userEvent.click(screen.getByRole('button', { name: 'Trả lời' }));
-    expect(await screen.findByRole('dialog', { name: 'Soạn email trả lời' })).toBeVisible();
-    expect(conversationDialog).toHaveAttribute('aria-hidden', 'true');
-    expect(conversationDialog).toHaveAttribute('inert');
-    await userEvent.type(screen.getByLabelText('Nội dung'), 'Cảm ơn bạn đã phản hồi.');
-    await userEvent.click(screen.getByRole('button', { name: 'Gửi email' }));
-    expect((await screen.findAllByText('Đang chờ gửi')).length).toBeGreaterThan(0);
+    expect(screen.getByRole('dialog', { name: 'Chi tiết hộp thư chung' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Trả lời' })).not.toBeInTheDocument();
+  });
+
+  it('does not render a redundant empty conversation panel', async () => {
+    renderPage();
+
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
   });
 
   it('opens conversation details in an animated modal and closes with Escape', async () => {

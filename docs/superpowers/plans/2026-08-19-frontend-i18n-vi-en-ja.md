@@ -442,9 +442,9 @@ git commit -m "chore(web): enforce zero hardcoded ui text"
 Run: `pnpm --filter @cms/web lint && pnpm --filter @cms/web typecheck && pnpm --filter @cms/web test && pnpm --filter @cms/web build`
 Expected: zero i18n violations, zero type/lint errors, all Vitest cases pass, all Next routes build.
 
-- [ ] **Step 2: Start the production server with MSW enabled**
+- [ ] **Step 2: Start the production server against the real local API**
 
-Run: `$env:NEXT_PUBLIC_MSW_ENABLED='true'; pnpm --filter @cms/web exec next start -p 4176`
+Run: `$env:NEXT_PUBLIC_MSW_ENABLED='false'; pnpm --filter @cms/web exec next start -p 4176`
 Expected: server listens on `http://127.0.0.1:4176`.
 
 - [ ] **Step 3: Verify shell, representative feature, modal and admin screens in each locale**

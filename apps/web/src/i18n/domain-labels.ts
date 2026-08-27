@@ -2,12 +2,17 @@ import type { Translate, TranslationKey } from './types';
 
 const domainLabelKeys = {
   emailStatus: {
+    DRAFT: 'mailbox.emailStatus.draft',
     RECEIVED: 'mailbox.emailStatus.received',
     QUEUED: 'mailbox.emailStatus.queued',
     SENDING: 'mailbox.emailStatus.sending',
+    RETRY_WAIT: 'mailbox.emailStatus.retryWait',
+    RECONCILING: 'mailbox.emailStatus.reconciling',
     SENT: 'mailbox.emailStatus.sent',
+    DELIVERED: 'mailbox.emailStatus.delivered',
     FAILED: 'mailbox.emailStatus.failed',
-    BOUNCED: 'mailbox.emailStatus.bounced'
+    BOUNCED: 'mailbox.emailStatus.bounced',
+    CANCELLED: 'mailbox.emailStatus.cancelled'
   },
   conversationStatus: {
     NEEDS_ACTION: 'mailbox.conversationStatus.needsAction',
@@ -30,6 +35,7 @@ const domainLabelKeys = {
   applicationStatus: {
     MATCHED: 'candidates.detail.applications.matched',
     IN_INTERVIEW_PROCESS: 'candidates.detail.applications.interviewing',
+    ON_HOLD: 'applications.profile.onHold',
     PASSED: 'candidates.detail.applications.passed',
     FAILED: 'applications.profile.fail',
     WITHDRAWN: 'applications.views.withdrawn',
@@ -37,15 +43,20 @@ const domainLabelKeys = {
   },
   orderStatus: {
     DRAFT: 'orders.status.draft',
+    OPEN: 'orders.status.recruiting',
     RECRUITING: 'orders.status.recruiting',
+    ON_HOLD: 'orders.status.paused',
     PAUSED: 'orders.status.paused',
     FILLED: 'orders.status.filled',
-    CLOSED: 'orders.status.closed'
+    CLOSED: 'orders.status.closed',
+    CANCELLED: 'orders.status.closed'
   },
   orderHealth: {
     UNDER_TARGET: 'orders.table.underTarget',
     INTERVIEW_DELAY: 'orders.table.interviewDelay',
     EXPIRING: 'orders.table.expiring',
+    RESULT_DELAY: 'orders.table.resultDelay',
+    CLIENT_PAUSED: 'orders.table.clientPaused',
     FILLED: 'orders.status.filled'
   },
   journeyHealth: {
@@ -115,13 +126,19 @@ const domainLabelKeys = {
   },
   auditSource: {
     UI: 'admin.audit.source',
-    EMAIL: 'mailbox.send.sent'
+    EMAIL: 'mailbox.send.sent',
+    API: 'admin.audit.sourceApi'
   },
   workSource: {
+    MANUAL: 'work.sourceTypes.manual',
     INTERVIEW_RESULT_DUE: 'work.sourceTypes.interviewResultDue',
     INTERVIEW_SCHEDULED: 'work.sourceTypes.interviewScheduled',
     CANDIDATE_EMAIL_REPLY: 'work.sourceTypes.candidateEmailReply',
-    MILESTONE_BLOCKED: 'work.sourceTypes.milestoneBlocked'
+    MILESTONE_BLOCKED: 'work.sourceTypes.milestoneBlocked',
+    APPLICATION: 'work.sourceTypes.application',
+    JOURNEY_MILESTONE: 'work.sourceTypes.journeyMilestone',
+    ORDER: 'work.sourceTypes.order',
+    CANDIDATE: 'work.sourceTypes.candidate'
   },
   milestoneName: {
     OFFER_ACCEPTED: 'catalog.milestone.offerAccepted',
@@ -153,6 +170,11 @@ const domainLabelKeys = {
     'Cung ứng ngành chăm sóc': 'templateNames.careSupply'
   },
   candidateNextAction: {
+    REVIEW_PROFILE: 'catalog.nextAction.review',
+    FOLLOW_UP_INTERVIEW: 'catalog.nextAction.followInterview',
+    START_SUPPLY_JOURNEY: 'catalog.nextAction.followJourney',
+    COMPLETE_DOCUMENTS: 'catalog.nextAction.supplementCoe',
+    MONITOR_ONBOARDING: 'catalog.nextAction.followOnboarding',
     'Rà soát hồ sơ': 'catalog.nextAction.review',
     'Rà soát hồ sơ import': 'catalog.nextAction.reviewImport',
     'Sàng lọc hồ sơ': 'catalog.nextAction.screen',
@@ -203,13 +225,19 @@ const domainLabelKeys = {
     applications: 'reportFunnelStages.applications',
     interviewed: 'reportFunnelStages.interviewed',
     passed: 'reportFunnelStages.passed',
-    supplied: 'reportFunnelStages.supplied'
+    supplied: 'reportFunnelStages.supplied',
+    MATCHED: 'reportDimensions.matched',
+    IN_INTERVIEW_PROCESS: 'reportDimensions.inInterviewProcess',
+    ON_HOLD: 'reportDimensions.onHold',
+    PASSED: 'reportFunnelStages.passed',
+    FAILED: 'reportDimensions.failed',
+    WITHDRAWN: 'reportDimensions.withdrawn'
   }
 } as const satisfies Record<string, Record<string, TranslationKey>>;
 
 export type DomainLabelGroup = keyof typeof domainLabelKeys;
 
-export function getDomainLabel(t: Translate, group: DomainLabelGroup, code: string): string {
+export function getDomainLabel(t: Translate, group: DomainLabelGroup, code: string, fallback?: TranslationKey): string {
   const key = (domainLabelKeys[group] as Record<string, TranslationKey>)[code];
-  return key ? t(key) : code;
+  return key ? t(key) : fallback ? t(fallback) : code;
 }

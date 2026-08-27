@@ -26,3 +26,18 @@ export class AssignTaskDto {
   @IsString() assigneeUserId!: string;
   @IsOptional() @IsString() teamId?: string | null;
 }
+
+/** Compatibility payload used by the web work-item surface. */
+export class CreateWorkItemDto {
+  @IsString() @MinLength(1) @MaxLength(240) title!: string;
+  @IsEnum(['URGENT', 'HIGH', 'NORMAL']) priority!: 'URGENT' | 'HIGH' | 'NORMAL';
+  @IsDateString() dueAt!: string;
+  @IsString() candidateId!: string;
+  @IsOptional() @IsString() orderId?: string | null;
+  @IsOptional() @IsString() clientId?: string | null;
+  @IsOptional() @IsString() @MaxLength(2000) notes?: string | null;
+  @IsOptional() @IsString() assigneeId?: string;
+  @IsOptional() @IsEnum(TASK_WAITING_ON) waitingOn?: string | null;
+  @IsOptional() @IsString() referenceEntityType?: string;
+  @IsOptional() @IsString() referenceEntityId?: string;
+}

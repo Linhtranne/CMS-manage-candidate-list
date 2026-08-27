@@ -91,19 +91,23 @@ export class CandidatesController {
 function serializeCandidate(candidate: CandidateEntity) {
   const profile = candidate.profiles.find((entry) => entry.status !== 'ARCHIVED') ?? candidate.profiles[0];
   return {
-    id: candidate.id, code: candidate.code, name: candidate.name, industryLabels: candidate.industryLabels, occupation: candidate.occupation,
+    id: candidate.id, code: candidate.code, name: candidate.name, industryLabels: candidate.industryLabels, occupation: candidate.occupation, source: candidate.source,
     japaneseLevel: candidate.japaneseLevel, recordStatus: candidate.recordStatus, readinessStatus: candidate.readinessStatus,
-    contactabilityStatus: candidate.contactabilityStatus, operationalPhase: 'POTENTIAL', owner: { id: candidate.ownerId, name: candidate.ownerName ?? candidate.ownerId },
-    lastActivityAt: candidate.updatedAt.toISOString(), nextAction: 'REVIEW_PROFILE', applicationCount: 0, hasActiveJourney: false,
-    isPossibleDuplicate: false, version: candidate.version, emailMasked: maskEmail(candidate.email), phoneMasked: maskPhone(candidate.phone),
+    contactabilityStatus: candidate.contactabilityStatus, operationalPhase: candidate.operationalPhase ?? 'POTENTIAL', owner: { id: candidate.ownerId, name: candidate.ownerName ?? candidate.ownerId },
+    lastActivityAt: candidate.updatedAt.toISOString(), nextAction: candidate.nextAction ?? 'REVIEW_PROFILE', applicationCount: candidate.applicationCount ?? 0, hasActiveJourney: candidate.hasActiveJourney ?? false,
+    isPossibleDuplicate: candidate.isPossibleDuplicate ?? false, version: candidate.version, emailMasked: maskEmail(candidate.email), phoneMasked: maskPhone(candidate.phone),
+    skills: candidate.skills ?? profile?.skills ?? [], yearsExperience: candidate.yearsExperience ?? profile?.yearsExperience ?? 0, desiredLocation: candidate.desiredLocation ?? profile?.desiredLocation ?? null,
+    missingDocumentCount: candidate.missingDocumentCount ?? 0,
     ...(profile ? { profile: { industryLabel: profile.industryLabel, occupation: profile.occupation, yearsExperience: profile.yearsExperience, skills: profile.skills } } : {}),
   };
 }
 
 function serializeDetail(candidate: CandidateEntity) {
   return {
-    ...serializeCandidate(candidate), email: null, phone: null, address: null,
+    ...serializeCandidate(candidate),
     occupationProfiles: candidate.profiles.map((profile) => ({ industryLabel: profile.industryLabel, occupation: profile.occupation, yearsExperience: profile.yearsExperience, skills: profile.skills, status: profile.status })),
-    applications: [], journeys: [], emailCount: candidate.email ? 1 : 0, files: [], notes: [], history: [],
+    email: candidate.email ?? null, phone: candidate.phone ?? null, passportNumber: candidate.passportNumber ?? null, address: candidate.address ?? null,
+    applications: (candidate.applications ?? []).map((application) => ({ ...application, candidate: { id: candidate.id, code: candidate.code, name: candidate.name } })),
+    journeys: candidate.journeys ?? [], emailCount: candidate.emailCount ?? 0, files: candidate.files ?? [], notes: candidate.notes ?? [], history: candidate.history ?? [],
   };
 }

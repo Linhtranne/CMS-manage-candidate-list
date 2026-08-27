@@ -27,7 +27,7 @@ macOS/Linux:
 cp .env.example .env
 ```
 
-Local mặc định dùng API thật ở `http://localhost:3100/api/v1`, PostgreSQL/Redis trong Docker, OIDC tắt, mailbox provider `DISABLED`, và MSW tắt. Không đặt credential production vào `.env`.
+Local mặc định dùng API thật ở `http://localhost:3100/api/v1`, PostgreSQL/Redis trong Docker, OIDC tắt, mailbox provider `FAKE` (không gửi mail ra ngoài), queue worker/scheduler local và MSW tắt. Không đặt credential production vào `.env`.
 
 ### 2. Cài dependency và khởi động database
 
@@ -42,6 +42,7 @@ docker compose up -d postgres redis
 pnpm --filter @cms/api db:migrate:deploy
 pnpm --filter @cms/api db:migrate:status
 pnpm --filter @cms/api db:seed:local
+pnpm --filter @cms/api db:seed:local-data
 ```
 
 Seed mặc định là repeatable và chỉ dành cho local. Tài khoản mặc định:
@@ -51,8 +52,17 @@ Lệnh seed cũng tạo một interview-question template local ở trạng thá
 | Email | Password | Role |
 | --- | --- | --- |
 | `admin@local.test` | `LocalOnly-2026!` | `MANAGER`, `CONFIG_ADMIN` |
+| `demo.admin@local.test` | `LocalDemo-2026!` | `CONFIG_ADMIN`, `MANAGER` |
+| `demo.manager@local.test` | `LocalDemo-2026!` | `MANAGER` |
+| `demo.recruiter@local.test` | `LocalDemo-2026!` | `RECRUITER` |
+| `demo.coordinator@local.test` | `LocalDemo-2026!` | `JAPAN_COORDINATOR` |
+| `demo.business@local.test` | `LocalDemo-2026!` | `BUSINESS` |
+
+`db:seed:local-data` nạp bộ dữ liệu nghiệp vụ repeatable để review UI: 4 khách hàng, 4 đơn tuyển, 8 ứng viên, 6 hồ sơ ứng tuyển, 3 lịch phỏng vấn, mailbox, supply journey, task, tài liệu và dữ liệu báo cáo. Seed chỉ thêm/cập nhật bản ghi local; lịch sử/audit append-only của các lần chạy trước được giữ nguyên theo policy bảo toàn truy vết.
 
 Có thể đổi tài khoản seed bằng `LOCAL_AUTH_EMAIL`, `LOCAL_AUTH_PASSWORD`, `LOCAL_AUTH_DISPLAY_NAME` và `LOCAL_AUTH_ROLES` trong `.env`, sau đó chạy lại `db:seed:local`.
+
+Nếu đổi `MAIL_SENDER_ADDRESS` cho SES, chạy lại `pnpm --filter @cms/api db:seed:local-data` để mailbox demo dùng đúng địa chỉ From (seed vẫn giữ provider `FAKE` cho tới khi bạn chủ động chuyển adapter).
 
 Ví dụ tạo recruiter local bằng PowerShell:
 
@@ -68,7 +78,7 @@ Remove-Item Env:LOCAL_AUTH_EMAIL,Env:LOCAL_AUTH_PASSWORD,Env:LOCAL_AUTH_DISPLAY_
 ### 4. Build và chạy web/API
 
 ```bash
-docker compose up -d --build api web
+docker compose --profile queue up -d --build api web worker scheduler
 docker compose ps
 ```
 
@@ -157,7 +167,9 @@ Sau reset, chạy lại bước migration và seed ở trên.
 
 - `.env.example` chỉ chứa giá trị development an toàn; `.env` không được commit.
 - Local login là email/password. OIDC không cần để chạy local và không xuất hiện trên màn hình login.
-- `MAIL_PROVIDER=DISABLED` là mặc định an toàn. Provider thật cần approval record tương ứng.
+- Local dùng `MAIL_PROVIDER=FAKE`, chỉ lưu/đẩy mail synthetic qua worker, không gửi ra Internet. `MAIL_MODE=NOTIFICATION_ONLY` là mặc định: trạng thái ứng tuyển/lịch phỏng vấn có thể tạo email một chiều từ `MAIL_SENDER_ADDRESS`, còn reply, inbound ingest, soạn thư và liên kết thủ công đều bị khóa.
+- `MAIL_SENDER_ADDRESS` phải là địa chỉ `noreply` thuộc miền công ty khi triển khai thật. Provider thật vẫn cần adapter cụ thể, credential, DNS mail (SPF/DKIM/DMARC) và approval record DEC-003; khi thiếu bất kỳ điều kiện nào hệ thống giữ fail-closed.
+- Khi đã có SES SMTP credential, xem [hướng dẫn setup SES + Nodemailer local](docs/backend/decisions/DEC-003-local-ses-setup.md). Không commit SMTP password; local seed vẫn dùng `FAKE` cho tới khi bạn chủ động đổi provider.
 - Catalog production, document storage, bulk export, purge, break-glass và các tính năng rủi ro cao chỉ bật khi có approval artifact đúng decision register.
 - API không tự chạy migration khi boot; migration là release/local step riêng.
 
@@ -175,6 +187,10 @@ docs/backend/             Contract, security, release gates và phase plans
 
 Tài liệu chính:
 
+- [Hướng dẫn sử dụng HTML tự chứa có ảnh](./presentation/candidate-cms-presentation.html)
+- [Bản nguồn Markdown](./docs/USER_GUIDE.md)
+- [Thiết kế Figma chính · cập nhật toàn bộ UI](https://www.figma.com/design/YAg8I8FmOutAuUQGTBznFp)
+- [Figma bản tham chiếu UI coverage](https://www.figma.com/design/3ANKdwAmkgK6Bm7LcqgmP4)
 - [PRODUCT.md](./PRODUCT.md)
 - [Tổng quan sản phẩm](./docs/00-tong-quan.md)
 - [Backend Production Handoff](./docs/backend/README.md)

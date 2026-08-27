@@ -15,8 +15,8 @@ export interface ClientMutationEffects {
   outbox(transaction: unknown, input: { eventType: string; aggregateId: string; correlationId: string }): Promise<void>;
 }
 
-function copyForResponse(entity: ClientEntity): ClientEntity {
-  return { ...entity, contact: entity.contact ? maskClientContact(entity.contact) : null };
+function copyForResponse(entity: ClientEntity, revealContact = false): ClientEntity {
+  return { ...entity, contact: entity.contact && !revealContact ? maskClientContact(entity.contact) : entity.contact };
 }
 
 function assertClientInput(input: { name: string; organizationType: string; industryLabels: string[]; region: string; ownerId: string }): void {
@@ -51,10 +51,10 @@ export class ClientService {
     });
   }
 
-  async get(id: string): Promise<ClientEntity> {
+  async get(id: string, options: { revealContact?: boolean } = {}): Promise<ClientEntity> {
     const entity = await this.repository.findById(id);
     if (!entity) throw new OrderDomainError('CLIENT_NOT_FOUND', 'errors.clientNotFound', 404);
-    return copyForResponse(entity);
+    return copyForResponse(entity, options.revealContact === true);
   }
 
   async update(id: string, input: { name?: string; organizationType?: string; industryLabels?: string[]; region?: string; ownerId?: string; teamId?: string | null; contact?: ClientContact | null; notes?: string | null; status?: ClientStatus }, expectedVersion: number, context: OrderCommandContext): Promise<ClientEntity> {
@@ -86,7 +86,7 @@ export class ClientService {
     const limit = boundedLimit(filter.limit);
     const rows = await this.repository.list({ ...filter, limit: limit + 1 });
     const hasMore = rows.length > limit;
-    const items = rows.slice(0, limit).map(copyForResponse);
+    const items = rows.slice(0, limit).map((entity) => copyForResponse(entity));
     const last = items.at(-1);
     return { items, page: { hasMore, nextCursor: hasMore && last ? encodeCursor({ sortValue: last.updatedAt.toISOString(), id: last.id }) : null } };
   }

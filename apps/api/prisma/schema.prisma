@@ -23,6 +23,7 @@ model Team {
   candidates Candidate[] @relation("CandidateTeam")
   candidateImports CandidateImportBatch[] @relation("ImportTeam")
   applications Application[] @relation("ApplicationTeam")
+  savedViews SavedView[] @relation("SavedViewTeam")
 
   @@map("teams")
 }
@@ -56,6 +57,9 @@ model User {
   duplicateResolutions CandidateDuplicateCase[] @relation("DuplicateResolver")
   mergeActions CandidateMergeAlias[] @relation("MergeActor")
   emailMatchDecisions EmailMatchDecision[] @relation("EmailMatchResolver")
+  savedViews SavedView[] @relation("SavedViewOwner")
+  entityNotes EntityNote[] @relation("EntityNoteAuthor")
+  notifications Notification[] @relation("NotificationRecipient")
 
   @@index([teamId])
   @@map("users")
@@ -127,6 +131,21 @@ model UserRole {
   @@map("user_roles")
 }
 
+model EntityNote {
+  id           String   @id @default(uuid()) @db.Uuid
+  entityType   String   @map("entity_type") @db.VarChar(64)
+  entityId     String   @map("entity_id") @db.Uuid
+  content      String   @db.VarChar(5000)
+  authorUserId String   @map("author_user_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  author User @relation("EntityNoteAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt, id])
+  @@index([authorUserId, createdAt])
+  @@map("entity_notes")
+}
+
 model Session {
   id               String    @id @default(uuid()) @db.Uuid
   userId           String    @map("user_id") @db.Uuid
@@ -144,6 +163,44 @@ model Session {
   @@index([userId, expiresAt])
   @@index([expiresAt, revokedAt])
   @@map("sessions")
+}
+
+model SavedView {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  teamId     String?  @map("team_id") @db.Uuid
+  resource   String   @db.VarChar(80)
+  name       String   @db.VarChar(160)
+  query      Json
+  visibility String   @db.VarChar(16)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner User  @relation("SavedViewOwner", fields: [userId], references: [id], onDelete: Cascade)
+  team  Team? @relation("SavedViewTeam", fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, resource, name])
+  @@index([userId, resource, visibility])
+  @@index([teamId, resource, visibility])
+  @@map("saved_views")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  kind      String    @db.VarChar(64)
+  severity  String    @default("INFO") @db.VarChar(16)
+  params    Json      @default("{}")
+  href      String?   @db.VarChar(500)
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  dedupeKey String    @unique @map("dedupe_key") @db.VarChar(320)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt, id])
+  @@index([userId, createdAt, id])
+  @@map("notifications")
 }
 
 model AuditEvent {

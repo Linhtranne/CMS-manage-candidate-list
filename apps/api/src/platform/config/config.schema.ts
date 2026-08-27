@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 
 export type NodeEnvironment = 'development' | 'test' | 'staging' | 'production';
 export type MailProvider = 'DISABLED' | 'FAKE' | 'MICROSOFT_GRAPH' | 'GMAIL_API' | 'SMTP_IMAP';
+export type MailMode = 'NOTIFICATION_ONLY' | 'INTERACTIVE';
 
 export interface ConfigIssue {
   field: string;
@@ -14,6 +15,14 @@ export interface MailOperationalPolicy {
   maxConcurrency: number;
   maxAttempts: number;
   retryWindowSeconds: number;
+}
+
+export interface MailSmtpConfig {
+  endpoint: string | null;
+  port: number;
+  secure: boolean;
+  username: string | null;
+  password: string | null;
 }
 
 export interface ActivationGateConfig {
@@ -101,18 +110,21 @@ export interface RuntimeConfig {
   };
   mail: {
     provider: MailProvider;
+    mode: MailMode;
+    senderAddress: string | null;
     enabled: boolean;
     approvalFile: string | null;
     approved: boolean;
     canaryOnly: boolean;
     canaryRecipients: string[];
     operationalPolicy: MailOperationalPolicy | null;
+    smtp: MailSmtpConfig;
   };
 }
 
 const DEFAULTS = {
   appOrigin: 'http://localhost:3000',
-  databaseUrl: 'postgresql://localhost:5432/cms_candidate_supply',
+  databaseUrl: 'postgresql://cms_owner:cms_owner_dev@localhost:5432/cms_candidate_supply',
   redisUrl: 'redis://localhost:6379',
   encryptionKey: 'development-only-encryption-key-32',
   sessionSecret: 'development-only-session-secret-32',
@@ -473,7 +485,21 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
   const mailProviders: readonly MailProvider[] = ['DISABLED', 'FAKE', 'MICROSOFT_GRAPH', 'GMAIL_API', 'SMTP_IMAP'];
   if (!mailProviders.includes(rawMailProvider as MailProvider)) issue(issues, 'MAIL_PROVIDER', 'is not supported');
   const mailProvider = mailProviders.includes(rawMailProvider as MailProvider) ? rawMailProvider as MailProvider : 'DISABLED';
+  const rawMailMode = value(env, 'MAIL_MODE') ?? 'NOTIFICATION_ONLY';
+  const mailModes: readonly MailMode[] = ['NOTIFICATION_ONLY', 'INTERACTIVE'];
+  if (!mailModes.includes(rawMailMode as MailMode)) issue(issues, 'MAIL_MODE', 'is not supported');
+  const mailMode = mailModes.includes(rawMailMode as MailMode) ? rawMailMode as MailMode : 'NOTIFICATION_ONLY';
+  const mailSenderAddress = value(env, 'MAIL_SENDER_ADDRESS');
+  if (mailSenderAddress && (mailSenderAddress.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mailSenderAddress))) {
+    issue(issues, 'MAIL_SENDER_ADDRESS', 'must be a valid email address');
+  }
   if (mailProvider === 'FAKE' && strictSecrets) issue(issues, 'MAIL_PROVIDER', 'FAKE is allowed only in development or test');
+  const smtpEndpoint = value(env, 'SES_SMTP_ENDPOINT') ?? value(env, 'SMTP_HOST') ?? null;
+  const smtpPort = parseBoundedInteger(value(env, 'SES_SMTP_PORT') ?? value(env, 'SMTP_PORT'), 'SES_SMTP_PORT', 587, 1, 65_535, issues);
+  const smtpSecure = parseBoolean(value(env, 'SES_SMTP_SECURE') ?? value(env, 'SMTP_SECURE'), 'SES_SMTP_SECURE', false, issues);
+  const smtpUsername = value(env, 'SES_SMTP_USERNAME') ?? value(env, 'SMTP_USER') ?? null;
+  const smtpPasswordFromEnv = value(env, 'SES_SMTP_PASSWORD') ?? value(env, 'SMTP_PASS') ?? null;
+  const smtpPasswordFile = value(env, 'SES_SMTP_PASSWORD_FILE') ?? null;
   const mailApprovalFile = value(env, 'MAIL_PROVIDER_APPROVAL_RECORD_FILE');
   const mailApproval = mailProvider === 'DISABLED'
     ? { approved: true, operationalPolicy: null }
@@ -481,6 +507,25 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
       ? { approved: true, operationalPolicy: SYNTHETIC_MAIL_OPERATIONAL_POLICY }
     : readMailApprovalRecord(mailApprovalFile, nodeEnv, mailProvider, issues);
   const mailApproved = mailApproval.approved;
+  let smtpPasswordFromFile: string | null = null;
+  if (mailProvider === 'SMTP_IMAP' && smtpPasswordFile) {
+    try {
+      smtpPasswordFromFile = readFileSync(smtpPasswordFile, 'utf8').trim() || null;
+      if (!smtpPasswordFromFile) issue(issues, 'SES_SMTP_PASSWORD_FILE', 'must contain a non-empty secret');
+    } catch {
+      issue(issues, 'SES_SMTP_PASSWORD_FILE', 'must be a readable secret file');
+    }
+  }
+  const smtpPassword = strictSecrets ? smtpPasswordFromFile : smtpPasswordFromEnv ?? smtpPasswordFromFile;
+  if (mailProvider === 'SMTP_IMAP' && mailApproved) {
+    if (!smtpEndpoint) issue(issues, 'SES_SMTP_ENDPOINT', 'is required for approved SMTP_IMAP');
+    else if (!/^email-smtp\.[a-z0-9-]+\.amazonaws\.com$/i.test(smtpEndpoint)) issue(issues, 'SES_SMTP_ENDPOINT', 'must be an Amazon SES SMTP endpoint');
+    if (!smtpUsername) issue(issues, 'SES_SMTP_USERNAME', 'is required for approved SMTP_IMAP');
+    if (strictSecrets && smtpPasswordFromEnv) issue(issues, 'SES_SMTP_PASSWORD', 'raw SMTP passwords are not allowed in staging/production; use SES_SMTP_PASSWORD_FILE');
+    if (strictSecrets && !smtpPasswordFile) issue(issues, 'SES_SMTP_PASSWORD_FILE', 'is required for approved SMTP_IMAP outside local development');
+    if (!smtpPassword) issue(issues, strictSecrets ? 'SES_SMTP_PASSWORD_FILE' : 'SES_SMTP_PASSWORD', 'is required for approved SMTP_IMAP');
+    if (smtpPort === 25) issue(issues, 'SES_SMTP_PORT', 'port 25 is not allowed for application SMTP delivery');
+  }
   const canaryRecipients = parseCanaryRecipients(value(env, 'MAIL_CANARY_RECIPIENTS'), issues);
   const canaryOnly = nodeEnv === 'staging' && mailProvider !== 'DISABLED';
   if (canaryOnly && canaryRecipients.length === 0) issue(issues, 'MAIL_CANARY_RECIPIENTS', 'is required when a staging mail provider is enabled');
@@ -623,6 +668,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
     },
     malwareScanner: { endpoint: malwareScannerEndpoint ?? null, timeoutMs: malwareScannerTimeoutMs },
     security: { encryptionKey, sessionSecret, secureCookies },
-    mail: { provider: mailProvider, enabled: mailProvider !== 'DISABLED' && mailApproved, approvalFile: mailApprovalFile ?? null, approved: mailApproved, canaryOnly, canaryRecipients, operationalPolicy: mailApproval.operationalPolicy },
+    mail: {
+      provider: mailProvider,
+      mode: mailMode,
+      senderAddress: mailSenderAddress ?? null,
+      enabled: mailProvider !== 'DISABLED' && mailApproved,
+      approvalFile: mailApprovalFile ?? null,
+      approved: mailApproved,
+      canaryOnly,
+      canaryRecipients,
+      operationalPolicy: mailApproval.operationalPolicy,
+      smtp: { endpoint: smtpEndpoint, port: smtpPort, secure: smtpSecure, username: smtpUsername, password: smtpPassword },
+    },
   };
 }

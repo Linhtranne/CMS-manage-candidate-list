@@ -33,6 +33,28 @@ export class ConversationsController {
     return { data: { items: result.items }, page: result.page, requestId: getRequestContext()?.requestId ?? 'unknown-request' };
   }
 
+  @Get('templates')
+  @RequirePermission('email.read', 'NORMAL')
+  async templates() {
+    const rows = await this.prisma.interviewQuestionTemplateVersion.findMany({
+      where: { status: { not: 'RETIRED' } },
+      include: { template: { select: { name: true } } },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+    });
+    const items = rows.map((row) => {
+      const raw = Array.isArray(row.questions) ? row.questions[0] : row.questions;
+      const payload = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+      return {
+        id: row.id,
+        name: row.template.name,
+        subject: typeof payload.subject === 'string' ? payload.subject : '',
+        body: typeof payload.body === 'string' ? payload.body : typeof payload.previewText === 'string' ? payload.previewText : '',
+        variables: Array.isArray(payload.variables) ? payload.variables.filter((value): value is string => typeof value === 'string') : [],
+      };
+    });
+    return { data: { items }, page: { hasMore: false, nextCursor: null }, requestId: getRequestContext()?.requestId ?? 'unknown-request' };
+  }
+
   @Get(':id')
   @RequirePermission('email.read', 'NORMAL')
   async get(@Param('id') id: string, @Req() request: AuthenticatedRequest) {

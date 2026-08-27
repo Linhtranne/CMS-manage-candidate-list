@@ -7,6 +7,7 @@ import { AuthController } from './http/auth.controller.js';
 import { CurrentUserController } from './http/current-user.controller.js';
 import { AdminCompatibilityController } from './http/admin-compatibility.controller.js';
 import { PolicyController } from './http/policy.controller.js';
+import { WorkspaceSearchController } from './http/workspace-search.controller.js';
 import { CsrfGuard } from './http/guards/csrf.guard.js';
 import { PolicyGuard } from './http/guards/policy.guard.js';
 import { SessionGuard } from './http/guards/session.guard.js';
@@ -14,7 +15,7 @@ import { OIDC_FETCH, OidcAdapter } from './infrastructure/oidc.adapter.js';
 
 @Module({
   imports: [DatabaseModule, CommandPlatformModule],
-  controllers: [AuthController, CurrentUserController, PolicyController, AdminCompatibilityController],
+  controllers: [AuthController, CurrentUserController, PolicyController, AdminCompatibilityController, WorkspaceSearchController],
   providers: [
     PolicyService,
     SessionService,
